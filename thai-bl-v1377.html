@@ -4428,6 +4428,10 @@ function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(!n
 
 
 // ══ DD CATALOG CMS ══
+var ddData=(function(){try{const r=localStorage.getItem('thaiBL-dd');if(r)return JSON.parse(r);}catch(e){}return[];})();
+function ddSaveData(){try{localStorage.setItem('thaiBL-dd',JSON.stringify(ddData));}catch(e){}}
+function ddBuildFilters(){}
+function ddRenderGrid(){}
 function ddCmsBuildList(){
   const el=document.getElementById('dd-cms-list');if(!el)return;
   el.innerHTML='';
