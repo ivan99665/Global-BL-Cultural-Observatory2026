@@ -515,6 +515,8 @@ body.cursor-active{cursor:none;}
 .snt{display:flex;padding-right:160px;}
 .sn{flex:1;padding:.85rem .5rem;font-family:var(--mono);font-size:.88rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faded);background:none;border:none;cursor:pointer;border-right:1px solid rgba(184,107,48,.06);transition:all .3s;position:relative;}
 .sn:last-child{border-right:none;}
+@media(max-width:768px){.snt{padding-right:0;}.sn{font-size:.72rem;letter-spacing:.04em;padding:.7rem .3rem;}}
+@media(max-width:480px){.sn{font-size:.62rem;letter-spacing:0;padding:.65rem .2rem;}}
 .sn.on{color:var(--amber);}
 .sn.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--amber);}
 .sn:hover{color:var(--cream);}
@@ -829,7 +831,7 @@ body.cursor-active{cursor:none;}
 @media(max-width:1100px){.flip-grid{grid-template-columns:repeat(4,1fr);}}
 @media(max-width:700px){.flip-grid{grid-template-columns:repeat(2,1fr);}}
 .fcard{height:380px;perspective:1200px;cursor:pointer;}
-.fcard-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
+.fcard-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;-webkit-transform-style:preserve-3d;}
 .fcard:hover .fcard-inner{transform:rotateY(180deg);}
 /* Also allow touch */
 .fcard.flipped .fcard-inner{transform:rotateY(180deg);}
@@ -1805,13 +1807,13 @@ body.theme-global .nav-tab.active::after{background:var(--bud-wine);}
   gap:1.2rem;max-width:1000px;margin:0 auto;
 }
 .bud-flip-wrap{height:280px;perspective:1000px;cursor:pointer;}
-.bud-flip-wrap:hover .bud-flip-inner{transform:rotateY(180deg);}
+.bud-flip-wrap:hover .bud-flip-inner,.bud-flip-wrap.flipped .bud-flip-inner{transform:rotateY(180deg);}
 .bud-flip-inner{
   position:relative;width:100%;height:100%;
-  transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);
 }
 .bud-flip-front,.bud-flip-back{
-  position:absolute;inset:0;backface-visibility:hidden;
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   border:1px solid var(--bud-frame);border-radius:4px;
   padding:1.4rem;display:flex;flex-direction:column;justify-content:space-between;
 }
@@ -8636,6 +8638,28 @@ flipBgInit();
     requestAnimationFrame(loop);
   }
   loop();
+})();
+</script>
+<script>
+/* Touch toggle for flip cards on mobile */
+(function(){
+  function addTouchFlip(sel,cls){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.addEventListener('touchend',function(e){
+        e.preventDefault();
+        el.classList.toggle(cls);
+      },{passive:false});
+    });
+  }
+  /* .bud-flip-wrap uses .flipped class */
+  addTouchFlip('.bud-flip-wrap','flipped');
+  /* .fcard already has onclick toggle but also support touch explicitly */
+  document.querySelectorAll('.fcard').forEach(function(el){
+    el.addEventListener('touchend',function(e){
+      e.preventDefault();
+      el.classList.toggle('flipped');
+    },{passive:false});
+  });
 })();
 </script>
 </body>
