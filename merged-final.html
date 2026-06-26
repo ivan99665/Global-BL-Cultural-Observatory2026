@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
 <script>
-/* 首次進入才播開場動畫，F5 重整跳過 */
+/* 每次進入都直接定位到內容區，跳過 hero 動畫捲動 */
 (function(){
-  if(sessionStorage.getItem('siteVisited')){
-    document.documentElement.classList.add('skip-hero');
-  }
-  sessionStorage.setItem('siteVisited','1');
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  document.addEventListener('DOMContentLoaded',function(){
+    var a=document.getElementById('tab-anchor');
+    if(a) window.scrollTo(0,a.offsetTop);
+  });
 })();
 </script>
 <style>
@@ -5332,7 +5333,7 @@ const HP_WM_DATA = {
     works:[
       {title:'陳情令',en:'The Untamed',year:'2019',desc:'《魔道祖師》真人化，肖戰與王一博主演，官方定位「兄弟情」卻引發全球耽美熱潮。',img:'map/The Untamed01.jpg',imgs:['map/The Untamed01.jpg','map/The Untamed02.webp','map/The Untamed03.webp'],platforms:[{cls:'plat-ott',label:'▶ 愛奇藝國際版'},{cls:'plat-intl',label:'🌐 Netflix 部分地區'}],yt:'https://www.youtube.com/watch?v=6gHxH8V7STM'},
       {title:'天官賜福',en:'Heaven Official\'s Blessing',year:'2020',desc:'MXTX 原著動畫化，花城與謝憐的深情在精緻作畫下打動無數海外觀眾。',img:"map/Heaven Official's Blessing01.webp",imgs:["map/Heaven Official's Blessing01.webp","map/Heaven Official's Blessing02.jpeg","map/Heaven Official's Blessing03.jpeg"],platforms:[{cls:'plat-ott',label:'▶ bilibili 國際版'},{cls:'plat-yt',label:'▶ YouTube 官方'}],yt:'https://www.youtube.com/watch?v=aRhaKwvM360'},
-      {title:'逆愛',en:'Revenged Love',year:'2023',desc:'典型「環大陸」製作——由中國團隊操刀，迴避大陸上映，採 YouTube 官方頻道與海外平台優先播出，讓同性情感得以正面呈現。',img:'map/Revenged Love01.jpg',imgs:['map/Revenged Love01.jpg','map/Revenged Love02.jpg','map/Revenged Love03.jpg'],platforms:[{cls:'plat-env',label:'⊙ 環大陸模式'},{cls:'plat-yt',label:'▶ YouTube 官方頻道'},{cls:'plat-intl',label:'🌐 海外平台'}],note:'因中國題材禁令，本劇不在大陸平台上架，是環大陸播出模式的代表案例。',yt:'https://www.youtube.com/watch?v=2u3Qj_SpaGU'},
+      {title:'逆愛',en:'Revenged Love',year:'2025',desc:'典型「環大陸」製作——由中國團隊操刀，迴避大陸上映，採 YouTube 官方頻道與海外平台優先播出，讓同性情感得以正面呈現。',img:'map/Revenged Love01.jpg',imgs:['map/Revenged Love01.jpg','map/Revenged Love02.jpg','map/Revenged Love03.jpg'],platforms:[{cls:'plat-env',label:'⊙ 環大陸模式'},{cls:'plat-yt',label:'▶ YouTube 官方頻道'},{cls:'plat-intl',label:'🌐 海外平台'}],note:'因中國題材禁令，本劇不在大陸平台上架，是環大陸播出模式的代表案例。',yt:'https://www.youtube.com/watch?v=2u3Qj_SpaGU'},
     ],
     monetize:{model:'禁忌悖論 · Censorship Paradox',steps:['廣電全面封鎖同性影視，強制改編為「兄弟情」','粉絲發展精密解碼文化，自行腦補情感還原','補償心理激發瘋狂消費——周邊、二創、聯名','「環大陸」模式：YouTube／海外 OTT 廣告收益反哺製作','拍攝地旅遊暴利：《陳情令》帶動數十億人民幣產值'],desc:'禁忌非但沒有消滅欲望，反而放大了粉絲的補償性消費能量。「環大陸」播出模式讓部分作品得以繞過審查在全球華語市場直接變現——這是中國市場獨有的悖論邏輯。'}
   },
@@ -5382,8 +5383,8 @@ const HP_WM_DATA = {
     works:[
       {title:'以你的心詮釋我的愛',en:'I Told Sunset About You',year:'2020',desc:'Nadao Bangkok 精品 BL，普吉島夕陽下的純愛美學，改變了整個類型劇的視覺標準。',img:'map/I Told Sunset About You01.jpg',imgs:['map/I Told Sunset About You01.jpg','map/I Told Sunset About You02.png','map/I Told Sunset About You03.png'],yt:'https://www.youtube.com/watch?v=x7ts_4tL0cQ'},
       {title:'KinnPorsche',en:'KinnPorsche The Series',year:'2022',desc:'電影等級黑幫 BL，Mile 與 Apo 的螢幕化學反應引爆全球，製作規格突破泰 BL 極限。',img:'map/KinnPorsche01.jpeg',imgs:['map/KinnPorsche01.jpeg','map/KinnPorsche02.jpeg','map/KinnPorsche03.webp'],yt:'https://www.youtube.com/watch?v=dZvpNreGVOc'},
-      {title:'清醒點，泰爾先生',en:'Me and Thee',year:'2023',desc:'黑幫少爺 Thee 不擅與人相處，偶遇攝影師 Peach 後聘為生活教練。朝夕相處間，Thee 對 Peach 暗生情愫，在他身上感受到前所未有的溫暖與愛。',img:'map/Me and Thee01.jpg',imgs:['map/Me and Thee01.jpg','map/Me and Thee02.jpg','map/Me and Thee03.jpg'],yt:'https://www.youtube.com/watch?v=PXqpISTPse8'},
-      {title:'通往天堂的門票',en:'Ticket to Heaven',year:'2023',desc:'1996 年泰國天主教男校，虔誠資優生 Tanrak 與叛逆轉學生 Barth 在朝夕相處中滋長禁忌情愫。信仰與愛情的拉鋸，讓這張通往天堂的門票充滿掙扎與抉擇。',img:'map/Ticket to Heaven01.jpg',imgs:['map/Ticket to Heaven01.jpg','map/Ticket to Heaven02.jpg','map/Ticket to Heaven03.jpg'],yt:'https://www.youtube.com/watch?v=9rPBmHoxQX4'},
+      {title:'清醒點，泰爾先生',en:'Me and Thee',year:'2025',desc:'黑幫少爺 Thee 不擅與人相處，偶遇攝影師 Peach 後聘為生活教練。朝夕相處間，Thee 對 Peach 暗生情愫，在他身上感受到前所未有的溫暖與愛。',img:'map/Me and Thee01.jpg',imgs:['map/Me and Thee01.jpg','map/Me and Thee02.jpg','map/Me and Thee03.jpg'],yt:'https://www.youtube.com/watch?v=PXqpISTPse8'},
+      {title:'通往天堂的門票',en:'Ticket to Heaven',year:'2026',desc:'1996 年泰國天主教男校，虔誠資優生 Tanrak 與叛逆轉學生 Barth 在朝夕相處中滋長禁忌情愫。信仰與愛情的拉鋸，讓這張通往天堂的門票充滿掙扎與抉擇。',img:'map/Ticket to Heaven01.jpg',imgs:['map/Ticket to Heaven01.jpg','map/Ticket to Heaven02.jpg','map/Ticket to Heaven03.jpg'],yt:'https://www.youtube.com/watch?v=9rPBmHoxQX4'},
     ],
     monetize:{model:'擬真陪伴 · Parasocial CP Economy',steps:['選秀節目建立 CP 粉絲基礎（如 GMMTV 旗下藝人）','Y 劇播出強化角色情感，確立「戲裡戀愛」印象','社交媒體甜蜜互動（Fanservice）維繫日常黏著度','雙人商業代言、品牌活動高效商業變現','國際巡迴見面會：動輒數千元門票的精華收割'],desc:'泰國模式的核心是「擬真陪伴」——讓觀眾相信 CP 在現實中也有情感，從而願意為「延續烏托邦成真的幸福感」持續掏錢。'}
   },
@@ -6052,6 +6053,7 @@ function snTab(el,name){
   if(target) target.classList.add('active');
   document.body.setAttribute('data-tab', name);
   sessionStorage.setItem('activeSnTab', name);
+  localStorage.setItem('activeSnTab', name);
   if(name==='audience' && window._runAudCounters){
     setTimeout(window._runAudCounters, 400);
   }
@@ -7650,7 +7652,7 @@ const WM_DATA = {
     works:[
       {title:'陳情令',en:'The Untamed',year:'2019',desc:'《魔道祖師》真人化，肖戰與王一博主演，官方定位「兄弟情」卻引發全球耽美熱潮。',img:'map/The Untamed01.jpg',imgs:['map/The Untamed01.jpg','map/The Untamed02.webp','map/The Untamed03.webp'],platforms:[{cls:'plat-ott',label:'▶ 愛奇藝國際版'},{cls:'plat-intl',label:'🌐 Netflix 部分地區'}],yt:'https://www.youtube.com/watch?v=6gHxH8V7STM'},
       {title:'天官賜福',en:'Heaven Official\'s Blessing',year:'2020',desc:'MXTX 原著動畫化，花城與謝憐的深情在精緻作畫下打動無數海外觀眾。',img:"map/Heaven Official's Blessing01.webp",imgs:["map/Heaven Official's Blessing01.webp","map/Heaven Official's Blessing02.jpeg","map/Heaven Official's Blessing03.jpeg"],platforms:[{cls:'plat-ott',label:'▶ bilibili 國際版'},{cls:'plat-yt',label:'▶ YouTube 官方'}],yt:'https://www.youtube.com/watch?v=aRhaKwvM360'},
-      {title:'逆愛',en:'Revenged Love',year:'2023',desc:'典型「環大陸」製作——由中國團隊操刀，迴避大陸上映，採 YouTube 官方頻道與海外平台優先播出，讓同性情感得以正面呈現。',img:'map/Revenged Love01.jpg',imgs:['map/Revenged Love01.jpg','map/Revenged Love02.jpg','map/Revenged Love03.jpg'],platforms:[{cls:'plat-env',label:'⊙ 環大陸模式'},{cls:'plat-yt',label:'▶ YouTube 官方頻道'},{cls:'plat-intl',label:'🌐 海外平台'}],note:'因中國題材禁令，本劇不在大陸平台上架，是環大陸播出模式的代表案例。',yt:'https://www.youtube.com/watch?v=2u3Qj_SpaGU'},
+      {title:'逆愛',en:'Revenged Love',year:'2025',desc:'典型「環大陸」製作——由中國團隊操刀，迴避大陸上映，採 YouTube 官方頻道與海外平台優先播出，讓同性情感得以正面呈現。',img:'map/Revenged Love01.jpg',imgs:['map/Revenged Love01.jpg','map/Revenged Love02.jpg','map/Revenged Love03.jpg'],platforms:[{cls:'plat-env',label:'⊙ 環大陸模式'},{cls:'plat-yt',label:'▶ YouTube 官方頻道'},{cls:'plat-intl',label:'🌐 海外平台'}],note:'因中國題材禁令，本劇不在大陸平台上架，是環大陸播出模式的代表案例。',yt:'https://www.youtube.com/watch?v=2u3Qj_SpaGU'},
     ],
     monetize:{model:'禁忌悖論 · Censorship Paradox',steps:['廣電全面封鎖同性影視，強制改編為「兄弟情」','粉絲發展精密解碼文化，自行腦補情感還原','補償心理激發瘋狂消費——周邊、二創、聯名','「環大陸」模式：YouTube／海外 OTT 廣告收益反哺製作','拍攝地旅遊暴利：《陳情令》帶動數十億人民幣產值'],desc:'禁忌非但沒有消滅欲望，反而放大了粉絲的補償性消費能量。「環大陸」播出模式讓部分作品得以繞過審查在全球華語市場直接變現——這是中國市場獨有的悖論邏輯。'}
   },
@@ -7700,8 +7702,8 @@ const WM_DATA = {
     works:[
       {title:'以你的心詮釋我的愛',en:'I Told Sunset About You',year:'2020',desc:'Nadao Bangkok 精品 BL，普吉島夕陽下的純愛美學，改變了整個類型劇的視覺標準。',img:'map/I Told Sunset About You01.jpg',imgs:['map/I Told Sunset About You01.jpg','map/I Told Sunset About You02.png','map/I Told Sunset About You03.png'],yt:'https://www.youtube.com/watch?v=x7ts_4tL0cQ'},
       {title:'KinnPorsche',en:'KinnPorsche The Series',year:'2022',desc:'電影等級黑幫 BL，Mile 與 Apo 的螢幕化學反應引爆全球，製作規格突破泰 BL 極限。',img:'map/KinnPorsche01.jpeg',imgs:['map/KinnPorsche01.jpeg','map/KinnPorsche02.jpeg','map/KinnPorsche03.webp'],yt:'https://www.youtube.com/watch?v=dZvpNreGVOc'},
-      {title:'清醒點，泰爾先生',en:'Me and Thee',year:'2023',desc:'黑幫少爺 Thee 不擅與人相處，偶遇攝影師 Peach 後聘為生活教練。朝夕相處間，Thee 對 Peach 暗生情愫，在他身上感受到前所未有的溫暖與愛。',img:'map/Me and Thee01.jpg',imgs:['map/Me and Thee01.jpg','map/Me and Thee02.jpg','map/Me and Thee03.jpg'],yt:'https://www.youtube.com/watch?v=PXqpISTPse8'},
-      {title:'通往天堂的門票',en:'Ticket to Heaven',year:'2023',desc:'1996 年泰國天主教男校，虔誠資優生 Tanrak 與叛逆轉學生 Barth 在朝夕相處中滋長禁忌情愫。信仰與愛情的拉鋸，讓這張通往天堂的門票充滿掙扎與抉擇。',img:'map/Ticket to Heaven01.jpg',imgs:['map/Ticket to Heaven01.jpg','map/Ticket to Heaven02.jpg','map/Ticket to Heaven03.jpg'],yt:'https://www.youtube.com/watch?v=9rPBmHoxQX4'},
+      {title:'清醒點，泰爾先生',en:'Me and Thee',year:'2025',desc:'黑幫少爺 Thee 不擅與人相處，偶遇攝影師 Peach 後聘為生活教練。朝夕相處間，Thee 對 Peach 暗生情愫，在他身上感受到前所未有的溫暖與愛。',img:'map/Me and Thee01.jpg',imgs:['map/Me and Thee01.jpg','map/Me and Thee02.jpg','map/Me and Thee03.jpg'],yt:'https://www.youtube.com/watch?v=PXqpISTPse8'},
+      {title:'通往天堂的門票',en:'Ticket to Heaven',year:'2026',desc:'1996 年泰國天主教男校，虔誠資優生 Tanrak 與叛逆轉學生 Barth 在朝夕相處中滋長禁忌情愫。信仰與愛情的拉鋸，讓這張通往天堂的門票充滿掙扎與抉擇。',img:'map/Ticket to Heaven01.jpg',imgs:['map/Ticket to Heaven01.jpg','map/Ticket to Heaven02.jpg','map/Ticket to Heaven03.jpg'],yt:'https://www.youtube.com/watch?v=9rPBmHoxQX4'},
     ],
     monetize:{model:'擬真陪伴 · Parasocial CP Economy',steps:['選秀節目建立 CP 粉絲基礎（如 GMMTV 旗下藝人）','Y 劇播出強化角色情感，確立「戲裡戀愛」印象','社交媒體甜蜜互動（Fanservice）維繫日常黏著度','雙人商業代言、品牌活動高效商業變現','國際巡迴見面會：動輒數千元門票的精華收割'],desc:'泰國模式的核心是「擬真陪伴」——讓觀眾相信 CP 在現實中也有情感，從而願意為「延續烏托邦成真的幸福感」持續掏錢。'}
   },
@@ -8295,14 +8297,12 @@ flipBgInit();
     });
   }
   // Patch snTab to trigger after tab switch
-  // 首次進入網站才播開場動畫；F5 重整直接回到內容頂部
-  if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
+  var _blKey='blSiteVisited';
   window.addEventListener('load',function(){
-    var isReturn=sessionStorage.getItem('siteVisited');
-    sessionStorage.setItem('siteVisited','1');
+    var isReturn=localStorage.getItem(_blKey)||sessionStorage.getItem(_blKey);
     if(isReturn){
-      // 重整：還原上次 tab，跳到內容區
-      var savedTab=sessionStorage.getItem('activeSnTab');
+      // 非首次：還原上次 tab，跳到內容區
+      var savedTab=localStorage.getItem('activeSnTab')||sessionStorage.getItem('activeSnTab');
       if(savedTab&&window.snTab){
         var btn=document.querySelector('.sn[onclick*="\''+savedTab+'\'"]');
         window.snTab(btn||null,savedTab);
@@ -8310,7 +8310,7 @@ flipBgInit();
       setTimeout(function(){
         var a=document.getElementById('tab-anchor');
         if(a) window.scrollTo(0,a.offsetTop);
-      },50);
+      },80);
     }else{
       // 首次進入：頂部，播動畫
       window.scrollTo(0,0);
