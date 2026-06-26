@@ -680,6 +680,19 @@ body.cursor-active{cursor:none;}
 /* Close */
 .cp-close{position:absolute;top:.9rem;right:1.1rem;z-index:10;background:rgba(5,5,5,.70);border:1px solid var(--cp-border);color:rgba(228,214,197,.55);font-size:1rem;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:2px;transition:all .2s;font-family:var(--mono);}
 .cp-close:hover{color:#E4D6C5;border-color:var(--cp-accent);}
+/* ── Mobile: stack cpanel vertically ── */
+@media(max-width:768px){
+  #cpanel{grid-template-columns:1fr;grid-template-rows:42vh 1fr;overflow:hidden;}
+  .cpl{grid-row:1;height:42vh;min-height:0;}
+  .cpl-main{flex:1;min-height:0;}
+  .cpl-hdr{padding:1.5rem 1rem .8rem;}
+  .cp-name{font-size:1.5rem;}
+  .cpl-thumbs{height:46px;}
+  .cpr{grid-row:2;overflow-y:auto;border-left:none;border-top:1px solid var(--cp-border);}
+  .cpr-in{padding:1rem 1.1rem;}
+  .wk-tit{font-size:1.1rem;}
+  .wk-desc{font-size:.9rem;}
+}
 
 /* ══ FEATURES ══ */
 .feat{position:relative;z-index:1;padding:6rem 0;border-top:1px solid rgba(152,66,22,.06);}
@@ -830,12 +843,13 @@ body.cursor-active{cursor:none;}
 .flip-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.6rem;margin-top:3rem;}
 @media(max-width:1100px){.flip-grid{grid-template-columns:repeat(4,1fr);}}
 @media(max-width:700px){.flip-grid{grid-template-columns:repeat(2,1fr);}}
-.fcard{height:380px;perspective:1200px;cursor:pointer;}
+.fcard{height:380px;perspective:1200px;-webkit-perspective:1200px;cursor:pointer;}
 .fcard-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;-webkit-transform-style:preserve-3d;}
 .fcard:hover .fcard-inner{transform:rotateY(180deg);}
 /* Also allow touch */
 .fcard.flipped .fcard-inner{transform:rotateY(180deg);}
 .fface,.fback{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid rgba(184,107,48,.12);border-radius:3px;overflow:hidden;}
+.fface{-webkit-transform:translate3d(0,0,0);}
 /* Front */
 .fface{background:var(--reel);display:flex;flex-direction:column;justify-content:flex-end;}
 .ff-bg{position:absolute;inset:0;}
@@ -851,7 +865,7 @@ body.cursor-active{cursor:none;}
 .fface::before{top:7px;left:7px;border-width:1px 0 0 1px;}
 .fface::after{bottom:7px;right:7px;border-width:0 1px 1px 0;}
 /* Back — Ivory Sand 底 */
-.fback{background:#E4D6C5;transform:rotateY(180deg);padding:1.4rem;display:flex;flex-direction:column;justify-content:space-between;border-color:rgba(152,66,22,.25);}
+.fback{background:#E4D6C5;transform:rotateY(180deg);-webkit-transform:rotateY(180deg) translate3d(0,0,0);padding:1.4rem;display:flex;flex-direction:column;justify-content:space-between;border-color:rgba(152,66,22,.25);}
 .fb-ctry{font-family:var(--mono);font-size:.8rem;letter-spacing:.16em;color:rgba(58,32,16,.72);text-transform:uppercase;margin-bottom:.5rem;}
 .fb-h{font-family:var(--serif);font-weight:700;font-size:1.3rem;line-height:1.2;margin-bottom:.7rem;color:#3A2010;}
 .fb-h em{font-style:italic;color:#984216;}
@@ -1806,7 +1820,7 @@ body.theme-global .nav-tab.active::after{background:var(--bud-wine);}
   display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
   gap:1.2rem;max-width:1000px;margin:0 auto;
 }
-.bud-flip-wrap{height:280px;perspective:1000px;cursor:pointer;}
+.bud-flip-wrap{height:280px;perspective:1000px;-webkit-perspective:1000px;cursor:pointer;}
 .bud-flip-wrap:hover .bud-flip-inner,.bud-flip-wrap.flipped .bud-flip-inner{transform:rotateY(180deg);}
 .bud-flip-inner{
   position:relative;width:100%;height:100%;
@@ -1817,6 +1831,8 @@ body.theme-global .nav-tab.active::after{background:var(--bud-wine);}
   border:1px solid var(--bud-frame);border-radius:4px;
   padding:1.4rem;display:flex;flex-direction:column;justify-content:space-between;
 }
+.bud-flip-front{-webkit-transform:translate3d(0,0,0);}
+
 .bud-flip-front{
   background:#EDE5D8;
   /* warm reality side */
@@ -1824,6 +1840,7 @@ body.theme-global .nav-tab.active::after{background:var(--bud-wine);}
 .bud-flip-back{
   background:var(--bud-cream);
   transform:rotateY(180deg);
+  -webkit-transform:rotateY(180deg) translate3d(0,0,0);
 }
 .bud-flip-front .bud-flip-flag{font-size:1.5rem;margin-bottom:.4rem;}
 .bud-flip-front .bud-flip-country{
