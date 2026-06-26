@@ -142,8 +142,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1rem 3rem;display:fl
 .biz-card-title{font-size:.9rem;font-weight:500;color:var(--sunset-peach);}
 .biz-card p{font-size:.8rem;line-height:1.78;color:rgba(245,237,216,.6);}
 .biz-highlight{background:linear-gradient(135deg,rgba(139,42,26,.22),rgba(201,75,37,.1));border:1px solid rgba(232,134,58,.28);border-radius:10px;padding:1.2rem 1.5rem;margin-top:1.5rem;text-align:center;}
-.biz-highlight .num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--sunset-gold);}
+.biz-highlight .num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--sunset-gold);transition:color .3s;}
 .biz-highlight .label{font-size:.72rem;letter-spacing:.1em;color:rgba(245,237,216,.5);text-transform:uppercase;margin-top:.2rem;}
+.biz-highlight .num.counting{color:#fff;text-shadow:0 0 18px rgba(232,134,58,.7);}
 
 /* ── CULTURE ── */
 .culture-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:2.5rem;}
@@ -1403,6 +1404,7 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 <!-- NAV -->
 <nav id="nav">
   <a class="nav-logo" href="merged-final.html?skip=1" style="text-decoration:none;cursor:pointer;">彩虹經緯 · Global BL</a>
+  <div style="display:flex;align-items:center;gap:.5rem;margin-left:auto;">
   <ul class="nav-tabs">
     <li>
       <button class="nav-tab" onclick="location.href='merged-final.html?skip=1'">首頁</button>
@@ -1429,6 +1431,8 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
       </div>
     </li>
   </ul>
+    <a href="about.html" style="display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1.2rem;font-size:.72rem;letter-spacing:.1em;color:rgba(245,237,216,.75);text-decoration:none;border:1px solid rgba(245,237,216,.2);border-radius:20px;transition:all .25s;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='rgba(245,237,216,.1)';this.style.color='rgba(245,237,216,1)';this.style.borderColor='rgba(245,237,216,.45)'" onmouseout="this.style.background='';this.style.color='rgba(245,237,216,.75)';this.style.borderColor='rgba(245,237,216,.2)'">🌿 關於我</a>
+  </div>
 </nav>
 
 
@@ -1663,15 +1667,15 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
       <!-- Stats row -->
       <div class="aud-stat-row" style="max-width:820px;margin:0 auto 2.5rem;">
         <div class="aud-stat">
-          <div class="aud-stat-num">80%</div>
+          <div class="aud-stat-num loop-count" data-target="80" data-suffix="%">80%</div>
           <div class="aud-stat-label">BL 核心消費者<br>為女性受眾</div>
         </div>
         <div class="aud-stat">
-          <div class="aud-stat-num">47億</div>
+          <div class="aud-stat-num loop-count" data-target="47" data-suffix="億">47億</div>
           <div class="aud-stat-label">泰國 Y 劇<br>年產值（台幣）</div>
         </div>
         <div class="aud-stat">
-          <div class="aud-stat-num">2億+</div>
+          <div class="aud-stat-num loop-count" data-target="2" data-suffix="億+">2億+</div>
           <div class="aud-stat-label">《陳情令》<br>全球播放量</div>
         </div>
       </div>
@@ -1950,10 +1954,10 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 
   <div class="stat-bar" id="stats">
     <div class="stat-bar-inner">
-      <div><div class="stat-num">47億</div><div class="stat-label">年產值（台幣）</div></div>
-      <div><div class="stat-num">17年</div><div class="stat-label">從先驅到全球</div></div>
-      <div><div class="stat-num">8.7</div><div class="stat-label">ITSAY IMDb評分</div></div>
-      <div><div class="stat-num">59,000+</div><div class="stat-label">普吉島朝聖旅客</div></div>
+      <div><div class="stat-num statbar-count" data-target="47" data-suffix="億">47億</div><div class="stat-label">年產值（台幣）</div></div>
+      <div><div class="stat-num statbar-count" data-target="17" data-suffix="年">17年</div><div class="stat-label">從先驅到全球</div></div>
+      <div><div class="stat-num statbar-count" data-target="8.7" data-decimals="1" data-suffix="">8.7</div><div class="stat-label">ITSAY IMDb評分</div></div>
+      <div><div class="stat-num statbar-count" data-target="59000" data-suffix="+" data-format="comma">59,000+</div><div class="stat-label">普吉島朝聖旅客</div></div>
     </div>
   </div>
 
@@ -2189,7 +2193,7 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
         <p>泰國政府已將BL劇納入國家軟實力戰略，透過影視帶動觀光、提升國際形象，《以你的心》使普吉島觀光復甦即為最佳案例。</p>
       </div>
       <div class="biz-highlight">
-        <div class="num">47億 NTD</div>
+        <div class="num" id="biz-count-num" data-target="47" data-suffix="億 NTD">47億 NTD</div>
         <div class="label">泰BL相關產業年估產值</div>
       </div>
     </div>
@@ -2968,8 +2972,9 @@ function showPage(id){
   if(globalPages.includes(id)){document.body.classList.add('theme-global');}
   else{document.body.classList.remove('theme-global');}
   document.querySelectorAll('.bud-subnav-btn').forEach(b=>b.classList.remove('active'));
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'instant'});
   sessionStorage.setItem('currentPage',id);
+  history.replaceState(null,'','#page-'+id);
 }
 
 // Sub-navigation within global section
@@ -5260,11 +5265,79 @@ showPage=function(id){
   ddlLoad(); ddlRenderAll();
   // Default to global page on first visit; honour URL hash (e.g. #page-home)
   const hashPage=location.hash.replace('#page-','');
-  const validPages=['style','audience','culture','home','deeplist','itsay','recs'];
+  const validPages=['global','style','audience','culture','home','deeplist','itsay','recs'];
   const savedPage2=sessionStorage.getItem('currentPage');
   if(hashPage && validPages.includes(hashPage)){showPage(hashPage);}
   else if(savedPage2){showPage(savedPage2);}
   else{showPage('home');}
+})();
+</script>
+
+<script>
+(function(){
+  var DURATION = 1800;
+  var PAUSE    = 1200;
+
+  function fmt(val, decimals, formatComma){
+    var s = decimals > 0 ? val.toFixed(decimals) : String(Math.round(val));
+    return formatComma ? Number(s).toLocaleString() : s;
+  }
+
+  function loopCount(el){
+    if(el._looping) return;
+    el._looping = true;
+    var target     = parseFloat(el.dataset.target);
+    var suffix     = el.dataset.suffix || '';
+    var decimals   = parseInt(el.dataset.decimals || '0');
+    var formatComma= el.dataset.format === 'comma';
+    function runOnce(){
+      el.classList.add('counting');
+      var startTime = null;
+      function step(ts){
+        if(!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / DURATION, 1);
+        var ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = fmt(ease * target, decimals, formatComma) + suffix;
+        if(progress < 1){
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = fmt(target, decimals, formatComma) + suffix;
+          el.classList.remove('counting');
+          setTimeout(runOnce, PAUSE);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    runOnce();
+  }
+
+  // 對頁面內捲動深處的元素使用 IntersectionObserver（頁面已顯示後才有效）
+  var scrollObs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) loopCount(e.target);
+    });
+  }, {threshold: 0.1});
+
+  // 在 showPage 後啟動該頁頂部可見元素，深處元素交由 scrollObs
+  window._startCounters = function(pageEl){
+    pageEl.querySelectorAll('.statbar-count, .loop-count, [data-target]').forEach(function(el){
+      if(!el._looping) scrollObs.observe(el);
+    });
+  };
+
+  // 攔截 showPage，在頁面變為 active 後觸發
+  var _origShowPage = window.showPage;
+  window.showPage = function(id){
+    _origShowPage(id);
+    var page = document.getElementById('page-' + id);
+    if(page) setTimeout(function(){ window._startCounters(page); }, 50);
+  };
+
+  // 初始頁面（第一次載入）
+  setTimeout(function(){
+    var activePage = document.querySelector('.page.active');
+    if(activePage) window._startCounters(activePage);
+  }, 200);
 })();
 </script>
 
