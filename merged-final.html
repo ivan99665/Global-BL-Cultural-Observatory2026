@@ -2,17 +2,51 @@
 <html lang="zh-TW">
 <head>
 <script>
-/* 每次進入都直接定位到內容區，跳過 hero 動畫捲動 */
+/* 開場邏輯：
+   - F5(reload) → 頁面先隱藏，定位到上次位置後才顯示，完全不閃 hero
+   - 新 session（關閉後重開）→ 回頂部播開場動畫 */
 (function(){
+  var _key='blHeroShown';
+  var _scrollKey='blScrollY';
+  var isReload=false;
+  try{ isReload=(performance.navigation.type===1); }catch(e){}
+  var alreadyShown=(sessionStorage.getItem(_key)==='1');
+  sessionStorage.setItem(_key,'1');
+  var isNew=(!isReload && !alreadyShown);
+  window._isNewBLSession=isNew;
   if('scrollRestoration' in history) history.scrollRestoration='manual';
-  document.addEventListener('DOMContentLoaded',function(){
-    var a=document.getElementById('tab-anchor');
-    if(a) window.scrollTo(0,a.offsetTop);
+
+  if(isNew){
+    sessionStorage.removeItem(_scrollKey);
+    document.documentElement.classList.add('hero-anim-pending');
+    window.addEventListener('load',function(){ window.scrollTo(0,0); });
+  }else{
+    // F5：先把頁面藏起來，等定位完才顯示
+    var savedY=parseInt(sessionStorage.getItem(_scrollKey)||'0',10);
+    document.documentElement.style.visibility='hidden';
+    window.addEventListener('load',function(){
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo(0,savedY);
+      document.documentElement.style.visibility='';
+      document.documentElement.style.scrollBehavior='';
+    });
+  }
+  window.addEventListener('beforeunload',function(){
+    sessionStorage.setItem(_scrollKey,Math.round(window.scrollY));
   });
 })();
 </script>
 <style>
 html.skip-hero #hero{display:none!important;height:0!important;overflow:hidden!important;}
+/* ── 開場動畫：純 CSS，只在新 session 時播放 ── */
+@keyframes heroFadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+@keyframes heroFadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes heroDivGrow{from{height:0;}to{height:52px;}}
+html.hero-anim-pending .h-eyebrow{opacity:0;animation:heroFadeUp .9s ease .3s forwards;}
+html.hero-anim-pending .h-title{opacity:0;animation:heroFadeUp 1.1s cubic-bezier(.16,1,.3,1) .6s forwards;}
+html.hero-anim-pending .h-sub{opacity:0;animation:heroFadeIn .9s ease 1.1s forwards;}
+html.hero-anim-pending .h-div{height:0;animation:heroDivGrow .8s ease .9s forwards;}
+html.hero-anim-pending #hscr{opacity:0;animation:heroFadeIn .7s ease 1.4s forwards;}
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -468,12 +502,12 @@ body.cursor-active{cursor:none;}
 .h-counter{position:absolute;top:1.2rem;left:50%;transform:translateX(-50%);z-index:30;font-family:var(--mono);font-size:.44rem;letter-spacing:.2em;color:rgba(184,107,48,.65);background:rgba(17,26,25,.5);padding:.28rem .9rem;border:1px solid rgba(184,107,48,.14);pointer-events:none;}
 .ccd-ts{position:absolute;bottom:1.3rem;right:1.5rem;z-index:30;font-family:var(--mono);font-size:.4rem;letter-spacing:.1em;color:rgba(255,165,0,.65);text-shadow:0 0 8px rgba(255,140,0,.35);pointer-events:none;}
 .h-content{position:absolute;inset:0;z-index:28;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 5rem;}
-.h-eyebrow{font-family:var(--mono);font-size:.9rem;letter-spacing:.22em;color:var(--amber);text-transform:uppercase;margin-bottom:1.6rem;opacity:0;}
-.h-title{font-family:var(--serif);font-weight:900;font-size:clamp(3.2rem,8vw,9.5rem);line-height:.88;letter-spacing:-.02em;text-shadow:0 0 80px rgba(184,107,48,.2),0 2px 40px rgba(0,0,0,.95);opacity:0;}
+.h-eyebrow{font-family:var(--mono);font-size:.9rem;letter-spacing:.22em;color:var(--amber);text-transform:uppercase;margin-bottom:1.6rem;}
+.h-title{font-family:var(--serif);font-weight:900;font-size:clamp(3.2rem,8vw,9.5rem);line-height:.88;letter-spacing:-.02em;text-shadow:0 0 80px rgba(184,107,48,.2),0 2px 40px rgba(0,0,0,.95);}
 .h-title .zh{display:block;color:var(--cream);}
 .h-title .em{display:block;font-style:italic;font-size:.78em;color:transparent;-webkit-text-stroke:1.5px var(--amber);}
-.h-div{width:1px;height:0;margin:2rem auto;background:linear-gradient(to bottom,var(--amber),transparent);}
-.h-sub{font-family:var(--mono);font-size:.88rem;letter-spacing:.15em;color:var(--faded);text-transform:uppercase;line-height:2.4;opacity:0;}
+.h-div{width:1px;height:52px;margin:2rem auto;background:linear-gradient(to bottom,var(--amber),transparent);}
+.h-sub{font-family:var(--mono);font-size:.88rem;letter-spacing:.15em;color:var(--faded);text-transform:uppercase;line-height:2.4;}
 .h-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:30;background:none;border:none;font-family:var(--serif);font-size:3rem;color:rgba(152,66,22,.45);cursor:pointer;padding:1.2rem;transition:color .3s;}
 .h-btn:hover{color:#984216;}
 .h-btn.p{left:28px;}.h-btn.n{right:28px;}
@@ -2564,7 +2598,7 @@ body.thai-active #nav{display:flex;}
   filter:brightness(0.82) saturate(.9) contrast(1.08);
 }
 
-/* ── 遮罩：前3秒完全透明，第3秒與文字同步加深 ── */
+/* ── 遮罩：第1秒與文字同步加深 ── */
 #vig{
   position:absolute;inset:0;
   z-index:1;
@@ -2578,11 +2612,11 @@ body.thai-active #nav{display:flex;}
     linear-gradient(to bottom,
       rgba(0,0,0,0.5) 0%,transparent 15%,
       transparent 85%,rgba(0,0,0,0.5) 100%);
-  transition:opacity 1.2s ease 3s;
+  transition:opacity 1.2s ease 1s;
 }
 #oc.in #vig{opacity:1;}
 
-/* ── 文字：第3秒後淡入 ── */
+/* ── 文字：第1秒後淡入 ── */
 #content{
   position:relative;
   z-index:2;
@@ -2592,9 +2626,9 @@ body.thai-active #nav{display:flex;}
 #ci{
   opacity:0;
   transform:translateY(12px);
-  transition:opacity .7s ease,transform .7s ease;
+  transition:opacity 1.2s ease 1s,transform 1.2s ease 1s;
 }
-#oc.in #ci{/* text revealed by click only */}
+#oc.in #ci{opacity:1;transform:translateY(0);}
 
 .etag{
   font-size:.58rem;letter-spacing:0.32em;text-transform:uppercase;
@@ -3299,7 +3333,8 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
 
 </script>
 
-<div id="thai-btn-wrap" style="position:fixed;top:1rem;right:1.5rem;z-index:300;display:flex;">
+<div id="thai-btn-wrap" style="position:fixed;top:1rem;right:1.5rem;z-index:300;display:flex;align-items:center;gap:.5rem;">
+  <a href="about.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;background:rgba(17,26,25,.85);border:1px solid rgba(97,127,114,.4);color:rgba(171,196,179,.9);font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;backdrop-filter:blur(10px);white-space:nowrap;text-decoration:none;transition:all .25s;" onmouseover="this.style.background='rgba(97,127,114,.2)';this.style.borderColor='rgba(97,127,114,.7)'" onmouseout="this.style.background='rgba(17,26,25,.85)';this.style.borderColor='rgba(97,127,114,.4)'">🌿 關於我</a>
   <button id="thai-btn-trigger" style="display:flex;align-items:center;gap:.4rem;padding:.4rem 1rem;background:rgba(17,26,25,.85);border:1px solid rgba(184,107,48,.35);color:rgba(249,228,197,.9);font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;backdrop-filter:blur(10px);white-space:nowrap;">🇹🇭 泰BL專區 ▾</button>
   <div id="thai-btn-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:rgba(10,8,18,.97);border:1px solid rgba(184,107,48,.22);border-radius:10px;min-width:210px;padding:.5rem 0;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.8);z-index:301;">
     <div style="padding:.45rem 1.1rem .3rem;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(184,107,48,.4);">泰 BL 專區</div>
@@ -3725,7 +3760,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
           <div class="bud-card-head">
             <span class="bud-card-flag">🇨🇳</span>
             <div>
-              <div class="bud-card-name">中國大陸</div>
+              <div class="bud-card-name">中國</div>
               <div style="font-size:.62rem;color:var(--bud-purple);">CHINA</div>
             </div>
             <span class="bud-card-tag">耽美帝國</span>
@@ -3943,7 +3978,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <!-- Image-text row: Female gaze -->
       <div class="aud-imgtext" style="max-width:900px;margin:0 auto 2rem;">
         <div>
-          <img class="aud-imgtext-img" src="Audience Analysis/01.jpg" alt="Female Gaze">
+          <img id="aud1" class="aud-imgtext-img" src="Audience Analysis/01.jpg" alt="Female Gaze">
         </div>
         <div class="aud-imgtext-text">
           <h4>「她」為什麼愛 BL？<br><em style="font-size:.88rem;color:var(--vin-sepia);">Female Gaze 與安全投射的理論基礎</em></h4>
@@ -3960,7 +3995,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
           <p style="margin-top:.6rem;">泰國粉絲投射的則是「提前實現完美平權」的集體宣洩——劇中菁英角色所享有的無條件同性接納，是她們對現實制度的幻想補償。</p>
         </div>
         <div>
-          <img class="aud-imgtext-img" src="Audience Analysis/02.jpg" alt="Safety">
+          <img id="aud2" class="aud-imgtext-img" src="Audience Analysis/02.jpg" alt="Safety">
         </div>
       </div>
 
@@ -4162,7 +4197,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
             <div class="bud-flip-front">
               <div>
                 <div class="bud-flip-flag">🇨🇳</div>
-                <div class="bud-flip-country">中國大陸</div>
+                <div class="bud-flip-country">中國</div>
                 <div style="font-size:.64rem;letter-spacing:.1em;color:rgba(27,68,54,.4);text-transform:uppercase;margin-bottom:.5rem;">現實困境</div>
                 <p class="bud-flip-reality">廣電總局全面封鎖同性戀影視內容。2021 年後 LGBTQ+ 受到更嚴格的社會管控。所有改編必須去同性化，貼上「兄弟情」標籤。</p>
               </div>
@@ -4312,29 +4347,32 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
 </div>
 <nav id="nav">
   <div class="nav-logo">彩虹經緯 · Global BL</div>
-  <ul class="nav-tabs">
-    <li>
-      <button class="nav-tab active" onclick="showPage('global')">🌍 全球版圖</button>
-    </li>
-    <li class="nav-dd-wrap" id="nav-thai-wrap">
-      <span style="display:inline-flex;align-items:center;gap:0;">
-        <button class="nav-tab" style="border-radius:6px 0 0 6px;padding-right:.5rem;" onclick="location.href='thai-bl-v1377.html#page-home'">🇹🇭 泰BL專區</button>
-        <button onclick="navThaiToggle(event)" style="background:none;border:none;border-left:1px solid rgba(232,134,58,.15);color:rgba(245,237,216,.45);cursor:pointer;padding:.35rem .5rem;line-height:1;font-size:.75rem;transition:color .2s;border-radius:0 6px 6px 0;" onmouseover="this.style.color='rgba(245,237,216,.85)'" onmouseout="this.style.color='rgba(245,237,216,.45)'"><span style="display:inline-block;" class="nav-tab-arrow">▾</span></button>
-      </span>
-      <div class="nav-dd-menu" id="nav-thai-menu" style="min-width:200px;">
-        <div class="nav-dd-head">泰BL專區</div>
-        <div class="nav-dd-item" onclick="location.href='thai-bl-v1377.html#page-home'">
-          <div class="nav-dd-info"><div class="nav-dd-title">泰BL概覽</div><div class="nav-dd-sub">歷史脈絡・統計・時間軸</div></div>
+  <div style="display:flex;align-items:center;gap:.5rem;margin-left:auto;">
+    <ul class="nav-tabs">
+      <li>
+        <button class="nav-tab active" onclick="showPage('global')">🌍 全球版圖</button>
+      </li>
+      <li class="nav-dd-wrap" id="nav-thai-wrap">
+        <span style="display:inline-flex;align-items:center;gap:0;">
+          <button class="nav-tab" style="border-radius:6px 0 0 6px;padding-right:.5rem;" onclick="location.href='thai-bl-v1377.html#page-home'">🇹🇭 泰BL專區</button>
+          <button onclick="navThaiToggle(event)" style="background:none;border:none;border-left:1px solid rgba(232,134,58,.15);color:rgba(245,237,216,.45);cursor:pointer;padding:.35rem .5rem;line-height:1;font-size:.75rem;transition:color .2s;border-radius:0 6px 6px 0;" onmouseover="this.style.color='rgba(245,237,216,.85)'" onmouseout="this.style.color='rgba(245,237,216,.45)'"><span style="display:inline-block;" class="nav-tab-arrow">▾</span></button>
+        </span>
+        <div class="nav-dd-menu" id="nav-thai-menu" style="min-width:200px;">
+          <div class="nav-dd-head">泰BL專區</div>
+          <div class="nav-dd-item" onclick="location.href='thai-bl-v1377.html#page-home'">
+            <div class="nav-dd-info"><div class="nav-dd-title">泰BL概覽</div><div class="nav-dd-sub">歷史脈絡・統計・時間軸</div></div>
+          </div>
+          <div class="nav-dd-item" onclick="location.href='thai-bl-v1377.html#page-deeplist'">
+            <div class="nav-dd-info"><div class="nav-dd-title">🎬 深度專題</div><div class="nav-dd-sub">ITSAY 及更多深度分析</div></div>
+          </div>
+          <div class="nav-dd-divider"></div>
+          <div class="nav-dd-all" onclick="location.href='thai-bl-v1377.html#page-home'">進入泰BL專區 →</div>
         </div>
-        <div class="nav-dd-item" onclick="location.href='thai-bl-v1377.html#page-deeplist'">
-          <div class="nav-dd-info"><div class="nav-dd-title">🎬 深度專題</div><div class="nav-dd-sub">ITSAY 及更多深度分析</div></div>
-        </div>
-        <div class="nav-dd-divider"></div>
-        <div class="nav-dd-all" onclick="location.href='thai-bl-v1377.html#page-home'">進入泰BL專區 →</div>
-      </div>
-    </li>
-    <li><button class="nav-tab" onclick="showPage('recs')">🌟 作品推薦</button></li>
-  </ul>
+      </li>
+      <li><button class="nav-tab" onclick="showPage('recs')">🌟 作品推薦</button></li>
+    </ul>
+    <a href="about.html" style="display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1.2rem;font-size:.72rem;letter-spacing:.1em;color:rgba(245,237,216,.75);text-decoration:none;border:1px solid rgba(245,237,216,.2);border-radius:20px;transition:all .25s;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='rgba(245,237,216,.1)';this.style.color='rgba(245,237,216,1)';this.style.borderColor='rgba(245,237,216,.45)'" onmouseout="this.style.background='';this.style.color='rgba(245,237,216,.75)';this.style.borderColor='rgba(245,237,216,.2)'">🌿 關於我</a>
+  </div>
 </nav>
 <div id="page-home" class="page">
 
@@ -5339,7 +5377,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
 // ══ DATA ══
 const HP_WM_DATA = {
   cn:{
-    flag:'🇨🇳', name:'中國大陸', en:'CHINA · 耽美帝國',
+    flag:'🇨🇳', name:'中國', en:'CHINA · 耽美帝國',
     theme:'「禁忌反而放大欲望——越禁越狂的商業悖論」',
     accent:'wm-accent-cn',
     facts:[
@@ -5705,12 +5743,7 @@ startCarousel();
 // ══ GSAP ══
 function initGSAP(){
   gsap.registerPlugin(ScrollTrigger);
-  var hTL=gsap.timeline({delay:.3});
-  hTL.to('.h-eyebrow',{opacity:1,y:0,duration:.9,from:{y:16}})
-     .to('.h-title',{opacity:1,y:0,duration:1.1,ease:'power3.out',from:{y:38}},'-=.5')
-     .to('#hdv',{height:52,duration:.8,ease:'power2.out'},'-=.5')
-     .to('.h-sub',{opacity:1,duration:.9},'-=.4')
-     .to('#hscr',{opacity:1,duration:.7},'-=.3');
+  // hero 開場動畫改由純 CSS 控制（hero-anim-pending class），GSAP 只處理 ScrollTrigger
   gsap.to('.th-q',{opacity:1,y:0,duration:1.1,scrollTrigger:{trigger:'.thesis',start:'top 72%'}});
   gsap.to('.th-attr',{opacity:1,duration:.8,delay:.4,scrollTrigger:{trigger:'.thesis',start:'top 72%'}});
   // Feature A & B scroll reveal
@@ -5914,7 +5947,7 @@ function buildMap(){
   }
   draw(); window.addEventListener('resize',function(){setTimeout(draw,150);});
   var PINS=[
-    {key:'cn',name:'中國大陸',x:'79%',y:'39%',c:'#D84050'},{key:'jp',name:'日本',x:'88.5%',y:'32%',c:'#8898D8'},
+    {key:'cn',name:'中國',x:'79%',y:'39%',c:'#D84050'},{key:'jp',name:'日本',x:'88.5%',y:'32%',c:'#8898D8'},
     {key:'kr',name:'韓國',x:'85%',y:'34%',c:'#A868D8'},{key:'th',name:'泰國',x:'76%',y:'51%',c:'#D4A020'},
     {key:'tw',name:'台灣',x:'85.5%',y:'42%',c:'#38B880'},{key:'eu',name:'歐洲',x:'50%',y:'20%',c:'#48A8D0'},
     {key:'us',name:'美國',x:'17%',y:'30%',c:'#6088D0'},
@@ -6354,7 +6387,7 @@ function moveIC(wrapId, state, dir) {
   </div>
 
   <!-- 右：音量 + 關閉 -->
-  <div style="display:flex;align-items:center;gap:.8rem;min-width:140px;justify-content:flex-end;">
+  <div id="mp-right-ctrl" style="display:flex;align-items:center;gap:.8rem;min-width:140px;justify-content:flex-end;">
     <span style="font-size:.78rem;color:rgba(245,237,216,.28);">🔊</span>
     <input type="range" id="mp-vol" min="0" max="100" value="70" oninput="mpVol(this.value)" style="
       width:80px;height:3px;cursor:pointer;
@@ -6365,6 +6398,12 @@ function moveIC(wrapId, state, dir) {
       font-size:.9rem;padding:.2rem;line-height:1;
       transition:color .2s;
     " onmouseover="this.style.color='rgba(245,237,216,.65)'" onmouseout="this.style.color='rgba(245,237,216,.25)'">✕</button>
+  </div>
+
+  <!-- Spotify 覆蓋層 -->
+  <div id="mp-spotify-layer" style="display:none;position:absolute;inset:0;z-index:2;align-items:center;padding:0 1rem;gap:.8rem;background:rgba(10,16,22,.92);backdrop-filter:blur(24px);">
+    <iframe id="spotify-iframe" style="border-radius:8px;flex:1;height:64px;border:none;" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <button onclick="mpHide()" style="background:none;border:none;color:rgba(245,237,216,.25);cursor:pointer;font-size:.9rem;padding:.2rem;flex-shrink:0;transition:color .2s;" onmouseover="this.style.color='rgba(245,237,216,.65)'" onmouseout="this.style.color='rgba(245,237,216,.25)'">✕</button>
   </div>
 </div>
 
@@ -6403,6 +6442,8 @@ const audio=document.getElementById('bg-audio');
 // YouTube IFrame API
 let ytPlayer=null,ytReady=false,ytPendingId=null,ytTimer=null;
 function ytId(url){if(!url)return null;const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?#\s]{11})/);return m?m[1]:null;}
+function spotifyId(url){if(!url)return null;const m=url.match(/spotify\.com\/(?:track|embed\/track)\/([A-Za-z0-9]+)/);return m?m[1]:null;}
+function bilibiliId(url){if(!url)return null;const m=url.match(/bilibili\.com\/video\/(BV[A-Za-z0-9]+)/);return m?m[1]:null;}
 function ytLoadAPI(){if(document.getElementById('yt-api-script'))return;const s=document.createElement('script');s.id='yt-api-script';s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);}
 window.onYouTubeIframeAPIReady=function(){ytReady=true;if(ytPendingId)ytCreate(ytPendingId);};
 function ytCreate(videoId){
@@ -6454,20 +6495,50 @@ function mpApply(){
     const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
     document.body.style.paddingBottom='0';return;
   }
-  const vid=ytId(mpData.audioUrl||'');
-  if(vid){
-    mpMode='youtube';audio.src='';ytCreate(vid);
-    // Safety timeout: if YT fails silently (no onError), try Piped after 10s
-    clearTimeout(window._ytTimeout);
-    window._ytTimeout=setTimeout(function(){
-      if(mpMode==='youtube'&&!mpPlaying&&mpData.audioUrl){
-        const v=ytId(mpData.audioUrl);
-        if(v)mpPipedFallback(v);
-      }
-    },10000);
+  const spId=spotifyId(mpData.audioUrl||'');
+  const bvId=bilibiliId(mpData.audioUrl||'');
+  const vid=(spId||bvId)?null:ytId(mpData.audioUrl||'');
+  const showEmbedLayer=(embedSrc)=>{
+    mpMode='embed';audio.src='';
+    const layer=document.getElementById('mp-spotify-layer');
+    const iframe=document.getElementById('spotify-iframe');
+    const leftEl=document.querySelector('#music-player > div:first-child');
+    const centerEl=document.querySelector('#music-player > div:nth-child(2)');
+    const rightEl=document.getElementById('mp-right-ctrl');
+    if(iframe)iframe.src=embedSrc;
+    if(layer)layer.style.display='flex';
+    if(leftEl)leftEl.style.display='none';
+    if(centerEl)centerEl.style.display='none';
+    if(rightEl)rightEl.style.display='none';
+    document.getElementById('music-player').style.height='80px';
+  };
+  if(spId){
+    showEmbedLayer('https://open.spotify.com/embed/track/'+spId+'?utm_source=generator&theme=0');
+  } else if(bvId){
+    showEmbedLayer('https://player.bilibili.com/player.html?bvid='+bvId+'&page=1&high_quality=1&danmaku=0&autoplay=1');
+  } else {
+    const layer=document.getElementById('mp-spotify-layer');
+    const leftEl=document.querySelector('#music-player > div:first-child');
+    const centerEl=document.querySelector('#music-player > div:nth-child(2)');
+    const rightEl=document.getElementById('mp-right-ctrl');
+    if(layer)layer.style.display='none';
+    if(leftEl)leftEl.style.display='';
+    if(centerEl)centerEl.style.display='';
+    if(rightEl)rightEl.style.display='flex';
+    document.getElementById('music-player').style.height='72px';
+    if(vid){
+      mpMode='youtube';audio.src='';ytCreate(vid);
+      clearTimeout(window._ytTimeout);
+      window._ytTimeout=setTimeout(function(){
+        if(mpMode==='youtube'&&!mpPlaying&&mpData.audioUrl){
+          const v=ytId(mpData.audioUrl);
+          if(v)mpPipedFallback(v);
+        }
+      },10000);
+    }
+    else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}
+    else{mpMode='none';}
   }
-  else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}
-  else{mpMode='none';}
   document.getElementById('music-player').style.display='flex';
   const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
   document.body.style.paddingBottom='72px';
@@ -6605,16 +6676,16 @@ mpApply();
 
 
 <!-- ══════════════════════════════════════════════
-     THAI BL · 全功能後台管理系統 v3
-     啟動：右下角 ⚙️ 或 Ctrl+Shift+A
+     彩虹經緯 · Global BL 後台管理系統
+     啟動：打 thai13 或 右下角 ⚙️
 ══════════════════════════════════════════════ -->
 <!-- admin trigger: logo ×5 clicks OR keyboard sequence -->
 
 <!-- Login -->
 <div id="cms-login" style="position:fixed;inset:0;z-index:9100;background:rgba(13,26,36,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;">
   <div style="background:#162535;border:1px solid rgba(232,134,58,.22);border-radius:16px;padding:2.5rem;width:360px;text-align:center;">
-    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#F2B07A;font-style:italic;margin-bottom:.3rem;">後台管理系統</div>
-    <div style="font-size:.64rem;letter-spacing:.2em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-bottom:1.8rem;">Content Management · Thai BL</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#F2B07A;font-style:italic;margin-bottom:.3rem;">彩虹經緯 · 後台管理</div>
+    <div style="font-size:.64rem;letter-spacing:.2em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-bottom:1.8rem;">Global BL Cultural Observatory · CMS</div>
     <div style="height:1px;background:rgba(232,134,58,.15);margin-bottom:1.8rem;"></div>
     <div style="font-size:.66rem;letter-spacing:.12em;color:rgba(245,237,216,.35);text-align:left;margin-bottom:.45rem;text-transform:uppercase;">管理員密碼</div>
     <input id="cms-pw" type="password" placeholder="輸入密碼..." onkeydown="if(event.key==='Enter')cmsLogin()" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(232,134,58,.2);border-radius:8px;padding:.72rem 1rem;color:#F5EDD8;font-family:'Noto Sans TC',sans-serif;font-size:.88rem;outline:none;">
@@ -6629,8 +6700,8 @@ mpApply();
 <div id="cms-panel" style="position:fixed;top:0;right:-680px;width:660px;height:100vh;z-index:9200;background:#0D1A24;border-left:1px solid rgba(232,134,58,.2);display:flex;flex-direction:column;transition:right .4s cubic-bezier(.22,1,.36,1);overflow:hidden;">
   <div style="background:#162535;border-bottom:1px solid rgba(232,134,58,.18);padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
     <div>
-      <div style="font-family:'Playfair Display',serif;font-size:.98rem;color:#F2B07A;font-style:italic;">後台管理</div>
-      <div style="font-size:.58rem;letter-spacing:.15em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-top:.1rem;">Thai BL · CMS v3</div>
+      <div style="font-family:'Playfair Display',serif;font-size:.98rem;color:#F2B07A;font-style:italic;">彩虹經緯 · 後台管理</div>
+      <div style="font-size:.58rem;letter-spacing:.15em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-top:.1rem;">Global BL · CMS v3</div>
     </div>
     <div style="display:flex;gap:.55rem;align-items:center;">
       <button id="cms-save-btn" onclick="cmsSaveAll()" style="background:linear-gradient(135deg,#C94B25,#E8863A);border:none;color:#fff;border-radius:7px;padding:6px 15px;font-family:'Noto Sans TC',sans-serif;font-size:.74rem;font-weight:500;cursor:pointer;">💾 儲存套用</button>
@@ -6638,14 +6709,19 @@ mpApply();
     </div>
   </div>
   <div style="display:flex;background:#111e2b;border-bottom:1px solid rgba(232,134,58,.14);flex-shrink:0;overflow-x:auto;">
-    <button class="ctab active" onclick="cmsTab('ddl')" data-s="ddl">🎬 深度專題管理</button>
-    <button class="ctab" onclick="cmsTab('recs')" data-s="recs">🌟 推薦管理</button>
-    <button class="ctab" onclick="cmsTab('tl')" data-s="tl">📅 時間軸</button>
+    <button class="ctab active" onclick="cmsEnterEdit()" data-s="edit" style="color:#4BA8A0;border-bottom-color:#4BA8A0;">✏️ 直接編輯頁面</button>
+    <button class="ctab" onclick="cmsTab('imgs')" data-s="imgs">📷 圖片</button>
+    <button class="ctab" onclick="cmsTab('music')" data-s="music">🎵 音樂</button>
     <button class="ctab" onclick="cmsTab('hero')" data-s="hero">🏠 英雄區</button>
     <button class="ctab" onclick="cmsTab('stats')" data-s="stats">📊 數據</button>
-    <button class="ctab" onclick="cmsTab('imgs')" data-s="imgs">📷 圖片</button>
     <button class="ctab" onclick="cmsTab('nav')" data-s="nav">🔗 導覽</button>
-    <button class="ctab" onclick="cmsTab('music')" data-s="music">🎵 音樂</button>
+    <button class="ctab" onclick="cmsTab('recs')" data-s="recs">🌟 推薦</button>
+    <button class="ctab" onclick="cmsTab('tl')" data-s="tl">📅 時間軸</button>
+    <button class="ctab" onclick="cmsTab('ddl')" data-s="ddl">🎬 深度專題</button>
+    <button class="ctab" onclick="cmsTab('map')" data-s="map">🗺️ 全球地圖</button>
+    <button class="ctab" onclick="cmsTab('aud')" data-s="aud">👥 受眾解構</button>
+    <button class="ctab" onclick="cmsTab('cult')" data-s="cult">🎭 文化錯位</button>
+    <button class="ctab" onclick="cmsTab('publish')" data-s="publish" style="color:#F2B07A;">🚀 發布</button>
     <button class="ctab" onclick="cmsTab('pw')" data-s="pw">⚙️</button>
   </div>
   <div id="cms-body" style="flex:1;overflow-y:auto;padding:1.2rem;">
@@ -6825,6 +6901,396 @@ mpApply();
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- ══ PUBLISH ══ -->
+    <div id="cs-publish" style="display:none;">
+      <div class="cloc">🚀 發布到 GitHub Pages</div>
+      <div style="font-size:.68rem;color:rgba(245,237,216,.35);margin-bottom:1rem;padding:.65rem;background:rgba(232,134,58,.05);border-radius:6px;border-left:2px solid rgba(232,134,58,.3);line-height:1.8;">
+        設定一次後，之後只需按「發布」就能把後台所有修改直接推上 GitHub，訪客立即看到最新內容。
+      </div>
+      <div class="ccard" style="margin-bottom:.8rem;">
+        <div class="cct">📷 ImgBB 圖片上傳 API Key</div>
+        <div style="font-size:.65rem;color:rgba(245,237,216,.3);margin-bottom:.5rem;">免費申請：imgbb.com → Account → API → 複製 API Key</div>
+        <div style="display:flex;gap:.5rem;">
+          <input class="ci" id="f-imgbb-key" type="password" placeholder="貼上 ImgBB API Key..." style="flex:1;">
+          <button onclick="pubSaveImgbb()" style="background:rgba(75,168,160,.15);border:1px solid rgba(75,168,160,.3);color:#4BA8A0;border-radius:7px;padding:6px 14px;font-size:.72rem;cursor:pointer;white-space:nowrap;">儲存</button>
+        </div>
+        <div id="imgbb-status" style="font-size:.65rem;margin-top:.4rem;color:rgba(245,237,216,.3);"></div>
+      </div>
+      <div class="ccard" style="margin-bottom:.8rem;">
+        <div class="cct">🔑 GitHub 設定</div>
+        <div style="font-size:.65rem;color:rgba(245,237,216,.3);margin-bottom:.6rem;">
+          Token 申請：GitHub → Settings → Developer settings → Personal access tokens → Fine-grained → 勾選 Contents (Read and write)
+        </div>
+        <div class="cf"><label class="cl">Personal Access Token</label>
+          <input class="ci" id="f-gh-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxx">
+        </div>
+        <div class="cf"><label class="cl">Repository（帳號/倉庫名）</label>
+          <input class="ci" id="f-gh-repo" placeholder="例：username/my-website">
+        </div>
+        <div class="cf"><label class="cl">檔案路徑</label>
+          <input class="ci" id="f-gh-path" placeholder="例：merged-final.html 或 index.html">
+        </div>
+        <div class="cf"><label class="cl">Branch</label>
+          <input class="ci" id="f-gh-branch" placeholder="main（預設）">
+        </div>
+        <button onclick="pubSaveGH()" style="background:rgba(75,168,160,.15);border:1px solid rgba(75,168,160,.3);color:#4BA8A0;border-radius:7px;padding:6px 16px;font-size:.72rem;cursor:pointer;">💾 儲存設定</button>
+        <div id="gh-settings-status" style="font-size:.65rem;margin-top:.4rem;color:rgba(245,237,216,.3);"></div>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <button id="gh-publish-btn" onclick="publishToGitHub()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#C94B25,#E8863A);border:none;border-radius:8px;color:#fff;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;letter-spacing:.08em;">
+          🚀 儲存並發布到 GitHub
+        </button>
+        <div id="gh-publish-log" style="margin-top:.6rem;font-size:.67rem;color:rgba(245,237,216,.35);line-height:1.8;"></div>
+      </div>
+    </div>
+
+    <!-- ══ MAP ══ -->
+    <div id="cs-map" style="display:none;">
+      <div class="cloc">🗺️ 全球地圖分頁 — 文字管理</div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">💬 核心論點引言</div>
+        <div class="cf"><label class="cl">引言內文 <span class="cbadge">支援 HTML</span></label><textarea class="cta" id="f-th-q" style="min-height:70px;">BL 從來不只是單純的戀愛故事，<br>它是各國社會文化與性別體制的一面<strong>鏡子</strong>，<br>精準反射出當地消費者的<strong>集體心理與精神匱乏</strong>。</textarea></div>
+        <div class="cf"><label class="cl">署名</label><input class="ci" id="f-th-attr" value="Global BL Cultural Observatory · Core Thesis"></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🌐 互動地圖區標題</div>
+        <div class="cf"><label class="cl">小標</label><input class="ci" id="f-map-eye" value="// 互動世界地圖 · Seven Core Territories"></div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-map-tit" value="全球 BL &lt;em&gt;文化版圖&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-map-sub" value="點擊各國標記 · 探索性別體制與消費心理"></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📌 深度專題 A — 區塊標題</div>
+        <div class="cf"><label class="cl">小標</label><input class="ci" id="f-fa-eye" value="// 深度專題 A · Deep Dive Feature A"></div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fa-tit" value="營業模式的&lt;em&gt;兩極&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-fa-sub" value="泰國沉浸式狂歡 vs 日本期間限定幻境"></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇹🇭 深度A · 泰國卡片</div>
+        <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fa1-ctry" value="🇹🇭 泰國 · Thailand"></div>
+        <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fa1-h" value="沉浸式&lt;em&gt;狂歡&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fa1-p" style="min-height:65px;">佛教文化的表面包容催生了獨特的「Koo-jin（真人CP）營業」文化。粉絲作為「投資人」，透過展現購買力決定CP的商業壽命，打破第四面牆的沉浸體驗是其核心驅動力。</textarea></div>
+        <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fa1-kw" style="min-height:55px;">真人CP營業
+打破第四面牆
+粉絲即投資人
+佛教包容文化</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇯🇵 深度A · 日本卡片</div>
+        <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fa2-ctry" value="🇯🇵 日本 · Japan"></div>
+        <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fa2-h" value="期間限定&lt;em&gt;幻境&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fa2-p" style="min-height:65px;">嚴格的「攻受體制」源於女性逃離現實父權壓迫、追求去性別化烏托邦的嘗試。粉絲定位為「旁觀者」，追求純粹的精神性愛，極力避免演員與角色的現實過度綁定。</textarea></div>
+        <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fa2-kw" style="min-height:55px;">攻受體制
+旁觀者視角
+虛構保護圈
+建前/本音</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📌 深度專題 B — 區塊標題</div>
+        <div class="cf"><label class="cl">小標</label><input class="ci" id="f-fb-eye" value="// 深度專題 B · Deep Dive Feature B"></div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fb-tit" value="反叛的斜線與&lt;em&gt;避難的烏托邦&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-fb-sub" value="歐美 Slash 文化 vs 亞洲傳統 BL"></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇺🇸🇪🇺 深度B · 歐美卡片</div>
+        <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fb1-ctry" value="🇺🇸🇪🇺 歐美 · West"></div>
+        <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fb1-h" value="反叛的&lt;em&gt;斜線&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fb1-p" style="min-height:65px;">起源於《星際爭霸戰》的 Slash 文化，強調交織性、身分認同與絕對的權力對等。粉絲將消費視為政治表態，反抗異性戀霸權，對「賣腐（Queerbaiting）」與刻板印象極度零容忍。</textarea></div>
+        <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fb1-kw" style="min-height:55px;">政治表態消費
+交織性
+反 Queerbaiting
+身分流動</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇯🇵🇨🇳🇰🇷🇹🇭 深度B · 亞洲卡片</div>
+        <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fb2-ctry" value="🇯🇵🇨🇳🇰🇷🇹🇭 亞洲 · Asia"></div>
+        <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fb2-h" value="避難的&lt;em&gt;烏托邦&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fb2-p" style="min-height:65px;">亞洲傳統 BL 建立在「攻受二元」的權力美學上，為女性讀者提供逃離現實性別束縛的精神空間。各國因地制宜：日本的隱忍、泰國的解放、中國的隱喻、韓國的視覺奇觀。</textarea></div>
+        <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fb2-kw" style="min-height:55px;">攻受二元美學
+精神逃避空間
+在地化改造
+女性凝視</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🃏 七國文化解碼 — 標題</div>
+        <div class="cf"><label class="cl">小標</label><input class="ci" id="f-snd-eye" value="// 七國文化解碼 · Seven Nations Decoded"></div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-snd-tit" value="翻轉，看見&lt;em&gt;背後的故事&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-snd-sub" value="Hover 翻轉卡片 · 解碼各國性別體制與消費心理"></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📊 跨國比較矩陣 — 標題與七國資料</div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-cdc-tit" value="七國&lt;em&gt;文化解碼&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-cdc-sub" value="性別體制 · 消費心理 · 文化驅動力"></div>
+        <div style="font-size:.63rem;color:rgba(245,237,216,.3);margin:.3rem 0 .6rem;line-height:1.6;">每格資料用 <strong style="color:#E8863A;">換行</strong> 分隔多個標籤（核心消費心理欄只填一行）</div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.3rem;font-size:.58rem;color:rgba(245,237,216,.35);letter-spacing:.05em;">
+          <span></span><span>核心文本載體</span><span>社會制約</span><span>性別權力</span><span>核心消費心理</span>
+        </div>
+        ${['JP 🇯🇵 日本','KR 🇰🇷 韓國','CN 🇨🇳 中國','TW 🇹🇼 台灣','TH 🇹🇭 泰國','US 🇺🇸 美國','EU 🇪🇺 歐洲'].map((lbl,i)=>{
+          const keys=[['JP','漫畫\n輕小說','父權\n讀空氣','嚴格攻受\n精神救贖','逃避現實束縛的烏托邦'],
+          ['KR','Webtoon\n影視','外貌焦慮\n階級','體格差\n強弱翻轉','感官刺激與視覺完美'],
+          ['CN','網路小說\n動漫','審查\n儒家','靈魂知己','宏大敘事與禁忌投射'],
+          ['TW','影視\n文學','同婚合法\n民主','攻受解構','平權認同與日常共鳴'],
+          ['TH','商業電視劇','佛教包容','青春公式','真人 CP 沉浸追星'],
+          ['US','同人\n串流','個人主義\n平權','身分流動','社群反叛與政治實踐'],
+          ['EU','串流\n獨立電影','個人主義','模糊 BL/LGBTQ+','心靈共鳴、去標籤化']];
+          return '';}).join('')}
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇯🇵 JP</div>
+          <textarea class="cta" id="f-cdc-JP-c1" style="min-height:48px;font-size:.72rem;">漫畫
+輕小說</textarea>
+          <textarea class="cta" id="f-cdc-JP-c2" style="min-height:48px;font-size:.72rem;">父權
+讀空氣</textarea>
+          <textarea class="cta" id="f-cdc-JP-c3" style="min-height:48px;font-size:.72rem;">嚴格攻受
+精神救贖</textarea>
+          <input class="ci" id="f-cdc-JP-c4" value="逃避現實束縛的烏托邦" style="font-size:.72rem;">
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇰🇷 KR</div>
+          <textarea class="cta" id="f-cdc-KR-c1" style="min-height:48px;font-size:.72rem;">Webtoon
+影視</textarea>
+          <textarea class="cta" id="f-cdc-KR-c2" style="min-height:48px;font-size:.72rem;">外貌焦慮
+階級</textarea>
+          <textarea class="cta" id="f-cdc-KR-c3" style="min-height:48px;font-size:.72rem;">體格差
+強弱翻轉</textarea>
+          <input class="ci" id="f-cdc-KR-c4" value="感官刺激與視覺完美" style="font-size:.72rem;">
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇨🇳 CN</div>
+          <textarea class="cta" id="f-cdc-CN-c1" style="min-height:48px;font-size:.72rem;">網路小說
+動漫</textarea>
+          <textarea class="cta" id="f-cdc-CN-c2" style="min-height:48px;font-size:.72rem;">審查
+儒家</textarea>
+          <textarea class="cta" id="f-cdc-CN-c3" style="min-height:48px;font-size:.72rem;">靈魂知己</textarea>
+          <input class="ci" id="f-cdc-CN-c4" value="宏大敘事與禁忌投射" style="font-size:.72rem;">
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇹🇼 TW</div>
+          <textarea class="cta" id="f-cdc-TW-c1" style="min-height:48px;font-size:.72rem;">影視
+文學</textarea>
+          <textarea class="cta" id="f-cdc-TW-c2" style="min-height:48px;font-size:.72rem;">同婚合法
+民主</textarea>
+          <textarea class="cta" id="f-cdc-TW-c3" style="min-height:48px;font-size:.72rem;">攻受解構</textarea>
+          <input class="ci" id="f-cdc-TW-c4" value="平權認同與日常共鳴" style="font-size:.72rem;">
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇹🇭 TH</div>
+          <textarea class="cta" id="f-cdc-TH-c1" style="min-height:48px;font-size:.72rem;">商業電視劇</textarea>
+          <textarea class="cta" id="f-cdc-TH-c2" style="min-height:48px;font-size:.72rem;">佛教包容</textarea>
+          <textarea class="cta" id="f-cdc-TH-c3" style="min-height:48px;font-size:.72rem;">青春公式</textarea>
+          <input class="ci" id="f-cdc-TH-c4" value="真人 CP 沉浸追星" style="font-size:.72rem;">
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇺🇸 US</div>
+          <textarea class="cta" id="f-cdc-US-c1" style="min-height:48px;font-size:.72rem;">同人
+串流</textarea>
+          <textarea class="cta" id="f-cdc-US-c2" style="min-height:48px;font-size:.72rem;">個人主義
+平權</textarea>
+          <textarea class="cta" id="f-cdc-US-c3" style="min-height:48px;font-size:.72rem;">身分流動</textarea>
+          <input class="ci" id="f-cdc-US-c4" value="社群反叛與政治實踐" style="font-size:.72rem;">
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;align-items:start;">
+          <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇪🇺 EU</div>
+          <textarea class="cta" id="f-cdc-EU-c1" style="min-height:48px;font-size:.72rem;">串流
+獨立電影</textarea>
+          <textarea class="cta" id="f-cdc-EU-c2" style="min-height:48px;font-size:.72rem;">個人主義</textarea>
+          <textarea class="cta" id="f-cdc-EU-c3" style="min-height:48px;font-size:.72rem;">模糊 BL/LGBTQ+</textarea>
+          <input class="ci" id="f-cdc-EU-c4" value="心靈共鳴、去標籤化" style="font-size:.72rem;">
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📝 結語</div>
+        <div class="cf"><label class="cl">小標籤</label><input class="ci" id="f-epi-lbl" value="// 結語 · 台灣文化座標"></div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;br&gt; &lt;em&gt;</span></label><input class="ci" id="f-epi-h" value="尋找台灣的&lt;br&gt;&lt;em&gt;文化座標&lt;/em&gt;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 01</div>
+            <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi1-n" value="01"></div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi1-tag" value="缺憾的投射"></div>
+            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi1-bh" style="min-height:50px;">各國 BL 體制，皆是在地心理匱乏的折射</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi1-bp" style="min-height:60px;">日本的逃避、歐美的反叛、泰國的沉浸、中國的隱喻——每一種 BL 消費型態，都精準指向那個社會的性別傷口與集體渴望。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 02</div>
+            <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi2-n" value="02"></div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi2-tag" value="歷史底蘊與絕對自由"></div>
+            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi2-bh" style="min-height:50px;">從白先勇《孽子》到婚姻平權，台灣擁有免於審查恐懼的創作環境</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi2-bp" style="min-height:60px;">亞洲首個同婚合法國家的身分，讓台灣 BL 創作者能夠直視傷痕、書寫禁忌。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 03</div>
+            <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi3-n" value="03"></div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi3-tag" value="直視傷痕與尺度綻放"></div>
+            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi3-bh" style="min-height:50px;">將大時代悲劇與個人極致愛戀交織，是台灣獨有的敘事能量</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi3-bp" style="min-height:60px;">《刻在你心底的名字》將 228 與白色恐怖時代的壓抑，轉化為跨越時空的愛戀。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 04</div>
+            <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi4-n" value="04"></div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi4-tag" value="動漫復興與專屬語彙"></div>
+            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi4-bh" style="min-height:50px;">文策院推動下，台灣正建立跨媒材 IP 產業鏈</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi4-bp" style="min-height:60px;">宮廟文化、冥婚民俗、本土地景——台灣的在地文化符號正被具象化為專屬視覺語彙。</textarea></div>
+          </div>
+        </div>
+        <div class="cf" style="margin-top:.5rem;"><label class="cl">結語引言 <span class="cbadge">支援 &lt;strong&gt;</span></label><textarea class="cta" id="f-epi-fq" style="min-height:70px;">「了解各國的性別體制與消費心理，不是為了迎合他國的成功公式，而是為了<strong>精準定位</strong>。只要繼續將這座島嶼的<strong>自由、傷痕與多元</strong>化作最動人的文本，結合日益成熟的視覺產業鏈，我們點亮的光，終將匯聚成<strong>星河</strong>，被全世界看見。」</textarea></div>
+        <div class="cf"><label class="cl">署名</label><input class="ci" id="f-epi-fa" value="— 彩虹經緯 研究宣言 · Global BL Cultural Observatory"></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🔬 三條研究軸線</div>
+        <div class="cf"><label class="cl">小標</label><input class="ci" id="f-ax-eye" value="// 三條研究軸線 · Three Research Axes"></div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-ax-tit" value="深入探索&lt;em&gt;三條研究軸線&lt;/em&gt;"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-ax-sub" value="美學 · 受眾 · 文化"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.3rem;">
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">軸線 01</div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-ax1-tag" value="美學 × 商業分析"></div>
+            <div class="cf"><label class="cl">標題 <span class="cbadge">&lt;em&gt;</span></label><input class="ci" id="f-ax1-h" value="風格&lt;em&gt;經緯&lt;/em&gt;"></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-ax1-p" style="min-height:70px;">解構 BL 劇的視覺語言——燈光、構圖、色調如何建構慾望的美學語法。從泰國的熱帶暖色到日本的清冷線條，風格即意識形態。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">軸線 02</div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-ax2-tag" value="女性凝視 × 心理機制"></div>
+            <div class="cf"><label class="cl">標題 <span class="cbadge">&lt;em&gt;</span></label><input class="ci" id="f-ax2-h" value="受眾&lt;em&gt;解構&lt;/em&gt;"></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-ax2-p" style="min-height:70px;">誰在看？她們為何著迷？BL 的跨國受眾心理折射出全球女性對情感表達自由的深層渴望。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">軸線 03</div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-ax3-tag" value="現實困境 × 幻想投射"></div>
+            <div class="cf"><label class="cl">標題 <span class="cbadge">&lt;em&gt;</span></label><input class="ci" id="f-ax3-h" value="文化&lt;em&gt;錯位&lt;/em&gt;"></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-ax3-p" style="min-height:70px;">文化錯位揭示 BL 如何在跨越邊界時，同時翻譯與重構性別想像。</textarea></div>
+          </div>
+        </div>
+      </div>
+      <button onclick="saveMap()" style="width:100%;padding:.75rem;background:linear-gradient(135deg,#C94B25,#E8863A);color:#F5EDD8;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:.5rem;letter-spacing:.08em;">💾 儲存套用 · 全球地圖</button>
+    </div>
+
+    <!-- ══ AUD ══ -->
+    <div id="cs-aud" style="display:none;">
+      <div class="cloc">👥 受眾解構分頁 — 文字管理</div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📌 頁面主標題</div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;br&gt;</span></label><input class="ci" id="f-aud-h1" value="誰在看 BL？為什麼看？"></div>
+        <div class="cf"><label class="cl">引言描述</label><textarea class="cta" id="f-aud-body" style="min-height:60px;">BL 的核心受眾與絕大多數創作者都是女性。這不只是「看帥哥談戀愛」——在文化研究、性別心理學與消費行為學上，有更值得深挖的多層意義。</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🖼️ 圖文段落 1 — Female Gaze</div>
+        <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;br&gt; &lt;em&gt;</span></label><textarea class="cta" id="f-it1-h" style="min-height:45px;">「她」為什麼愛 BL？&lt;br&gt;&lt;em style="font-size:.88rem;color:var(--vin-sepia);"&gt;Female Gaze 與安全投射的理論基礎&lt;/em&gt;</textarea></div>
+        <div class="cf"><label class="cl">段落 1</label><textarea class="cta" id="f-it1-p1" style="min-height:70px;">性別學者 Laura Mulvey 的「Male Gaze」（男性凝視）理論指出，傳統影視往往以男性視角物化女性。BL 的顛覆在於：女性讀者得以完全跳脫「被凝視的客體」身份，化身為「凝視的主體」——自由欣賞一場與自身性別無關的純粹情感故事，徹底逃離傳統性別框架的束縛。</textarea></div>
+        <div class="cf"><label class="cl">段落 2</label><textarea class="cta" id="f-it1-p2" style="min-height:55px;">更重要的是，BL 提供的不只是視覺快感，而是一種「情感結構上的解放」：兩個男主角的相對平等地位，讓女性受眾得以在虛構世界中體驗「不被性別壓迫的愛情」。</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🖼️ 圖文段落 2 — 安全疏離感</div>
+        <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;br&gt; &lt;em&gt;</span></label><textarea class="cta" id="f-it2-h" style="min-height:45px;">「安全疏離感」：&lt;br&gt;&lt;em style="font-size:.88rem;color:var(--vin-sepia);"&gt;日本腐女子文化的精神根源&lt;/em&gt;</textarea></div>
+        <div class="cf"><label class="cl">段落 1</label><textarea class="cta" id="f-it2-p1" style="min-height:70px;">日本女性受眾（腐女子/Fujoshi）在現實的異性戀關係中承受著巨大的社會期待——侍奉家庭、迴避衝突、成為「被規訓的女主角」。BL 提供了一個「絕對安全的疏離感」：站在第三方視角，純粹欣賞一場不涉及自身身份的情感，是一種對高壓教化的溫柔抵抗。</textarea></div>
+        <div class="cf"><label class="cl">段落 2</label><textarea class="cta" id="f-it2-p2" style="min-height:55px;">泰國粉絲投射的則是「提前實現完美平權」的集體宣洩——劇中菁英角色所享有的無條件同性接納，是她們對現實制度的幻想補償。</textarea></div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">💰 她們為什麼「買單」</div>
+        <div class="cf"><label class="cl">區塊標題</label><input class="ci" id="f-buy-h2" value="她們在為什麼「買單」？"></div>
+        <div class="cf"><label class="cl">區塊描述</label><textarea class="cta" id="f-buy-body" style="min-height:55px;">BL 受眾的消費不只是購買娛樂——背後有三層深層的心理補償機制，讓「情感投射」高效率地轉化為真金白銀。</textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.3rem;">
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">買單 1</div>
+            <div class="cf"><label class="cl">標題</label><input class="ci" id="f-buy1-h" value="購買「平權烏托邦」"></div>
+            <div class="cf"><label class="cl">說明 <span class="cbadge">&lt;strong&gt;</span></label><textarea class="cta" id="f-buy1-desc" style="min-height:65px;">傳統言情（BG）中女性長期承受性別框架與權力不對等。BL 的雙男性設定讓她們得以投射一場&lt;strong&gt;勢均力敵、不被壓迫的純粹愛戀&lt;/strong&gt;——是現實中難以獲得的情感補償。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">買單 2</div>
+            <div class="cf"><label class="cl">標題</label><input class="ci" id="f-buy2-h" value="投資「去毒化」親密關係"></div>
+            <div class="cf"><label class="cl">說明 <span class="cbadge">&lt;strong&gt;</span></label><textarea class="cta" id="f-buy2-desc" style="min-height:65px;">BL 男主角被允許脆弱、流淚、細膩傾聽，是&lt;strong&gt;女性凝視重新形塑的理想男性&lt;/strong&gt;。花錢支持這些形象，是對完美伴侶與情感關係的「精神認股」。</textarea></div>
+          </div>
+          <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">買單 3</div>
+            <div class="cf"><label class="cl">標題</label><input class="ci" id="f-buy3-h" value="買一張「精神逃離」門票"></div>
+            <div class="cf"><label class="cl">說明 <span class="cbadge">&lt;strong&gt;</span></label><textarea class="cta" id="f-buy3-desc" style="min-height:65px;">站在第三方視角，看一場與自身性別無關的戀愛，&lt;strong&gt;不承擔任何性別角色責任&lt;/strong&gt;。花錢，是為了買一張逃離高壓現實、獲得溫柔抵抗的門票。</textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🌏 她經濟 &amp; 研究結論</div>
+        <div class="cf"><label class="cl">她經濟標題</label><input class="ci" id="f-eco-h3" value="她經濟：各國「點石成金」的變現生態鏈"></div>
+        <div class="cf"><label class="cl">她經濟描述</label><textarea class="cta" id="f-eco-body" style="min-height:45px;">相同的情感需求，在不同國家發展出截然不同的商業收割模式。</textarea></div>
+        <div class="cf"><label class="cl">研究結論標題</label><input class="ci" id="f-con-h3" value="研究結論"></div>
+        <div class="cf"><label class="cl">研究結論內文</label><textarea class="cta" id="f-con-body" style="min-height:70px;">BL 影視不是無腦的娛樂——它是各國女性與小眾群體，在面對現實高壓的性別體制、權力不對等、以及保守社會風氣時，所集體進行的一場溫柔精神反叛，更因此意外催生出了產值驚人的全球粉紅經濟鏈。</textarea></div>
+      </div>
+      <button onclick="saveAud()" style="width:100%;padding:.75rem;background:linear-gradient(135deg,#C94B25,#E8863A);color:#F5EDD8;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:.5rem;letter-spacing:.08em;">💾 儲存套用 · 受眾解構</button>
+    </div>
+
+    <!-- ══ CULT ══ -->
+    <div id="cs-cult" style="display:none;">
+      <div class="cloc">🎭 文化錯位分頁 — 文字管理</div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📌 頁面主標題</div>
+        <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;br&gt;</span></label><input class="ci" id="f-cult-h1" value="現實越窒息&lt;br&gt;幻想越美麗"></div>
+        <div class="cf"><label class="cl">引言描述</label><textarea class="cta" id="f-cult-body" style="min-height:55px;">探討各國的現實性別困境與體制壓迫，如何反向推動粉絲對 BL 作品中「粉紅烏托邦」的瘋狂投射。</textarea></div>
+      </div>
+
+      <div style="font-size:.68rem;color:rgba(245,237,216,.35);margin-bottom:.8rem;padding:.6rem;background:rgba(232,134,58,.05);border-radius:6px;border-left:2px solid rgba(232,134,58,.3);line-height:1.8;">
+        💡 六國翻轉卡片：左欄為現實面（正面），右欄為幻想面（背面）。
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇰🇷 韓國 翻轉卡片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div class="cf"><label class="cl">現實面（正面）</label><textarea class="cta" id="f-kr-reality" style="min-height:80px;">儒家長輩文化、極端恐同情緒、宗教團體與軍隊體制帶來的性別壓迫。近年撕裂的厭女浪潮與反女性主義（Anti-feminism）思潮。主流媒體極少允許真正的同志角色。</textarea></div>
+          <div class="cf"><label class="cl">幻想面（背面）</label><textarea class="cta" id="f-kr-fantasy" style="min-height:80px;">在最保守的社會環境裡，K-Pop 級偶像在精緻光影下談戀愛。劇中沒有社會歧視、沒有長輩逼婚——粉絲將其視為「將禁忌純愛化」的心理補償，在最保守的現實裡消費最純粹、最不具威脅性的男色幻想。</textarea></div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇨🇳 中國 翻轉卡片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div class="cf"><label class="cl">現實面</label><textarea class="cta" id="f-cn-reality" style="min-height:80px;">廣電總局全面封鎖同性戀影視內容。2021 年後 LGBTQ+ 受到更嚴格的社會管控。所有改編必須去同性化，貼上「兄弟情」標籤。</textarea></div>
+          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-cn-fantasy" style="min-height:80px;">粉絲透過演員眼神、肢體語言與台詞縫隙，在官方「兄弟情」包裝下自行解讀真實的愛情。這種「破解密碼」的觀看體驗本身成為一種樂趣，反而強化了情感投入。越禁越狂，《陳情令》創造數十億產值。</textarea></div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇹🇭 泰國 翻轉卡片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div class="cf"><label class="cl">現實面</label><textarea class="cta" id="f-th-reality" style="min-height:80px;">表面性別包容，但社會本質上「表面包容、體制歧視」。職場高層晉升的隱形天花板、極大的貧富與階級差距。工程學院被戲稱為「大小爺們談戀愛」的場所。</textarea></div>
+          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-th-fantasy" style="min-height:80px;">劇中主角通常是非富即貴、有社會地位的菁英（黑幫少爺、醫師、工程師），且他們的父母與同儕往往「無條件支持」他們的同性戀情。這不僅投射了女性對上流社會生活的嚮往，更是「提前實現完美平權」的集體宣洩。</textarea></div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇯🇵 日本 翻轉卡片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div class="cf"><label class="cl">現實面</label><textarea class="cta" id="f-jp-reality" style="min-height:80px;">「讀空氣文化」對同性戀的徹底忽視。出櫃在職場與家族中依然是不可言說的禁忌，同婚在國家法律面也尚未完全合法。女性面臨職場天花板、主婦文化等巨大壓力。</textarea></div>
+          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-jp-fantasy" style="min-height:80px;">腐女子投射的核心在於「絕對的安全疏離感」——因為現實中的男性伴侶帶有巨大的侍奉家庭壓力，她們成功將自己從「被規訓的女主角」身份中抽離，站在第三方純粹欣賞一場與自身性別無關的純粹拉扯。</textarea></div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇹🇼 台灣 翻轉卡片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div class="cf"><label class="cl">現實面</label><textarea class="cta" id="f-tw-reality" style="min-height:80px;">雖然同婚合法，但在影視之外的現實家庭、中南部都會區或中老年群體中，傳統「傳宗接代」父權家庭觀念依然與平權思想在進行拉扯與衝突。</textarea></div>
+          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-tw-fantasy" style="min-height:80px;">台灣粉絲在 BL 作品中投射的是「與現實接軌的共鳴與希望」。劇中往往拍出主角如何面對傳統父母的出櫃掙扎、跨越家庭矛盾最終得到祝福——這段感情真的有可能在我的真實生活中遭遇。</textarea></div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">🇺🇸 美國 翻轉卡片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+          <div class="cf"><label class="cl">現實面</label><textarea class="cta" id="f-us-reality" style="min-height:80px;">雖然平權運動歷史悠久，但現實中 LGBTQ+ 群體依然面臨嚴重的恐同暴力、校園霸凌，以及高比例的青少年出櫃後被家庭遺棄、流落街頭等社會血腥現實。</textarea></div>
+          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-us-fantasy" style="min-height:80px;">《戀愛修課》核心策略：將殘酷的真實世界「過濾掉」。現實中的酷兒青春充滿眼淚與霸凌，但劇中，雖有微小的挫折，主角周圍還有最好的朋友守護、最溫柔理解的母親——給無數受傷的受眾一個「如果我的青春期也這樣被溫柔對待就好了」的心理重建。</textarea></div>
+        </div>
+      </div>
+
+      <div class="ccard" style="margin-bottom:.7rem;">
+        <div class="cct">📝 研究結論</div>
+        <div class="cf"><label class="cl">結論標題</label><input class="ci" id="f-cult-con-h3" value="研究結論"></div>
+        <div class="cf"><label class="cl">結論內文</label><textarea class="cta" id="f-cult-con-body" style="min-height:70px;">BL 影視不是無腦的娛樂——它是各國女性與小眾群體，在面對現實高壓的性別體制、權力不對等、以及保守社會風氣時，所集體進行的一場溫柔精神反叛，更因此意外催生出了產值驚人的全球粉紅經濟鏈。</textarea></div>
+      </div>
+      <button onclick="saveCult()" style="width:100%;padding:.75rem;background:linear-gradient(135deg,#C94B25,#E8863A);color:#F5EDD8;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:.5rem;letter-spacing:.08em;">💾 儲存套用 · 文化錯位</button>
     </div>
 
     <!-- ══ SETTINGS ══ -->
@@ -7198,6 +7664,27 @@ const FIXED_IMGS=[
   {key:'gal0',label:'三格圖片 1（左）',type:'img',sel:'.gallery-strip .g-cell:nth-child(1) img'},
   {key:'gal1',label:'三格圖片 2（中）',type:'img',sel:'.gallery-strip .g-cell:nth-child(2) img'},
   {key:'gal2',label:'三格圖片 3（右）',type:'img',sel:'.gallery-strip .g-cell:nth-child(3) img'},
+  // 深度專題 A
+  {key:'fa1', label:'深度A · 泰國圖 1',type:'img',sel:'#fa1'},
+  {key:'fa1b',label:'深度A · 泰國圖 2',type:'img',sel:'#fa1b'},
+  {key:'fa1c',label:'深度A · 泰國圖 3',type:'img',sel:'#fa1c'},
+  {key:'fa2', label:'深度A · 日本圖 1',type:'img',sel:'#fa2'},
+  {key:'fa2b',label:'深度A · 日本圖 2',type:'img',sel:'#fa2b'},
+  {key:'fa2c',label:'深度A · 日本圖 3',type:'img',sel:'#fa2c'},
+  // 深度專題 B
+  {key:'fb1', label:'深度B · 歐美圖 1',type:'img',sel:'#fb1'},
+  {key:'fb1b',label:'深度B · 歐美圖 2',type:'img',sel:'#fb1b'},
+  {key:'fb1c',label:'深度B · 歐美圖 3',type:'img',sel:'#fb1c'},
+  {key:'fb2', label:'深度B · 亞洲圖 1',type:'img',sel:'#fb2'},
+  {key:'fb2b',label:'深度B · 亞洲圖 2',type:'img',sel:'#fb2b'},
+  {key:'fb2c',label:'深度B · 亞洲圖 3',type:'img',sel:'#fb2c'},
+  // 三大研究軸
+  {key:'ax1',label:'研究軸 01 · 風格經緯',type:'img',sel:'#ax1'},
+  {key:'ax2',label:'研究軸 02 · 受眾解構',type:'img',sel:'#ax2'},
+  {key:'ax3',label:'研究軸 03 · 文化錯位',type:'img',sel:'#ax3'},
+  // 受眾分析
+  {key:'aud1',label:'受眾分析圖 1（Female Gaze）',type:'img',sel:'#aud1'},
+  {key:'aud2',label:'受眾分析圖 2（安全疏離感）',type:'img',sel:'#aud2'},
 ];
 let fixedImgs={};
 function loadFixedImgs(){try{const r=localStorage.getItem(K_IMGS);if(r)fixedImgs=JSON.parse(r);}catch(e){fixedImgs={};}}
@@ -7449,6 +7936,9 @@ function applyTxt(d){
 // MASTER SAVE
 // ═══════════════════════════════
 function cmsSaveAll(){
+  try{saveMap();}catch(e){console.warn('saveMap',e);}
+  try{saveAud();}catch(e){console.warn('saveAud',e);}
+  try{saveCult();}catch(e){console.warn('saveCult',e);}
   collectRecsMain(); collectRecsDramas(); collectTL();
   ddCmsCollect(); ddSaveData(); ddBuildFilters(); ddRenderGrid();
   ddlCmsCollect(); ddlSave(); ddlRenderAll();
@@ -7485,6 +7975,9 @@ function cmsLogin(){
     try{mpCmsLoad();}catch(e){console.warn('mpCmsLoad',e);}
     try{ddCmsBuildList();}catch(e){console.warn('ddCmsBuildList',e);}
     try{ddlCmsBuildList();}catch(e){console.warn('ddlCmsBuildList',e);}
+    try{loadMapForm();}catch(e){console.warn('loadMapForm',e);}
+    try{loadAudForm();}catch(e){console.warn('loadAudForm',e);}
+    try{loadCultForm();}catch(e){console.warn('loadCultForm',e);}
     // Show the first tab correctly
     try{cmsTab('ddl');}catch(e){console.warn('cmsTab',e);}
   }else{
@@ -7502,8 +7995,185 @@ function cmsTab(s){
   if(s==='imgs')buildFixedImgList();
   if(s==='music')mpCmsLoad();
   if(s==='ddl'){ddlCmsBuildList();}
+  if(s==='publish')pubLoadSettings();
+  if(s==='map')loadMapForm();
+  if(s==='aud')loadAudForm();
+  if(s==='cult')loadCultForm();
 }
 function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(!np){alert('請輸入新密碼');return;}localStorage.setItem(K_PW,np);document.getElementById('f-npw').value='';alert('✅ 密碼已更新：'+np);}
+
+// ══ MAP / AUD / CULT CMS ══
+const K_MAP='thaiBL-map', K_AUD='thaiBL-aud', K_CULT='thaiBL-cult';
+function $v(id){const el=document.getElementById(id);return el?(el.value||''):''}
+function $s(id,v){const el=document.getElementById(id);if(el)el.value=v;}
+
+// ── MAP ──
+function collectMap(){return{thQ:$v('f-th-q'),thAttr:$v('f-th-attr'),mapEye:$v('f-map-eye'),mapTit:$v('f-map-tit'),mapSub:$v('f-map-sub'),faEye:$v('f-fa-eye'),faTit:$v('f-fa-tit'),faSub:$v('f-fa-sub'),fa1Ctry:$v('f-fa1-ctry'),fa1H:$v('f-fa1-h'),fa1P:$v('f-fa1-p'),fa1Kw:$v('f-fa1-kw'),fa2Ctry:$v('f-fa2-ctry'),fa2H:$v('f-fa2-h'),fa2P:$v('f-fa2-p'),fa2Kw:$v('f-fa2-kw'),fbEye:$v('f-fb-eye'),fbTit:$v('f-fb-tit'),fbSub:$v('f-fb-sub'),fb1Ctry:$v('f-fb1-ctry'),fb1H:$v('f-fb1-h'),fb1P:$v('f-fb1-p'),fb1Kw:$v('f-fb1-kw'),fb2Ctry:$v('f-fb2-ctry'),fb2H:$v('f-fb2-h'),fb2P:$v('f-fb2-p'),fb2Kw:$v('f-fb2-kw'),sndEye:$v('f-snd-eye'),sndTit:$v('f-snd-tit'),sndSub:$v('f-snd-sub'),cdcTit:$v('f-cdc-tit'),cdcSub:$v('f-cdc-sub'),cdcJP:[$v('f-cdc-JP-c1'),$v('f-cdc-JP-c2'),$v('f-cdc-JP-c3'),$v('f-cdc-JP-c4')],cdcKR:[$v('f-cdc-KR-c1'),$v('f-cdc-KR-c2'),$v('f-cdc-KR-c3'),$v('f-cdc-KR-c4')],cdcCN:[$v('f-cdc-CN-c1'),$v('f-cdc-CN-c2'),$v('f-cdc-CN-c3'),$v('f-cdc-CN-c4')],cdcTW:[$v('f-cdc-TW-c1'),$v('f-cdc-TW-c2'),$v('f-cdc-TW-c3'),$v('f-cdc-TW-c4')],cdcTH:[$v('f-cdc-TH-c1'),$v('f-cdc-TH-c2'),$v('f-cdc-TH-c3'),$v('f-cdc-TH-c4')],cdcUS:[$v('f-cdc-US-c1'),$v('f-cdc-US-c2'),$v('f-cdc-US-c3'),$v('f-cdc-US-c4')],cdcEU:[$v('f-cdc-EU-c1'),$v('f-cdc-EU-c2'),$v('f-cdc-EU-c3'),$v('f-cdc-EU-c4')],epiLbl:$v('f-epi-lbl'),epiH:$v('f-epi-h'),epiFq:$v('f-epi-fq'),epiFa:$v('f-epi-fa'),epi1:[$v('f-epi1-n'),$v('f-epi1-tag'),$v('f-epi1-bh'),$v('f-epi1-bp')],epi2:[$v('f-epi2-n'),$v('f-epi2-tag'),$v('f-epi2-bh'),$v('f-epi2-bp')],epi3:[$v('f-epi3-n'),$v('f-epi3-tag'),$v('f-epi3-bh'),$v('f-epi3-bp')],epi4:[$v('f-epi4-n'),$v('f-epi4-tag'),$v('f-epi4-bh'),$v('f-epi4-bp')],axEye:$v('f-ax-eye'),axTit:$v('f-ax-tit'),axSub:$v('f-ax-sub'),ax1:[$v('f-ax1-tag'),$v('f-ax1-h'),$v('f-ax1-p')],ax2:[$v('f-ax2-tag'),$v('f-ax2-h'),$v('f-ax2-p')],ax3:[$v('f-ax3-tag'),$v('f-ax3-h'),$v('f-ax3-p')]};}
+function applyMap(d){
+  const si=(sel,v)=>{const el=document.querySelector(sel);if(el&&v!==undefined)el.innerHTML=v;};
+  si('.th-q',d.thQ);si('.th-attr',d.thAttr);
+  const mapSec=document.querySelector('#tab-map .sec');
+  if(mapSec){const e=mapSec.querySelector('.eye'),t=mapSec.querySelector('.tit'),s=mapSec.querySelector('.sub');if(e)e.innerHTML=d.mapEye;if(t)t.innerHTML=d.mapTit;if(s)s.innerHTML=d.mapSub;}
+  const fa=document.querySelector('#fa');
+  if(fa){const si2=fa.querySelector('.si');if(si2){const e=si2.querySelector('.eye'),t=si2.querySelector('.tit'),s=si2.querySelector('.sub');if(e)e.innerHTML=d.faEye;if(t)t.innerHTML=d.faTit;if(s)s.innerHTML=d.faSub;}
+    const applyCard=(id,ctry,h,p,kw)=>{const el=document.querySelector(id);if(!el)return;const c=el.querySelector('.fc-ctry');if(c)c.innerHTML=ctry;const hh=el.querySelector('.fc-h');if(hh)hh.innerHTML=h;const pp=el.querySelector('.fc-p');if(pp)pp.innerHTML=p;const kws=el.querySelectorAll('.fc-kw span');kw.split('\n').filter(Boolean).forEach((k,i)=>{if(kws[i])kws[i].textContent=k;});};
+    applyCard('#fa-th',d.fa1Ctry,d.fa1H,d.fa1P,d.fa1Kw);applyCard('#fa-jp',d.fa2Ctry,d.fa2H,d.fa2P,d.fa2Kw);}
+  const fb=document.querySelector('#fb');
+  if(fb){const si2=fb.querySelector('.si');if(si2){const e=si2.querySelector('.eye'),t=si2.querySelector('.tit'),s=si2.querySelector('.sub');if(e)e.innerHTML=d.fbEye;if(t)t.innerHTML=d.fbTit;if(s)s.innerHTML=d.fbSub;}
+    const applyCard=(id,ctry,h,p,kw)=>{const el=document.querySelector(id);if(!el)return;const c=el.querySelector('.fc-ctry');if(c)c.innerHTML=ctry;const hh=el.querySelector('.fc-h');if(hh)hh.innerHTML=h;const pp=el.querySelector('.fc-p');if(pp)pp.innerHTML=p;const kws=el.querySelectorAll('.fc-kw span');kw.split('\n').filter(Boolean).forEach((k,i)=>{if(kws[i])kws[i].textContent=k;});};
+    applyCard('#fb-west',d.fb1Ctry,d.fb1H,d.fb1P,d.fb1Kw);applyCard('#fb-asia',d.fb2Ctry,d.fb2H,d.fb2P,d.fb2Kw);}
+  const flipSec=document.querySelector('.flip-sec');
+  if(flipSec){const e=flipSec.querySelector('.eye'),t=flipSec.querySelector('.tit'),s=flipSec.querySelector('.sub');if(e)e.innerHTML=d.sndEye;if(t)t.innerHTML=d.sndTit;if(s)s.innerHTML=d.sndSub;}
+  const cdcSec=document.querySelector('.cdc-sec');
+  if(cdcSec){const tit=cdcSec.querySelector('.tit'),sub=cdcSec.querySelector('.sub');if(tit)tit.innerHTML=d.cdcTit;if(sub)sub.innerHTML=d.cdcSub;
+    const rows=cdcSec.querySelectorAll('.cdc-row');const nations=[d.cdcJP,d.cdcKR,d.cdcCN,d.cdcTW,d.cdcTH,d.cdcUS,d.cdcEU];
+    rows.forEach((row,i)=>{if(!nations[i])return;const cells=row.querySelectorAll('.cdc-cell');nations[i].forEach((val,ci)=>{if(cells[ci])cells[ci].innerHTML=val.replace(/\n/g,'<br>');});});}
+  const epi=document.querySelector('#epi');
+  if(epi){const lbl=epi.querySelector('.sec-lbl'),h=epi.querySelector('h2');if(lbl)lbl.innerHTML=d.epiLbl;if(h)h.innerHTML=d.epiH;
+    const bks=epi.querySelectorAll('.epi-block');[[d.epi1],[d.epi2],[d.epi3],[d.epi4]].forEach((arr,i)=>{if(!bks[i])return;const bk=arr[0];const n=bks[i].querySelector('.epi-n'),tag=bks[i].querySelector('.epi-tag'),bh=bks[i].querySelector('.epi-bh'),bp=bks[i].querySelector('.epi-bp');if(n)n.textContent=bk[0];if(tag)tag.textContent=bk[1];if(bh)bh.innerHTML=bk[2];if(bp)bp.innerHTML=bk[3];});
+    const fq=epi.querySelector('.epi-fq'),faa=epi.querySelector('.epi-fa');if(fq)fq.innerHTML=d.epiFq;if(faa)faa.innerHTML=d.epiFa;}
+  const axSec=document.querySelector('.axes-sec');
+  if(axSec){const e=axSec.querySelector('.eye'),t=axSec.querySelector('.tit'),s=axSec.querySelector('.sub');if(e)e.innerHTML=d.axEye;if(t)t.innerHTML=d.axTit;if(s)s.innerHTML=d.axSub;
+    const axCards=axSec.querySelectorAll('.ax-card');[d.ax1,d.ax2,d.ax3].forEach((ax,i)=>{if(!axCards[i])return;const tag=axCards[i].querySelector('.ax-tag'),h=axCards[i].querySelector('.ax-h'),p=axCards[i].querySelector('.ax-p');if(tag)tag.textContent=ax[0];if(h)h.innerHTML=ax[1];if(p)p.innerHTML=ax[2];});}
+}
+function loadMapForm(){const raw=localStorage.getItem(K_MAP);if(!raw)return;try{const d=JSON.parse(raw);$s('f-th-q',d.thQ||'');$s('f-th-attr',d.thAttr||'');$s('f-map-eye',d.mapEye||'');$s('f-map-tit',d.mapTit||'');$s('f-map-sub',d.mapSub||'');$s('f-fa-eye',d.faEye||'');$s('f-fa-tit',d.faTit||'');$s('f-fa-sub',d.faSub||'');$s('f-fa1-ctry',d.fa1Ctry||'');$s('f-fa1-h',d.fa1H||'');$s('f-fa1-p',d.fa1P||'');$s('f-fa1-kw',d.fa1Kw||'');$s('f-fa2-ctry',d.fa2Ctry||'');$s('f-fa2-h',d.fa2H||'');$s('f-fa2-p',d.fa2P||'');$s('f-fa2-kw',d.fa2Kw||'');$s('f-fb-eye',d.fbEye||'');$s('f-fb-tit',d.fbTit||'');$s('f-fb-sub',d.fbSub||'');$s('f-fb1-ctry',d.fb1Ctry||'');$s('f-fb1-h',d.fb1H||'');$s('f-fb1-p',d.fb1P||'');$s('f-fb1-kw',d.fb1Kw||'');$s('f-fb2-ctry',d.fb2Ctry||'');$s('f-fb2-h',d.fb2H||'');$s('f-fb2-p',d.fb2P||'');$s('f-fb2-kw',d.fb2Kw||'');$s('f-snd-eye',d.sndEye||'');$s('f-snd-tit',d.sndTit||'');$s('f-snd-sub',d.sndSub||'');$s('f-cdc-tit',d.cdcTit||'');$s('f-cdc-sub',d.cdcSub||'');if(d.cdcJP){$s('f-cdc-JP-c1',d.cdcJP[0]||'');$s('f-cdc-JP-c2',d.cdcJP[1]||'');$s('f-cdc-JP-c3',d.cdcJP[2]||'');$s('f-cdc-JP-c4',d.cdcJP[3]||'');}if(d.cdcKR){$s('f-cdc-KR-c1',d.cdcKR[0]||'');$s('f-cdc-KR-c2',d.cdcKR[1]||'');$s('f-cdc-KR-c3',d.cdcKR[2]||'');$s('f-cdc-KR-c4',d.cdcKR[3]||'');}if(d.cdcCN){$s('f-cdc-CN-c1',d.cdcCN[0]||'');$s('f-cdc-CN-c2',d.cdcCN[1]||'');$s('f-cdc-CN-c3',d.cdcCN[2]||'');$s('f-cdc-CN-c4',d.cdcCN[3]||'');}if(d.cdcTW){$s('f-cdc-TW-c1',d.cdcTW[0]||'');$s('f-cdc-TW-c2',d.cdcTW[1]||'');$s('f-cdc-TW-c3',d.cdcTW[2]||'');$s('f-cdc-TW-c4',d.cdcTW[3]||'');}if(d.cdcTH){$s('f-cdc-TH-c1',d.cdcTH[0]||'');$s('f-cdc-TH-c2',d.cdcTH[1]||'');$s('f-cdc-TH-c3',d.cdcTH[2]||'');$s('f-cdc-TH-c4',d.cdcTH[3]||'');}if(d.cdcUS){$s('f-cdc-US-c1',d.cdcUS[0]||'');$s('f-cdc-US-c2',d.cdcUS[1]||'');$s('f-cdc-US-c3',d.cdcUS[2]||'');$s('f-cdc-US-c4',d.cdcUS[3]||'');}if(d.cdcEU){$s('f-cdc-EU-c1',d.cdcEU[0]||'');$s('f-cdc-EU-c2',d.cdcEU[1]||'');$s('f-cdc-EU-c3',d.cdcEU[2]||'');$s('f-cdc-EU-c4',d.cdcEU[3]||'');}$s('f-epi-lbl',d.epiLbl||'');$s('f-epi-h',d.epiH||'');$s('f-epi-fq',d.epiFq||'');$s('f-epi-fa',d.epiFa||'');if(d.epi1){$s('f-epi1-n',d.epi1[0]||'');$s('f-epi1-tag',d.epi1[1]||'');$s('f-epi1-bh',d.epi1[2]||'');$s('f-epi1-bp',d.epi1[3]||'');}if(d.epi2){$s('f-epi2-n',d.epi2[0]||'');$s('f-epi2-tag',d.epi2[1]||'');$s('f-epi2-bh',d.epi2[2]||'');$s('f-epi2-bp',d.epi2[3]||'');}if(d.epi3){$s('f-epi3-n',d.epi3[0]||'');$s('f-epi3-tag',d.epi3[1]||'');$s('f-epi3-bh',d.epi3[2]||'');$s('f-epi3-bp',d.epi3[3]||'');}if(d.epi4){$s('f-epi4-n',d.epi4[0]||'');$s('f-epi4-tag',d.epi4[1]||'');$s('f-epi4-bh',d.epi4[2]||'');$s('f-epi4-bp',d.epi4[3]||'');}$s('f-ax-eye',d.axEye||'');$s('f-ax-tit',d.axTit||'');$s('f-ax-sub',d.axSub||'');if(d.ax1){$s('f-ax1-tag',d.ax1[0]||'');$s('f-ax1-h',d.ax1[1]||'');$s('f-ax1-p',d.ax1[2]||'');}if(d.ax2){$s('f-ax2-tag',d.ax2[0]||'');$s('f-ax2-h',d.ax2[1]||'');$s('f-ax2-p',d.ax2[2]||'');}if(d.ax3){$s('f-ax3-tag',d.ax3[0]||'');$s('f-ax3-h',d.ax3[1]||'');$s('f-ax3-p',d.ax3[2]||'');}  }catch(e){console.warn('loadMapForm',e);}}
+
+// ── AUD ──
+function collectAud(){return{h1:$v('f-aud-h1'),body:$v('f-aud-body'),it1H:$v('f-it1-h'),it1P1:$v('f-it1-p1'),it1P2:$v('f-it1-p2'),it2H:$v('f-it2-h'),it2P1:$v('f-it2-p1'),it2P2:$v('f-it2-p2'),buyH2:$v('f-buy-h2'),buyBody:$v('f-buy-body'),buy1H:$v('f-buy1-h'),buy1Desc:$v('f-buy1-desc'),buy2H:$v('f-buy2-h'),buy2Desc:$v('f-buy2-desc'),buy3H:$v('f-buy3-h'),buy3Desc:$v('f-buy3-desc'),ecoH3:$v('f-eco-h3'),ecoBody:$v('f-eco-body'),conH3:$v('f-con-h3'),conBody:$v('f-con-body')};}
+function applyAud(d){
+  const tab=document.querySelector('#tab-audience');if(!tab)return;
+  const q=(sel)=>tab.querySelector(sel);const qa=(sel)=>tab.querySelectorAll(sel);
+  const bh1=q('.bud-h1');if(bh1)bh1.innerHTML=d.h1;
+  const bBody=q('.bud-body');if(bBody)bBody.innerHTML=d.body;
+  const its=qa('.aud-imgtext');
+  if(its[0]){const h=its[0].querySelector('h3,h4');const ps=its[0].querySelectorAll('p');if(h)h.innerHTML=d.it1H;if(ps[0])ps[0].innerHTML=d.it1P1;if(ps[1])ps[1].innerHTML=d.it1P2;}
+  if(its[1]){const h=its[1].querySelector('h3,h4');const ps=its[1].querySelectorAll('p');if(h)h.innerHTML=d.it2H;if(ps[0])ps[0].innerHTML=d.it2P1;if(ps[1])ps[1].innerHTML=d.it2P2;}
+  const buyH=q('.aud-buy-h2');if(buyH)buyH.innerHTML=d.buyH2;
+  const buyBd=q('.aud-buy-body');if(buyBd)buyBd.innerHTML=d.buyBody;
+  const buyCards=qa('.aud-buy-card');
+  [[d.buy1H,d.buy1Desc],[d.buy2H,d.buy2Desc],[d.buy3H,d.buy3Desc]].forEach((arr,i)=>{if(!buyCards[i])return;const h=buyCards[i].querySelector('h4');if(h)h.innerHTML=arr[0];const p=buyCards[i].querySelector('p');if(p)p.innerHTML=arr[1];});
+  const h3s=qa('.bud-h3');if(h3s[0])h3s[0].innerHTML=d.ecoH3;if(h3s[1])h3s[1].innerHTML=d.conH3;
+  const bods=qa('.bud-h3-body');if(bods[0])bods[0].innerHTML=d.ecoBody;if(bods[1])bods[1].innerHTML=d.conBody;
+}
+function loadAudForm(){const raw=localStorage.getItem(K_AUD);if(!raw)return;try{const d=JSON.parse(raw);$s('f-aud-h1',d.h1||'');$s('f-aud-body',d.body||'');$s('f-it1-h',d.it1H||'');$s('f-it1-p1',d.it1P1||'');$s('f-it1-p2',d.it1P2||'');$s('f-it2-h',d.it2H||'');$s('f-it2-p1',d.it2P1||'');$s('f-it2-p2',d.it2P2||'');$s('f-buy-h2',d.buyH2||'');$s('f-buy-body',d.buyBody||'');$s('f-buy1-h',d.buy1H||'');$s('f-buy1-desc',d.buy1Desc||'');$s('f-buy2-h',d.buy2H||'');$s('f-buy2-desc',d.buy2Desc||'');$s('f-buy3-h',d.buy3H||'');$s('f-buy3-desc',d.buy3Desc||'');$s('f-eco-h3',d.ecoH3||'');$s('f-eco-body',d.ecoBody||'');$s('f-con-h3',d.conH3||'');$s('f-con-body',d.conBody||'');}catch(e){console.warn('loadAudForm',e);}}
+
+// ── CULT ──
+function collectCult(){return{h1:$v('f-cult-h1'),body:$v('f-cult-body'),kr:[$v('f-kr-reality'),$v('f-kr-fantasy')],cn:[$v('f-cn-reality'),$v('f-cn-fantasy')],th:[$v('f-th-reality'),$v('f-th-fantasy')],jp:[$v('f-jp-reality'),$v('f-jp-fantasy')],tw:[$v('f-tw-reality'),$v('f-tw-fantasy')],us:[$v('f-us-reality'),$v('f-us-fantasy')],conH3:$v('f-cult-con-h3'),conBody:$v('f-cult-con-body')};}
+function applyCult(d){
+  const tab=document.querySelector('#tab-culture');if(!tab)return;
+  const q=(sel)=>tab.querySelector(sel);const qa=(sel)=>tab.querySelectorAll(sel);
+  const bh1=q('.bud-h1');if(bh1)bh1.innerHTML=d.h1;
+  const bBody=q('.bud-body');if(bBody)bBody.innerHTML=d.body;
+  const realities=qa('.bud-flip-reality');const fantasies=qa('.bud-flip-text');
+  [d.kr,d.cn,d.th,d.jp,d.tw,d.us].forEach((pair,i)=>{if(pair){if(realities[i])realities[i].innerHTML=pair[0];if(fantasies[i])fantasies[i].innerHTML=pair[1];}});
+  const h3=q('.bud-h3');if(h3)h3.innerHTML=d.conH3;
+  const bod=q('.bud-h3-body');if(bod)bod.innerHTML=d.conBody;
+}
+function loadCultForm(){const raw=localStorage.getItem(K_CULT);if(!raw)return;try{const d=JSON.parse(raw);$s('f-cult-h1',d.h1||'');$s('f-cult-body',d.body||'');if(d.kr){$s('f-kr-reality',d.kr[0]||'');$s('f-kr-fantasy',d.kr[1]||'');}if(d.cn){$s('f-cn-reality',d.cn[0]||'');$s('f-cn-fantasy',d.cn[1]||'');}if(d.th){$s('f-th-reality',d.th[0]||'');$s('f-th-fantasy',d.th[1]||'');}if(d.jp){$s('f-jp-reality',d.jp[0]||'');$s('f-jp-fantasy',d.jp[1]||'');}if(d.tw){$s('f-tw-reality',d.tw[0]||'');$s('f-tw-fantasy',d.tw[1]||'');}if(d.us){$s('f-us-reality',d.us[0]||'');$s('f-us-fantasy',d.us[1]||'');}$s('f-cult-con-h3',d.conH3||'');$s('f-cult-con-body',d.conBody||'');}catch(e){console.warn('loadCultForm',e);}}
+
+function saveMap(){const d=collectMap();localStorage.setItem(K_MAP,JSON.stringify(d));applyMap(d);}
+function saveAud(){const d=collectAud();localStorage.setItem(K_AUD,JSON.stringify(d));applyAud(d);}
+function saveCult(){const d=collectCult();localStorage.setItem(K_CULT,JSON.stringify(d));applyCult(d);}
+
+// ══ IMGBB + GITHUB PUBLISH ══
+const K_IMGBB='thaiBL-imgbb-key';
+const K_GH_TOKEN='thaiBL-gh-token';
+const K_GH_REPO='thaiBL-gh-repo';
+const K_GH_PATH='thaiBL-gh-path';
+const K_GH_BRANCH='thaiBL-gh-branch';
+
+function pubLoadSettings(){
+  const k=localStorage.getItem(K_IMGBB)||'';
+  const el=document.getElementById('f-imgbb-key');if(el)el.value=k?'••••••••':'';
+  document.getElementById('f-gh-repo').value=localStorage.getItem(K_GH_REPO)||'';
+  document.getElementById('f-gh-path').value=localStorage.getItem(K_GH_PATH)||'';
+  document.getElementById('f-gh-branch').value=localStorage.getItem(K_GH_BRANCH)||'';
+  if(localStorage.getItem(K_GH_TOKEN))document.getElementById('f-gh-token').value='••••••••';
+  if(k)document.getElementById('imgbb-status').textContent='✅ ImgBB Key 已設定，上傳圖片將自動走 ImgBB';
+  if(localStorage.getItem(K_GH_TOKEN))document.getElementById('gh-settings-status').textContent='✅ GitHub 設定已儲存';
+}
+function pubSaveImgbb(){
+  const v=document.getElementById('f-imgbb-key').value.trim();
+  if(!v||v.startsWith('•')){document.getElementById('imgbb-status').textContent='⚠️ 請輸入新的 API Key';return;}
+  localStorage.setItem(K_IMGBB,v);
+  document.getElementById('f-imgbb-key').value='••••••••';
+  document.getElementById('imgbb-status').textContent='✅ ImgBB Key 已儲存，上傳圖片將自動走 ImgBB';
+}
+function pubSaveGH(){
+  const t=document.getElementById('f-gh-token').value.trim();
+  const r=document.getElementById('f-gh-repo').value.trim();
+  const p=document.getElementById('f-gh-path').value.trim();
+  const b=document.getElementById('f-gh-branch').value.trim()||'main';
+  if(!r||!p){document.getElementById('gh-settings-status').textContent='⚠️ 請填寫 Repository 和檔案路徑';return;}
+  if(t&&!t.startsWith('•'))localStorage.setItem(K_GH_TOKEN,t);
+  localStorage.setItem(K_GH_REPO,r);
+  localStorage.setItem(K_GH_PATH,p);
+  localStorage.setItem(K_GH_BRANCH,b);
+  document.getElementById('f-gh-token').value='••••••••';
+  document.getElementById('gh-settings-status').textContent='✅ GitHub 設定已儲存';
+}
+function cmsUploadImg(file,maxW,maxH,q,cb){
+  const key=localStorage.getItem(K_IMGBB);
+  if(!key){compressImg(file,maxW,maxH,q,cb);return;}
+  const form=new FormData();
+  form.append('image',file);
+  form.append('key',key);
+  fetch('https://api.imgbb.com/1/upload',{method:'POST',body:form})
+    .then(r=>r.json())
+    .then(d=>{if(d.success){cb(d.data.url);}else{compressImg(file,maxW,maxH,q,cb);}})
+    .catch(()=>compressImg(file,maxW,maxH,q,cb));
+}
+async function publishToGitHub(){
+  const token=localStorage.getItem(K_GH_TOKEN);
+  const repo=localStorage.getItem(K_GH_REPO);
+  const path=localStorage.getItem(K_GH_PATH);
+  const branch=localStorage.getItem(K_GH_BRANCH)||'main';
+  const log=document.getElementById('gh-publish-log');
+  const btn=document.getElementById('gh-publish-btn');
+  if(!token||!repo||!path){alert('請先在「🚀 發布」頁面填寫 GitHub 設定');return;}
+  cmsSaveAll();
+  const bakedAt=Date.now();
+  const allData={
+    bakedAt,
+    txt:JSON.parse(localStorage.getItem(K_TXT)||'null'),
+    recs:JSON.parse(localStorage.getItem(K_RECS)||'null'),
+    tl:JSON.parse(localStorage.getItem(K_TL)||'null'),
+    imgs:JSON.parse(localStorage.getItem(K_IMGS)||'null'),
+    ddl:JSON.parse(localStorage.getItem(K_DDL)||'null'),
+    music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
+  };
+  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData)+';var prev=+(localStorage.getItem("thaiBL-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("thaiBL-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  let html=document.documentElement.outerHTML;
+  html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
+  html=html.replace('<head>','<head>\n'+bakedScript);
+  btn.textContent='⏳ 取得檔案資訊...';btn.disabled=true;
+  log.textContent='';
+  try{
+    log.textContent='📡 連接 GitHub...';
+    const infoRes=await fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch,{
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}
+    });
+    if(!infoRes.ok){const e=await infoRes.json();throw new Error(e.message||infoRes.status);}
+    const info=await infoRes.json();
+    log.textContent='📦 準備上傳內容...';
+    const encoded=btoa(unescape(encodeURIComponent(html)));
+    log.textContent='🚀 推送到 GitHub...';
+    const commitRes=await fetch('https://api.github.com/repos/'+repo+'/contents/'+path,{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+      body:JSON.stringify({message:'後台更新 '+new Date().toLocaleString('zh-TW'),content:encoded,sha:info.sha,branch:branch})
+    });
+    if(!commitRes.ok){const e=await commitRes.json();throw new Error(e.message||commitRes.status);}
+    btn.textContent='✅ 發布成功！';
+    btn.style.background='linear-gradient(135deg,#1D9E75,#4BA8A0)';
+    log.innerHTML='✅ 已成功推送到 GitHub！<br>⏱ GitHub Pages 通常 1～2 分鐘後生效。';
+    setTimeout(()=>{btn.textContent='🚀 儲存並發布到 GitHub';btn.style.background='';btn.disabled=false;},4000);
+  }catch(e){
+    btn.textContent='🚀 儲存並發布到 GitHub';btn.disabled=false;
+    log.innerHTML='❌ 發布失敗：'+e.message;
+    console.error(e);
+  }
+}
 
 // ══ HIDDEN TRIGGER SYSTEM ══
 // Method 1: Logo click ×5 (mobile-friendly)
@@ -7658,7 +8328,7 @@ moveItem=function(list,i,dir){
 // ══ WORLD MAP INTERACTIVE ══
 const WM_DATA = {
   cn:{
-    flag:'🇨🇳', name:'中國大陸', en:'CHINA · 耽美帝國',
+    flag:'🇨🇳', name:'中國', en:'CHINA · 耽美帝國',
     theme:'「禁忌反而放大欲望——越禁越狂的商業悖論」',
     accent:'wm-accent-cn',
     facts:[
@@ -8316,24 +8986,12 @@ flipBgInit();
     });
   }
   // Patch snTab to trigger after tab switch
-  var _blKey='blSiteVisited';
   window.addEventListener('load',function(){
-    var isReturn=localStorage.getItem(_blKey)||sessionStorage.getItem(_blKey);
-    if(isReturn){
-      // 非首次：還原上次 tab，跳到內容區
-      var savedTab=localStorage.getItem('activeSnTab')||sessionStorage.getItem('activeSnTab');
-      if(savedTab&&window.snTab){
-        var btn=document.querySelector('.sn[onclick*="\''+savedTab+'\'"]');
-        window.snTab(btn||null,savedTab);
-      }
-      setTimeout(function(){
-        var a=document.getElementById('tab-anchor');
-        if(a) window.scrollTo(0,a.offsetTop);
-      },80);
-    }else{
-      // 首次進入：頂部，播動畫
+    if(window._isNewBLSession){
+      // 新 session（關閉重開）：停在頂部播 hero 動畫
       window.scrollTo(0,0);
     }
+    // 刷新：什麼都不做，讓瀏覽器自然保留捲動位置
   });
 
   document.addEventListener('DOMContentLoaded',function(){
@@ -8678,6 +9336,125 @@ flipBgInit();
     },{passive:false});
   });
 })();
+</script>
+
+<!-- ══ 直接編輯模式 浮動工具列 ══ -->
+<div id="edit-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0D1A24,#0A1018);border-top:1px solid rgba(75,168,160,.4);padding:.75rem 1.5rem;display:none;align-items:center;gap:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.6);">
+  <span style="font-size:.72rem;color:#4BA8A0;letter-spacing:.1em;">✏️ 直接編輯模式</span>
+  <span style="font-size:.65rem;color:rgba(245,237,216,.3);flex:1;">點擊任意文字即可編輯 · 圖片點「🔄」更換</span>
+  <button id="edit-save-btn" onclick="cmsExitEdit(true)" style="background:linear-gradient(135deg,#1D9E75,#4BA8A0);border:none;border-radius:7px;color:#fff;padding:.5rem 1.2rem;font-family:'Noto Sans TC',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;">💾 儲存所有修改</button>
+  <button onclick="cmsExitEdit(false)" style="background:rgba(245,237,216,.06);border:1px solid rgba(245,237,216,.15);border-radius:7px;color:rgba(245,237,216,.5);padding:.5rem 1rem;font-family:'Noto Sans TC',sans-serif;font-size:.78rem;cursor:pointer;">✕ 取消</button>
+</div>
+
+<style>
+.cms-editable{outline:1px dashed rgba(75,168,160,.45)!important;border-radius:3px;cursor:text;transition:outline .15s;}
+.cms-editable:hover,.cms-editable:focus{outline:2px solid rgba(75,168,160,.8)!important;background:rgba(75,168,160,.06)!important;}
+.cms-img-wrap{position:relative;display:inline-block;}
+.cms-img-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(13,26,36,.55);opacity:0;transition:opacity .2s;border-radius:4px;}
+.cms-img-wrap:hover .cms-img-overlay{opacity:1;}
+.cms-img-btn{background:rgba(75,168,160,.9);border:none;border-radius:6px;color:#fff;padding:.35rem .75rem;font-size:.72rem;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;}
+</style>
+
+<script>
+// ══ DIRECT EDIT MODE ══
+const K_EDIT='thaiBL-edit';
+const EDIT_SCOPE='#tab-map,#tab-audience,#tab-culture,#page-home .hero-content,#page-home .stat-bar';
+const EDIT_TAGS='p,h1,h2,h3,h4,h5,li,blockquote,span.fa-kw,span.fb-kw,span.cdc-pill,span.cdc-tag,span.epi-tag,span.ax-num,span.epi-n';
+
+function getEditEls(){return document.querySelectorAll(EDIT_SCOPE+' '+EDIT_TAGS);}
+
+function cmsEnterEdit(){
+  document.getElementById('cms-panel').style.right='-680px';
+  document.getElementById('edit-bar').style.display='flex';
+  getEditEls().forEach((el,i)=>{
+    el.dataset.cmsIdx=i;
+    el.contentEditable='true';
+    el.classList.add('cms-editable');
+  });
+  // Wrap images
+  document.querySelectorAll(EDIT_SCOPE+' img').forEach(img=>{
+    if(img.closest('.cms-img-wrap'))return;
+    const wrap=document.createElement('div');
+    wrap.className='cms-img-wrap';
+    const ov=document.createElement('div');
+    ov.className='cms-img-overlay';
+    const btn=document.createElement('button');
+    btn.className='cms-img-btn';
+    btn.textContent='🔄 換圖';
+    btn.onclick=e=>{e.stopPropagation();cmsEditImgReplace(img);};
+    ov.appendChild(btn);
+    img.parentNode.insertBefore(wrap,img);
+    wrap.appendChild(img);
+    wrap.appendChild(ov);
+  });
+}
+
+function cmsExitEdit(save){
+  if(save)cmsEditSave();
+  document.getElementById('edit-bar').style.display='none';
+  getEditEls().forEach(el=>{
+    el.removeAttribute('contenteditable');
+    el.classList.remove('cms-editable');
+    delete el.dataset.cmsIdx;
+  });
+  document.querySelectorAll('.cms-img-wrap').forEach(wrap=>{
+    const img=wrap.querySelector('img');
+    if(img)wrap.parentNode.insertBefore(img,wrap);
+    wrap.remove();
+  });
+}
+
+function cmsEditSave(){
+  const data=[];
+  getEditEls().forEach(el=>data.push(el.innerHTML));
+  localStorage.setItem(K_EDIT,JSON.stringify(data));
+  const btn=document.getElementById('edit-save-btn');
+  if(btn){btn.textContent='✅ 已儲存！';setTimeout(()=>btn.textContent='💾 儲存所有修改',2200);}
+}
+
+function cmsEditApply(){
+  const raw=localStorage.getItem(K_EDIT);if(!raw)return;
+  try{
+    const data=JSON.parse(raw);
+    getEditEls().forEach((el,i)=>{if(data[i]!==undefined&&data[i]!==null)el.innerHTML=data[i];});
+  }catch(e){}
+}
+
+function cmsEditImgReplace(img){
+  const menu=document.createElement('div');
+  menu.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000;background:#0D1A24;border:1px solid rgba(75,168,160,.4);border-radius:12px;padding:1.2rem;width:320px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:"Noto Sans TC",sans-serif;';
+  menu.innerHTML=`
+    <div style="font-size:.8rem;color:#4BA8A0;margin-bottom:.8rem;">🔄 更換圖片</div>
+    <input id="_eir_url" class="ci" placeholder="貼上圖片網址..." style="width:100%;margin-bottom:.6rem;">
+    <div style="display:flex;gap:.5rem;margin-bottom:.6rem;">
+      <label style="flex:1;text-align:center;background:rgba(75,168,160,.1);border:1px solid rgba(75,168,160,.25);color:#4BA8A0;border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">
+        📁 上傳檔案<input type="file" accept="image/*" style="display:none;" onchange="window._eirFile(this)">
+      </label>
+      <button onclick="window._eirApplyUrl()" style="flex:1;background:rgba(232,134,58,.15);border:1px solid rgba(232,134,58,.3);color:#E8863A;border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">套用網址</button>
+    </div>
+    <div style="display:flex;gap:.5rem;">
+      <button onclick="document.body.removeChild(window._eirMenu);window._eirMenu=null;" style="flex:1;background:rgba(245,237,216,.05);border:1px solid rgba(245,237,216,.12);color:rgba(245,237,216,.4);border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">取消</button>
+    </div>`;
+  window._eirMenu=menu;
+  window._eirImg=img;
+  window._eirApplyUrl=function(){
+    const url=document.getElementById('_eir_url').value.trim();
+    if(!url)return;
+    img.src=url;
+    document.body.removeChild(menu);window._eirMenu=null;
+  };
+  window._eirFile=function(input){
+    const file=input.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{img.src=e.target.result;document.body.removeChild(menu);window._eirMenu=null;};
+    reader.readAsDataURL(file);
+  };
+  document.body.appendChild(menu);
+  setTimeout(()=>document.getElementById('_eir_url')?.focus(),80);
+}
+
+// 頁面載入時自動套用儲存的編輯內容
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',cmsEditApply);}else{cmsEditApply();}
 </script>
 </body>
 </html>
