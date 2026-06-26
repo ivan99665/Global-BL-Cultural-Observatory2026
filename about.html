@@ -464,14 +464,48 @@ document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale').fo
 // ABOUT · 後台管理系統
 // 啟動：右下角 ⚙️ 或 Ctrl+Shift+A
 // ══════════════════════════════════════
-const ABOUT_KEY = 'aboutCMS';
 const ABOUT_PW_KEY = 'aboutCMS_pw';
-function aGetPW(){ return localStorage.getItem(ABOUT_PW_KEY)||'900211'; }
+const ABOUT_GH_TOKEN_KEY = 'aboutCMS_ghtoken';
+const GH_OWNER = 'ivan99665';
+const GH_REPO = 'Global-BL-Cultural-Observatory2026';
+const GH_FILE = 'about-data.json';
+const GH_RAW = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
+const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+const IMGBB_KEY = '1f8d50dc921cf0e59ee9467807a74b03';
 
-function aLoad(){
-  try{ const r=localStorage.getItem(ABOUT_KEY); return r?JSON.parse(r):{}; }catch(e){ return {}; }
+function aGetPW(){ return localStorage.getItem(ABOUT_PW_KEY)||'900211'; }
+function aGetToken(){ return localStorage.getItem(ABOUT_GH_TOKEN_KEY)||''; }
+
+async function aLoad(){
+  try{
+    const r = await fetch(GH_RAW+'?t='+Date.now());
+    if(r.ok) return await r.json();
+  }catch(e){}
+  return {};
 }
-function aSave(d){ localStorage.setItem(ABOUT_KEY, JSON.stringify(d)); }
+
+async function aSaveGitHub(d){
+  const token = aGetToken();
+  if(!token){ alert('請先在「⚙️ 設定」頁輸入 GitHub Token'); return false; }
+  let sha = '';
+  try{
+    const ri = await fetch(GH_API, { headers:{ Authorization:'Bearer '+token } });
+    if(ri.ok){ const info=await ri.json(); sha=info.sha; }
+  }catch(e){}
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(d, null, 2))));
+  const body = JSON.stringify({ message:'Update about data', content, ...(sha?{sha}:{}) });
+  const rp = await fetch(GH_API, { method:'PUT', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body });
+  return rp.ok;
+}
+
+async function aUploadImgBB(file){
+  const fd = new FormData();
+  fd.append('image', file);
+  const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method:'POST', body:fd });
+  const data = await r.json();
+  if(data.success) return data.data.url;
+  throw new Error('ImgBB 上傳失敗');
+}
 
 function aApply(d){
   if(!d) d = aLoad();
@@ -495,7 +529,7 @@ function aApply(d){
   if(d.avatar){ const img=document.getElementById('avatar-img'); if(img) img.src=d.avatar; document.querySelector('.photo-frame-inner').innerHTML='<img id="avatar-img" src="'+d.avatar+'" alt="十三" style="width:100%;height:100%;object-fit:cover;">'; }
 }
 
-window.addEventListener('DOMContentLoaded', ()=>{ aApply(aLoad()); });
+window.addEventListener('DOMContentLoaded', async ()=>{ aApply(await aLoad()); });
 
 // Admin open/close
 function aOpenLogin(){ document.getElementById('a-login').style.display='flex'; document.getElementById('a-pw').value=''; document.getElementById('a-pw-err').textContent=''; }
@@ -515,8 +549,8 @@ function aTab(id){
 }
 
 // Fill form from current page
-function aFillForm(){
-  const d=aLoad();
+async function aFillForm(){
+  const d=await aLoad();
   const g=(id,fb)=>d[id]||document.getElementById(id+'_src')?.textContent||fb||'';
   document.getElementById('f-name').value = d.name||'十三<br><em>Shisan</em>';
   document.getElementById('f-title').value = d.title||'BL 文化研究者 · 內容創作者';
@@ -537,9 +571,10 @@ function aFillForm(){
   document.getElementById('f-ig').value = d.ig||'lotus_13ss';
   document.getElementById('f-avatar').value = d.avatar||'';
   aSetAvatarPreview(d.avatar||'');
+  document.getElementById('f-ghtoken').value = aGetToken();
 }
 
-function aSaveAll(){
+async function aSaveAll(){
   const d={
     name: document.getElementById('f-name').value,
     title: document.getElementById('f-title').value,
@@ -560,11 +595,13 @@ function aSaveAll(){
     ig: document.getElementById('f-ig').value,
     avatar: document.getElementById('f-avatar').value,
   };
-  aSave(d);
-  aApply(d);
   const btn=document.getElementById('a-save-btn');
-  btn.textContent='✅ 已套用';
-  setTimeout(()=>btn.textContent='💾 儲存套用',1800);
+  btn.textContent='⏳ 同步中...';
+  btn.disabled=true;
+  const ok = await aSaveGitHub(d);
+  if(ok){ aApply(d); btn.textContent='✅ 已同步'; }
+  else{ btn.textContent='❌ 失敗'; }
+  setTimeout(()=>{ btn.textContent='💾 儲存套用'; btn.disabled=false; },2200);
 }
 
 function aSetAvatarPreview(src){
@@ -574,16 +611,21 @@ function aSetAvatarPreview(src){
   else{ p.innerHTML='🌿'; }
 }
 
-function aUploadImg(input){
+async function aUploadImg(input){
   const file=input.files[0];
   if(!file) return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const src=e.target.result;
-    document.getElementById('f-avatar').value=src;
-    aSetAvatarPreview(src);
-  };
-  reader.readAsDataURL(file);
+  const label=input.closest('label');
+  const orig=label.querySelector('div div:first-child').textContent;
+  label.querySelector('div div:first-child').textContent='⏳ 上傳中...';
+  try{
+    const url = await aUploadImgBB(file);
+    document.getElementById('f-avatar').value=url;
+    aSetAvatarPreview(url);
+    label.querySelector('div div:first-child').textContent='✅ 上傳成功';
+  }catch(e){
+    label.querySelector('div div:first-child').textContent='❌ 上傳失敗';
+  }
+  setTimeout(()=>label.querySelector('div div:first-child').textContent=orig, 2000);
 }
 
 function aPreviewUrl(){
@@ -737,14 +779,21 @@ document.addEventListener('keydown',e=>{
 
     <!-- 密碼 -->
     <div id="as-pw" class="a-section" style="display:none;">
-      <div class="asec">⚙️ 更改後台密碼</div>
+      <div class="asec">🔑 GitHub Token（跨裝置同步必填）</div>
+      <div class="af">
+        <label class="al">Personal Access Token（只存在本機，不上傳）</label>
+        <input class="ai" id="f-ghtoken" type="password" placeholder="github_pat_..." oninput="localStorage.setItem('aboutCMS_ghtoken',this.value)">
+        <div style="font-size:.68rem;color:var(--text-soft);margin-top:.35rem;">⚠️ 需要 repo 讀寫權限 · 只會存在你的瀏覽器 localStorage</div>
+      </div>
+      <div class="asec" style="margin-top:1.2rem;">⚙️ 更改後台密碼</div>
       <div class="af"><label class="al">新密碼</label><input class="ai" id="f-npw" type="password" placeholder="輸入新密碼..."></div>
       <button onclick="aChgPW()" style="padding:.75rem 1.5rem;background:var(--spring-river);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans TC',sans-serif;font-size:.82rem;cursor:pointer;">更新密碼</button>
       <div style="margin-top:1.5rem;padding:1rem;background:rgba(97,127,114,.08);border-radius:10px;font-size:.72rem;color:var(--text-soft);line-height:1.9;">
         💡 使用說明<br>
         · 右下角 ⚙️ 或 Ctrl+Shift+A 開啟後台<br>
         · 點擊 Logo 連續 5 次也可開啟<br>
-        · 所有資料儲存於瀏覽器 localStorage<br>
+        · 資料同步至 GitHub，所有裝置共享<br>
+        · 圖片上傳至 ImgBB，永久公開連結<br>
         · 預設密碼：900211
       </div>
     </div>
