@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後台管理</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Noto Sans TC',sans-serif;
+  background:#0D1A24;
+  color:#F5EDD8;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ── 密碼頁 ── */
+#lock-screen{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1.5rem;
+}
+#lock-screen h2{
+  font-size:1.1rem;
+  letter-spacing:.2em;
+  color:rgba(245,237,216,.5);
+  text-transform:uppercase;
+}
+#lock-screen input{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(232,134,58,.3);
+  border-radius:8px;
+  padding:.75rem 1.4rem;
+  color:#F5EDD8;
+  font-size:1rem;
+  text-align:center;
+  outline:none;
+  width:220px;
+  letter-spacing:.15em;
+}
+#lock-screen input:focus{border-color:#E8863A;}
+#lock-screen button{
+  background:linear-gradient(135deg,#C94B25,#E8863A);
+  border:none;
+  border-radius:8px;
+  padding:.7rem 2rem;
+  color:#fff;
+  font-size:.9rem;
+  letter-spacing:.1em;
+  cursor:pointer;
+  transition:opacity .2s;
+}
+#lock-screen button:hover{opacity:.85;}
+#lock-screen .err{
+  color:#C94B25;
+  font-size:.8rem;
+  display:none;
+}
+
+/* ── 後台內容 ── */
+#dashboard{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:2rem;
+  padding:2rem;
+  width:100%;
+  max-width:500px;
+}
+#dashboard h1{
+  font-size:1.3rem;
+  letter-spacing:.18em;
+  color:#E8863A;
+  text-transform:uppercase;
+}
+.card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(232,134,58,.2);
+  border-radius:14px;
+  padding:1.5rem 2rem;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+.card h3{
+  font-size:.78rem;
+  letter-spacing:.2em;
+  color:rgba(245,237,216,.45);
+  text-transform:uppercase;
+}
+.btn-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.6rem;
+  background:linear-gradient(135deg,#1A3A4A,#2C6E7A);
+  border:1px solid rgba(75,168,160,.3);
+  border-radius:10px;
+  padding:1rem;
+  color:#A8D8D4;
+  text-decoration:none;
+  font-size:.95rem;
+  letter-spacing:.05em;
+  transition:all .25s;
+}
+.btn-link:hover{
+  background:linear-gradient(135deg,#2C6E7A,#4BA8A0);
+  color:#fff;
+  border-color:#4BA8A0;
+}
+.btn-link .icon{font-size:1.3rem;}
+.site-links{display:flex;flex-direction:column;gap:.75rem;}
+.site-btn{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(232,134,58,.15);
+  border-radius:8px;
+  padding:.8rem 1rem;
+  color:#FAD9B5;
+  text-decoration:none;
+  font-size:.85rem;
+  transition:all .2s;
+}
+.site-btn:hover{
+  background:rgba(232,134,58,.1);
+  border-color:rgba(232,134,58,.4);
+}
+.logout{
+  background:none;
+  border:1px solid rgba(245,237,216,.15);
+  border-radius:8px;
+  padding:.55rem 1.5rem;
+  color:rgba(245,237,216,.4);
+  font-size:.78rem;
+  cursor:pointer;
+  letter-spacing:.1em;
+  transition:all .2s;
+  margin-top:.5rem;
+}
+.logout:hover{color:#C94B25;border-color:#C94B25;}
+</style>
+</head>
+<body>
+
+<!-- 密碼鎖 -->
+<div id="lock-screen">
+  <h2>🔐 後台管理</h2>
+  <input type="password" id="pw-input" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')checkPW()"/>
+  <button onclick="checkPW()">進入</button>
+  <p class="err" id="err-msg">密碼錯誤，請再試一次</p>
+</div>
+
+<!-- 後台儀表板 -->
+<div id="dashboard">
+  <h1>📊 網站後台</h1>
+
+  <div class="card">
+    <h3>數據分析</h3>
+    <a class="btn-link" href="https://analytics.google.com/analytics/web/#/p$(PROPERTY)/reports/reportinghub" target="_blank">
+      <span class="icon">📈</span> 開啟 Google Analytics 後台
+    </a>
+  </div>
+
+  <div class="card">
+    <h3>網站頁面</h3>
+    <div class="site-links">
+      <a class="site-btn" href="https://ivan99665.github.io/merged-final.html" target="_blank">
+        🌐 merged-final.html
+      </a>
+      <a class="site-btn" href="https://ivan99665.github.io/thai-bl-v1377.html" target="_blank">
+        🌐 thai-bl-v1377.html
+      </a>
+      <a class="site-btn" href="https://ivan99665.github.io/about.html" target="_blank">
+        🌐 about.html
+      </a>
+    </div>
+  </div>
+
+  <button class="logout" onclick="logout()">登出</button>
+</div>
+
+<script>
+const PASSWORD = '900211'; // ← 可以改成您想要的密碼
+
+function checkPW(){
+  const val = document.getElementById('pw-input').value;
+  if(val === PASSWORD){
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'flex';
+  } else {
+    document.getElementById('err-msg').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+function logout(){
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('lock-screen').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+}
+</script>
+</body>
+</html>
