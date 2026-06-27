@@ -7959,7 +7959,7 @@ function cmsLogin(){
     document.getElementById('cms-login').style.display='none';
     document.getElementById('cms-pw').value='';
     document.getElementById('cms-pw-err').textContent='';
-    document.getElementById('cms-panel').style.right='0';
+    document.getElementById('cms-panel').style.right='0';var w=document.getElementById('thai-btn-wrap');if(w)w.style.visibility='hidden';
     // Then build content — wrapped in try/catch so errors don't affect panel visibility
     try{loadTxtForm();}catch(e){console.warn('loadTxtForm',e);}
     try{buildRecsMainList();}catch(e){console.warn('buildRecsMainList',e);}
@@ -7980,7 +7980,7 @@ function cmsLogin(){
     document.getElementById('cms-pw').focus();
   }
 }
-function cmsClosePanel(){document.getElementById('cms-panel').style.right='-680px';}
+function cmsClosePanel(){document.getElementById('cms-panel').style.right='-680px';var w=document.getElementById('thai-btn-wrap');if(w)w.style.visibility='';}
 function cmsCloseAll(){document.getElementById('cms-login').style.display='none';cmsClosePanel();document.getElementById('cms-pw').value='';document.getElementById('cms-pw-err').textContent='';}
 function cmsTab(s){
   document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active',t.dataset.s===s));
