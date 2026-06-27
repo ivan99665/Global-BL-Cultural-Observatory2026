@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2WXJLCFY89"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-2WXJLCFY89');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>關於我 · About Me</title>
@@ -340,7 +348,7 @@ footer a{color:rgba(171,196,179,.7);text-decoration:none;}
     </div>
     <div class="contact-grid">
       <div class="reveal-left">
-        <p class="contact-intro">網站有任何錯誤或是建議歡迎聯絡我，我會盡快處理！無論是內容錯誤、排版問題，還是你想看到的新功能或作品推薦，都非常歡迎。</p>
+        <p class="contact-intro">與網站有任何錯誤或是建議歡迎聯絡我，我會盡快處理！無論是內容錯誤、排版問題，還是你想看到的新功能或作品推薦，都非常歡迎。</p>
         <div class="contact-links">
           <a id="contact-ig" class="contact-link contact-link-ig" href="https://www.instagram.com/lotus_13ss" target="_blank">
             <div class="contact-link-icon">📷</div>
@@ -800,5 +808,128 @@ document.addEventListener('keydown',e=>{
 
   </div>
 </div>
+
+<!-- ══ 音樂播放器 ══ -->
+<div id="yt-player-container" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;"><div id="yt-player"></div></div>
+<audio id="bg-audio" preload="auto" loop style="display:none;"></audio>
+
+<div id="music-player" style="position:fixed;bottom:0;left:0;right:0;z-index:7000;background:rgba(10,16,22,.92);border-top:1px solid rgba(232,134,58,.18);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:none;padding:0 2rem;height:72px;align-items:center;gap:1.5rem;transition:transform .45s cubic-bezier(.22,1,.36,1);">
+  <div style="display:flex;align-items:center;gap:.85rem;min-width:220px;max-width:280px;">
+    <div id="mp-cover-wrap" style="position:relative;flex-shrink:0;">
+      <img id="mp-cover" src="" alt="封面" style="width:48px;height:48px;border-radius:6px;object-fit:cover;border:1px solid rgba(232,134,58,.22);background:#1E3347;display:block;box-shadow:0 4px 18px rgba(0,0,0,.55);">
+      <div id="mp-spin-ring" style="position:absolute;inset:-3px;border-radius:9px;border:1.5px solid transparent;border-top-color:rgba(232,134,58,.6);border-right-color:rgba(232,134,58,.25);animation:mpSpin 2.8s linear infinite;display:none;pointer-events:none;"></div>
+    </div>
+    <div style="overflow:hidden;">
+      <div id="mp-title" style="font-size:.84rem;font-weight:500;color:#FAD9B5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">今日推薦歌曲</div>
+      <div id="mp-artist" style="font-size:.7rem;color:rgba(245,237,216,.42);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;margin-top:.1rem;">—</div>
+      <a id="mp-yt-fallback" href="#" target="_blank" rel="noopener" style="display:none;align-items:center;gap:.3rem;font-size:.62rem;color:#FAD9B5;text-decoration:none;margin-top:.2rem;background:rgba(200,60,30,.18);border:1px solid rgba(200,80,30,.3);border-radius:10px;padding:3px 10px;font-weight:500;">▶ 版權限制，點此在 YouTube 收聽</a>
+      <div id="mp-tag" style="font-size:.58rem;letter-spacing:.1em;color:rgba(232,134,58,.55);margin-top:.1rem;text-transform:uppercase;">今日推薦 · Thai Song</div>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.35rem;max-width:600px;">
+    <div style="display:flex;align-items:center;gap:1.1rem;">
+      <button onclick="mpSeek(-10)" style="background:none;border:none;color:rgba(245,237,216,.35);cursor:pointer;font-size:.75rem;padding:.2rem .4rem;" onmouseover="this.style.color='rgba(245,237,216,.75)'" onmouseout="this.style.color='rgba(245,237,216,.35)'">⟨ 10</button>
+      <button id="mp-play-btn" onclick="mpToggle()" style="width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#C94B25,#E8863A);color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .15s;flex-shrink:0;box-shadow:0 3px 14px rgba(232,134,58,.35);" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">▶</button>
+      <button onclick="mpSeek(10)" style="background:none;border:none;color:rgba(245,237,216,.35);cursor:pointer;font-size:.75rem;padding:.2rem .4rem;" onmouseover="this.style.color='rgba(245,237,216,.75)'" onmouseout="this.style.color='rgba(245,237,216,.35)'">10 ⟩</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:100%;">
+      <span id="mp-cur" style="font-size:.62rem;color:rgba(245,237,216,.35);min-width:32px;text-align:right;">0:00</span>
+      <div id="mp-bar-wrap" onclick="mpSeekClick(event)" style="flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;cursor:pointer;position:relative;">
+        <div id="mp-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#C94B25,#E8863A);border-radius:2px;transition:width .4s linear;pointer-events:none;"></div>
+        <div id="mp-thumb" style="position:absolute;top:50%;right:calc(100% - 0%);transform:translate(50%,-50%);width:11px;height:11px;border-radius:50%;background:#E8863A;opacity:0;transition:opacity .2s;pointer-events:none;"></div>
+      </div>
+      <span id="mp-dur" style="font-size:.62rem;color:rgba(245,237,216,.28);min-width:32px;">0:00</span>
+    </div>
+  </div>
+  <div id="mp-right-ctrl" style="display:flex;align-items:center;gap:.8rem;min-width:140px;justify-content:flex-end;">
+    <span style="font-size:.78rem;color:rgba(245,237,216,.28);">🔊</span>
+    <input type="range" id="mp-vol" min="0" max="100" value="70" oninput="mpVol(this.value)" style="width:80px;height:3px;cursor:pointer;accent-color:#E8863A;">
+    <button onclick="mpHide()" style="background:none;border:none;color:rgba(245,237,216,.25);cursor:pointer;font-size:.9rem;padding:.2rem;line-height:1;transition:color .2s;" onmouseover="this.style.color='rgba(245,237,216,.65)'" onmouseout="this.style.color='rgba(245,237,216,.25)'">✕</button>
+  </div>
+  <div id="mp-spotify-layer" style="display:none;position:absolute;inset:0;z-index:2;align-items:center;padding:0 1rem;gap:.8rem;background:rgba(10,16,22,.92);backdrop-filter:blur(24px);">
+    <iframe id="spotify-iframe" style="border-radius:8px;flex:1;height:64px;border:none;" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <button onclick="mpHide()" style="background:none;border:none;color:rgba(245,237,216,.25);cursor:pointer;font-size:.9rem;padding:.2rem;flex-shrink:0;" onmouseover="this.style.color='rgba(245,237,216,.65)'" onmouseout="this.style.color='rgba(245,237,216,.25)'">✕</button>
+  </div>
+</div>
+
+<div id="mp-restore-btn" onclick="mpShow()" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:6999;background:rgba(10,16,22,.88);border:1px solid rgba(232,134,58,.22);border-radius:24px;padding:.38rem 1rem;display:none;align-items:center;gap:.5rem;cursor:pointer;backdrop-filter:blur(12px);transition:opacity .3s;font-size:.7rem;color:rgba(245,237,216,.5);" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'">
+  <img id="mp-restore-cover" src="" style="width:22px;height:22px;border-radius:3px;object-fit:cover;background:#1E3347;">
+  <span id="mp-restore-title" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(245,237,216,.6);">—</span>
+  <span>♪</span>
+</div>
+
+<style>
+@keyframes mpSpin{to{transform:rotate(360deg);}}
+#mp-bar-wrap:hover #mp-thumb{opacity:1;}
+@media(max-width:680px){#music-player{padding:0 .8rem;gap:.7rem;}#music-player>div:first-child{min-width:0;max-width:160px;}#mp-tag,#mp-artist{display:none;}}
+</style>
+
+<script>
+const K_MUSIC='thaiBL-music';
+const DEF_MUSIC={title:'NEW SEASON',artist:'NuNew',cover:'',audioUrl:'https://open.spotify.com/track/3VcmuNLcc2sH1ZrFh2njnp',enabled:true};
+let mpData={...DEF_MUSIC};
+let mpPlaying=false,mpUserInteracted=false,mpMode='none';
+const audio=document.getElementById('bg-audio');
+let ytPlayer=null,ytReady=false,ytPendingId=null,ytTimer=null;
+function ytId(url){if(!url)return null;const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?#\s]{11})/);return m?m[1]:null;}
+function spotifyId(url){if(!url)return null;const m=url.match(/spotify\.com\/(?:track|embed\/track)\/([A-Za-z0-9]+)/);return m?m[1]:null;}
+function bilibiliId(url){if(!url)return null;const m=url.match(/bilibili\.com\/video\/(BV[A-Za-z0-9]+)/);return m?m[1]:null;}
+function ytLoadAPI(){if(document.getElementById('yt-api-script'))return;const s=document.createElement('script');s.id='yt-api-script';s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);}
+window.onYouTubeIframeAPIReady=function(){ytReady=true;if(ytPendingId)ytCreate(ytPendingId);};
+function ytCreate(videoId){if(!ytReady){ytPendingId=videoId;ytLoadAPI();return;}ytPendingId=null;if(ytPlayer&&ytPlayer.loadVideoById){ytPlayer.loadVideoById(videoId);return;}ytPlayer=new YT.Player('yt-player',{height:'1',width:'1',videoId,playerVars:{autoplay:0,controls:0,loop:1,playlist:videoId,rel:0},events:{onReady:e=>{e.target.setVolume(70);try{e.target.unMute();}catch(x){}const dur=e.target.getDuration();if(dur>0)document.getElementById('mp-dur').textContent=mpFmt(dur);document.getElementById('mp-tag').textContent='YouTube 頁內播放';if(mpUserInteracted){e.target.playVideo();document.getElementById('mp-tag').textContent='今日推薦 · Thai Song';}},onStateChange:e=>{const playing=e.data===YT.PlayerState.PLAYING;mpPlaying=playing;mpUpdatePlayBtn();document.getElementById('mp-spin-ring').style.display=playing?'block':'none';clearInterval(ytTimer);if(playing)ytTimer=setInterval(()=>{if(!ytPlayer||!ytPlayer.getCurrentTime)return;const cur=ytPlayer.getCurrentTime()||0,dur=ytPlayer.getDuration()||0;if(dur){const p=(cur/dur)*100;document.getElementById('mp-bar').style.width=p+'%';document.getElementById('mp-cur').textContent=mpFmt(cur);document.getElementById('mp-dur').textContent=mpFmt(dur);}},600);},onError:function(e){const vid=ytId(mpData.audioUrl||'');const artistEl=document.getElementById('mp-artist');const tagEl=document.getElementById('mp-tag');const reasons={2:'影片ID無效',5:'播放器錯誤',100:'影片不存在',101:'版權方禁止嵌入',150:'版權方禁止嵌入'};const reason=reasons[e.data]||'未知錯誤('+e.data+')';if(artistEl)artistEl.textContent='⏳ 正在切換備用播放方式...';if(tagEl)tagEl.textContent=reason;clearTimeout(window._ytTimeout);if(vid)mpPipedFallback(vid);else if(artistEl)artistEl.textContent='⚠ 無效的影片連結';}}});}
+function mpLoadData(){try{const r=localStorage.getItem(K_MUSIC);if(r)mpData={...DEF_MUSIC,...JSON.parse(r)};}catch(e){}}
+function mpApply(){
+  const cover=document.getElementById('mp-cover'),rCover=document.getElementById('mp-restore-cover');
+  if(mpData.cover){cover.src=mpData.cover;if(rCover)rCover.src=mpData.cover;}
+  const fbBtn=document.getElementById('mp-yt-fallback');if(fbBtn)fbBtn.style.display='none';
+  document.getElementById('mp-title').textContent=mpData.title||'今日推薦歌曲';
+  document.getElementById('mp-artist').textContent=mpData.artist||'—';
+  const rtl=document.getElementById('mp-restore-title');if(rtl)rtl.textContent=mpData.title||'今日推薦歌曲';
+  if(mpData.enabled===false){document.getElementById('music-player').style.display='none';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';document.body.style.paddingBottom='0';return;}
+  const spId=spotifyId(mpData.audioUrl||'');
+  const bvId=bilibiliId(mpData.audioUrl||'');
+  const vid=(spId||bvId)?null:ytId(mpData.audioUrl||'');
+  const showEmbedLayer=(embedSrc)=>{mpMode='embed';audio.src='';const layer=document.getElementById('mp-spotify-layer');const iframe=document.getElementById('spotify-iframe');const leftEl=document.querySelector('#music-player>div:first-child');const centerEl=document.querySelector('#music-player>div:nth-child(2)');const rightEl=document.getElementById('mp-right-ctrl');if(iframe)iframe.src=embedSrc;if(layer)layer.style.display='flex';if(leftEl)leftEl.style.display='none';if(centerEl)centerEl.style.display='none';if(rightEl)rightEl.style.display='none';document.getElementById('music-player').style.height='80px';};
+  if(spId){showEmbedLayer('https://open.spotify.com/embed/track/'+spId+'?utm_source=generator&theme=0');}
+  else if(bvId){showEmbedLayer('https://player.bilibili.com/player.html?bvid='+bvId+'&page=1&high_quality=1&danmaku=0&autoplay=1');}
+  else{const layer=document.getElementById('mp-spotify-layer');const leftEl=document.querySelector('#music-player>div:first-child');const centerEl=document.querySelector('#music-player>div:nth-child(2)');const rightEl=document.getElementById('mp-right-ctrl');if(layer)layer.style.display='none';if(leftEl)leftEl.style.display='';if(centerEl)centerEl.style.display='';if(rightEl)rightEl.style.display='flex';document.getElementById('music-player').style.height='72px';if(vid){mpMode='youtube';audio.src='';ytCreate(vid);clearTimeout(window._ytTimeout);window._ytTimeout=setTimeout(function(){if(mpMode==='youtube'&&!mpPlaying&&mpData.audioUrl){const v=ytId(mpData.audioUrl);if(v)mpPipedFallback(v);}},10000);}else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}else{mpMode='none';}}
+  document.getElementById('music-player').style.display='flex';
+  const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
+  document.body.style.paddingBottom='72px';
+  if(mpData.audioUrl&&mpUserInteracted)mpAutoPlay();
+}
+async function mpPipedFallback(videoId){const artistEl=document.getElementById('mp-artist');const tagEl=document.getElementById('mp-tag');const fbBtn=document.getElementById('mp-yt-fallback');const endpoints=[{url:'https://pipedapi.kavin.rocks',type:'piped'},{url:'https://api.piped.yt',type:'piped'},{url:'https://piped-api.mint.lgbt',type:'piped'},{url:'https://pipedapi.reallyaweso.me',type:'piped'}];for(const ep of endpoints){try{const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),5000);const res=await fetch(ep.url+'/streams/'+videoId,{signal:ctrl.signal,headers:{'Accept':'application/json'}});clearTimeout(timer);if(!res.ok)continue;const data=await res.json();const streams=(data.audioStreams||[]).filter(function(s){return s.url&&s.mimeType;}).sort(function(a,b){const aOpus=a.mimeType.includes('opus')?1:0;const bOpus=b.mimeType.includes('opus')?1:0;if(aOpus!==bOpus)return bOpus-aOpus;return(b.bitrate||0)-(a.bitrate||0);});if(!streams.length)continue;for(const stream of streams.slice(0,3)){try{audio.src=stream.url;audio.volume=0.7;await new Promise(function(resolve,reject){const onCanPlay=function(){audio.removeEventListener('canplaythrough',onCanPlay);audio.removeEventListener('error',onErr);resolve();};const onErr=function(){audio.removeEventListener('canplaythrough',onCanPlay);audio.removeEventListener('error',onErr);reject(new Error('cannot play'));};audio.addEventListener('canplaythrough',onCanPlay,{once:true});audio.addEventListener('error',onErr,{once:true});audio.load();setTimeout(function(){audio.removeEventListener('canplaythrough',onCanPlay);audio.removeEventListener('error',onErr);resolve();},3000);});const played=await audio.play().then(function(){return true;}).catch(function(){return false;});if(played){mpPlaying=true;mpMode='audio';mpUpdatePlayBtn();const spinEl=document.getElementById('mp-spin-ring');if(spinEl)spinEl.style.display='block';if(artistEl)artistEl.textContent=mpData.artist||'—';if(tagEl)tagEl.textContent='今日推薦 · Thai Song';if(fbBtn)fbBtn.style.display='none';return;}}catch(streamErr){}}}catch(err){}}if(artistEl)artistEl.textContent=mpData.artist||'—';if(tagEl)tagEl.textContent='⚠ 此影片版權限制，無法頁內播放';const btn=document.getElementById('mp-yt-fallback');if(btn){btn.href='https://www.youtube.com/watch?v='+videoId;btn.style.display='inline-flex';}}
+function mpAutoPlay(){if(mpMode==='youtube'){if(ytPlayer&&ytPlayer.playVideo){ytPlayer.unMute&&ytPlayer.unMute();ytPlayer.playVideo();}}else if(mpMode==='audio'){audio.play().then(function(){mpPlaying=true;mpUpdatePlayBtn();document.getElementById('mp-spin-ring').style.display='block';}).catch(function(){});}}
+function mpToggle(){if(mpMode==='youtube'){if(!ytPlayer)return;mpPlaying?ytPlayer.pauseVideo():ytPlayer.playVideo();}else if(mpMode==='audio'){if(!audio.src)return;if(mpPlaying)audio.pause();else audio.play();mpPlaying=!mpPlaying;mpUpdatePlayBtn();document.getElementById('mp-spin-ring').style.display=mpPlaying?'block':'none';}}
+function mpUpdatePlayBtn(){document.getElementById('mp-play-btn').textContent=mpPlaying?'⏸':'▶';}
+function mpSeek(s){if(mpMode==='youtube'&&ytPlayer&&ytPlayer.seekTo)ytPlayer.seekTo(Math.max(0,(ytPlayer.getCurrentTime()||0)+s),true);else if(mpMode==='audio'&&audio.duration)audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+s));}
+function mpSeekClick(e){const rect=e.currentTarget.getBoundingClientRect(),pct=(e.clientX-rect.left)/rect.width;if(mpMode==='youtube'&&ytPlayer&&ytPlayer.getDuration)ytPlayer.seekTo(pct*ytPlayer.getDuration(),true);else if(mpMode==='audio'&&audio.duration)audio.currentTime=pct*audio.duration;}
+function mpVol(v){if(mpMode==='youtube'&&ytPlayer&&ytPlayer.setVolume)ytPlayer.setVolume(+v);else audio.volume=v/100;}
+function mpHide(){document.getElementById('music-player').style.display='none';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='flex';document.body.style.paddingBottom='0';}
+function mpShow(){document.getElementById('music-player').style.display='flex';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';document.body.style.paddingBottom='72px';}
+function mpFmt(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+audio.addEventListener('timeupdate',()=>{if(mpMode!=='audio'||!audio.duration)return;const p=(audio.currentTime/audio.duration)*100;document.getElementById('mp-bar').style.width=p+'%';document.getElementById('mp-cur').textContent=mpFmt(audio.currentTime);});
+audio.addEventListener('loadedmetadata',()=>{if(mpMode==='audio')document.getElementById('mp-dur').textContent=mpFmt(audio.duration);});
+audio.addEventListener('play',()=>{if(mpMode==='audio'){mpPlaying=true;mpUpdatePlayBtn();document.getElementById('mp-spin-ring').style.display='block';}});
+audio.addEventListener('pause',()=>{if(mpMode==='audio'){mpPlaying=false;mpUpdatePlayBtn();document.getElementById('mp-spin-ring').style.display='none';}});
+function mpOnFirstInteract(){mpUserInteracted=true;if(mpData.enabled&&mpData.audioUrl&&!mpPlaying)mpAutoPlay();document.removeEventListener('click',mpOnFirstInteract);document.removeEventListener('keydown',mpOnFirstInteract);}
+document.addEventListener('click',mpOnFirstInteract);
+document.addEventListener('keydown',mpOnFirstInteract);
+mpLoadData();
+mpApply();
+</script>
+
+<!-- 隱藏後台入口：連續輸入 thai000 即可進入 -->
+<script>
+(function(){
+  const SECRET='thai000';let buf='';
+  document.addEventListener('keydown',function(e){
+    buf+=e.key;
+    if(buf.length>SECRET.length)buf=buf.slice(-SECRET.length);
+    if(buf===SECRET)window.location.href='admin.html';
+  });
+})();
+</script>
+
 </body>
 </html>
