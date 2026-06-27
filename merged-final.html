@@ -8111,14 +8111,17 @@ function pubSaveGH(){
 }
 function cmsUploadImg(file,maxW,maxH,q,cb){
   const key=localStorage.getItem(K_IMGBB);
-  if(!key){compressImg(file,maxW,maxH,q,cb);return;}
+  if(!key){alert('⚠️ 尚未設定 ImgBB Key！\n請到 ⚙️ 設定分頁填入 ImgBB API Key。');compressImg(file,maxW,maxH,q,cb);return;}
   const form=new FormData();
   form.append('image',file);
   form.append('key',key);
   fetch('https://api.imgbb.com/1/upload',{method:'POST',body:form})
     .then(r=>r.json())
-    .then(d=>{if(d.success){cb(d.data.url);}else{compressImg(file,maxW,maxH,q,cb);}})
-    .catch(()=>compressImg(file,maxW,maxH,q,cb));
+    .then(d=>{
+      if(d.success){cb(d.data.url);}
+      else{alert('❌ ImgBB 上傳失敗：'+(d.error?.message||JSON.stringify(d)));compressImg(file,maxW,maxH,q,cb);}
+    })
+    .catch(e=>{alert('❌ ImgBB 連線失敗：'+e.message);compressImg(file,maxW,maxH,q,cb);});
 }
 async function publishToGitHub(){
   const token=localStorage.getItem(K_GH_TOKEN);
