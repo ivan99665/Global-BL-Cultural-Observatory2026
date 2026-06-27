@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2WXJLCFY89"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-2WXJLCFY89');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
@@ -1962,9 +1970,9 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
   </div>
 
   <div class="gallery-strip">
-    <div class="g-cell"><img src="thaibl-main/banner/j.webp" alt="普吉夕陽"><div class="g-cell-label"><h4>普吉島夕陽</h4><p>《以你的心》最核心的視覺意象</p></div></div>
-    <div class="g-cell"><img src="thaibl-main/banner/Watch I Promised You the Moon _ Episode 5 Online _ Vimeo On Demand on Vimeo - Google Chrome 2021_6_26 下午 05_41_33.png" alt="曼谷街景"><div class="g-cell-label"><h4>曼谷都市</h4><p>BL劇最重要的製作中心</p></div></div>
-    <div class="g-cell"><img src="thaibl-main/banner/Artboard-1-copy-3.png" alt="扶桑花"><div class="g-cell-label"><h4>扶桑花語</h4><p>微妙的愛，接近不了卻無法離開</p></div></div>
+    <div class="g-cell"><img src="thaibl-main/BANNER/j.webp" alt="普吉夕陽"><div class="g-cell-label"><h4>普吉島夕陽</h4><p>《以你的心》最核心的視覺意象</p></div></div>
+    <div class="g-cell"><img src="thaibl-main/BANNER/Watch I Promised You the Moon _ Episode 5 Online _ Vimeo On Demand on Vimeo - Google Chrome 2021_6_26 下午 05_41_33.png" alt="曼谷街景"><div class="g-cell-label"><h4>曼谷都市</h4><p>BL劇最重要的製作中心</p></div></div>
+    <div class="g-cell"><img src="thaibl-main/BANNER/Artboard-1-copy-3.png" alt="扶桑花"><div class="g-cell-label"><h4>扶桑花語</h4><p>微妙的愛，接近不了卻無法離開</p></div></div>
   </div>
 
   <!-- TIMELINE with video cards -->
@@ -3170,7 +3178,7 @@ function moveIC(wrapId, state, dir) {
   </div>
 
   <!-- 右：音量 + 關閉 -->
-  <div style="display:flex;align-items:center;gap:.8rem;min-width:140px;justify-content:flex-end;">
+  <div id="mp-right-ctrl" style="display:flex;align-items:center;gap:.8rem;min-width:140px;justify-content:flex-end;">
     <span style="font-size:.78rem;color:rgba(245,237,216,.28);">🔊</span>
     <input type="range" id="mp-vol" min="0" max="100" value="70" oninput="mpVol(this.value)" style="
       width:80px;height:3px;cursor:pointer;
@@ -3181,6 +3189,11 @@ function moveIC(wrapId, state, dir) {
       font-size:.9rem;padding:.2rem;line-height:1;
       transition:color .2s;
     " onmouseover="this.style.color='rgba(245,237,216,.65)'" onmouseout="this.style.color='rgba(245,237,216,.25)'">✕</button>
+  </div>
+  <!-- Spotify / 外部嵌入覆蓋層 -->
+  <div id="mp-spotify-layer" style="display:none;position:absolute;inset:0;z-index:2;align-items:center;padding:0 1rem;gap:.8rem;background:rgba(10,16,22,.92);backdrop-filter:blur(24px);">
+    <iframe id="spotify-iframe" style="border-radius:8px;flex:1;height:64px;border:none;" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <button onclick="mpHide()" style="background:none;border:none;color:rgba(245,237,216,.25);cursor:pointer;font-size:.9rem;padding:.2rem;flex-shrink:0;transition:color .2s;" onmouseover="this.style.color='rgba(245,237,216,.65)'" onmouseout="this.style.color='rgba(245,237,216,.25)'">✕</button>
   </div>
 </div>
 
@@ -3211,7 +3224,7 @@ function moveIC(wrapId, state, dir) {
 <script>
 // ══ MUSIC PLAYER ENGINE (YouTube + Direct Audio) ══
 const K_MUSIC='thaiBL-music';
-const DEF_MUSIC={title:'Closer - ใกล้กว่านี้',artist:'Billkin & PP Krit · ITSAY OST',cover:'',audioUrl:'',enabled:true};
+const DEF_MUSIC={title:'NEW SEASON',artist:'NuNew',cover:'',audioUrl:'https://open.spotify.com/track/3VcmuNLcc2sH1ZrFh2njnp',enabled:true};
 let mpData={...DEF_MUSIC};
 let mpPlaying=false,mpVisible=false,mpUserInteracted=false,mpMode='none';
 const audio=document.getElementById('bg-audio');
@@ -3219,6 +3232,8 @@ const audio=document.getElementById('bg-audio');
 // YouTube IFrame API
 let ytPlayer=null,ytReady=false,ytPendingId=null,ytTimer=null;
 function ytId(url){if(!url)return null;const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?#\s]{11})/);return m?m[1]:null;}
+function spotifyId(url){if(!url)return null;const m=url.match(/spotify\.com\/(?:track|embed\/track)\/([A-Za-z0-9]+)/);return m?m[1]:null;}
+function bilibiliId(url){if(!url)return null;const m=url.match(/bilibili\.com\/video\/(BV[A-Za-z0-9]+)/);return m?m[1]:null;}
 function ytLoadAPI(){if(document.getElementById('yt-api-script'))return;const s=document.createElement('script');s.id='yt-api-script';s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);}
 window.onYouTubeIframeAPIReady=function(){ytReady=true;if(ytPendingId)ytCreate(ytPendingId);};
 function ytCreate(videoId){
@@ -3270,20 +3285,17 @@ function mpApply(){
     const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
     document.body.style.paddingBottom='0';return;
   }
-  const vid=ytId(mpData.audioUrl||'');
-  if(vid){
-    mpMode='youtube';audio.src='';ytCreate(vid);
-    // Safety timeout: if YT fails silently (no onError), try Piped after 10s
-    clearTimeout(window._ytTimeout);
-    window._ytTimeout=setTimeout(function(){
-      if(mpMode==='youtube'&&!mpPlaying&&mpData.audioUrl){
-        const v=ytId(mpData.audioUrl);
-        if(v)mpPipedFallback(v);
-      }
-    },10000);
+  const spId=spotifyId(mpData.audioUrl||'');
+  const bvId=bilibiliId(mpData.audioUrl||'');
+  const vid=(spId||bvId)?null:ytId(mpData.audioUrl||'');
+  const showEmbedLayer=(embedSrc)=>{mpMode='embed';audio.src='';const layer=document.getElementById('mp-spotify-layer');const iframe=document.getElementById('spotify-iframe');const leftEl=document.querySelector('#music-player>div:first-child');const centerEl=document.querySelector('#music-player>div:nth-child(2)');const rightEl=document.getElementById('mp-right-ctrl');if(iframe)iframe.src=embedSrc;if(layer)layer.style.display='flex';if(leftEl)leftEl.style.display='none';if(centerEl)centerEl.style.display='none';if(rightEl)rightEl.style.display='none';document.getElementById('music-player').style.height='80px';};
+  if(spId){showEmbedLayer('https://open.spotify.com/embed/track/'+spId+'?utm_source=generator&theme=0');}
+  else if(bvId){showEmbedLayer('https://player.bilibili.com/player.html?bvid='+bvId+'&page=1&high_quality=1&danmaku=0&autoplay=1');}
+  else{const layer=document.getElementById('mp-spotify-layer');const leftEl=document.querySelector('#music-player>div:first-child');const centerEl=document.querySelector('#music-player>div:nth-child(2)');const rightEl=document.getElementById('mp-right-ctrl');if(layer)layer.style.display='none';if(leftEl)leftEl.style.display='';if(centerEl)centerEl.style.display='';if(rightEl)rightEl.style.display='flex';document.getElementById('music-player').style.height='72px';
+    if(vid){mpMode='youtube';audio.src='';ytCreate(vid);clearTimeout(window._ytTimeout);window._ytTimeout=setTimeout(function(){if(mpMode==='youtube'&&!mpPlaying&&mpData.audioUrl){const v=ytId(mpData.audioUrl);if(v)mpPipedFallback(v);}},10000);}
+    else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}
+    else{mpMode='none';}
   }
-  else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}
-  else{mpMode='none';}
   document.getElementById('music-player').style.display='flex';
   const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
   document.body.style.paddingBottom='72px';
@@ -5338,6 +5350,18 @@ showPage=function(id){
     var activePage = document.querySelector('.page.active');
     if(activePage) window._startCounters(activePage);
   }, 200);
+})();
+</script>
+
+<!-- 隱藏後台入口：連續輸入 thai000 即可進入 -->
+<script>
+(function(){
+  const SECRET='thai000';let buf='';
+  document.addEventListener('keydown',function(e){
+    buf+=e.key;
+    if(buf.length>SECRET.length)buf=buf.slice(-SECRET.length);
+    if(buf===SECRET)window.location.href='admin.html';
+  });
 })();
 </script>
 
