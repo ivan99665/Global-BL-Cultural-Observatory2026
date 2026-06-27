@@ -3080,15 +3080,17 @@ setInterval(() => moveIC('culic',   culicState,   1), 3200);
 // Auto-play: BillkinPP carousel
 setInterval(() => moveIC('bpic', bpicState, 1), 2000);
 function moveIC(wrapId, state, dir) {
-  state.idx = (state.idx + dir + state.total) % state.total;
   const track = document.getElementById(wrapId + 'Track');
-  
+
   if (wrapId === 'genreCarousel') {
-    // 專為小卡片輪播設計：移動 300px (卡片寬) + 20px (間距 gap)
-    const moveDist = state.idx * (300 + 20);
+    const cardWidth = 300 + 20;
+    const container = document.getElementById(wrapId);
+    const maxTranslate = Math.max(0, state.total * cardWidth - 20 - container.clientWidth);
+    state.idx = Math.max(0, Math.min(state.idx + dir, state.total - 1));
+    const moveDist = Math.min(state.idx * cardWidth, maxTranslate);
     track.style.transform = `translateX(-${moveDist}px)`;
   } else {
-    // 原有的全螢幕輪播邏輯
+    state.idx = (state.idx + dir + state.total) % state.total;
     track.style.transform = `translateX(-${state.idx * 100}%)`;
   }
 }
