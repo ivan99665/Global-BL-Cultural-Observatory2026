@@ -7717,11 +7717,13 @@ function buildFixedImgList(){
 }
 function handleFixedImgUpload(key,input){
   const file=input.files[0];if(!file)return;
-  compressImg(file,1600,1000,.82,b64=>{
-    fixedImgs[key]=b64;saveFixedImgs();
+  const p=document.getElementById('fiprev-'+key);
+  if(p){p.style.opacity='.4';p.title='上傳中...';}
+  cmsUploadImg(file,1600,1000,.82,url=>{
+    fixedImgs[key]=url;saveFixedImgs();
     const def=FIXED_IMGS.find(d=>d.key===key);
-    applyFixedImg(def,b64);
-    const p=document.getElementById('fiprev-'+key);if(p)p.src=b64;
+    applyFixedImg(def,url);
+    if(p){p.src=url;p.style.opacity='1';p.title='';}
     buildFixedImgList();
   });
 }
