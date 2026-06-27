@@ -32,6 +32,7 @@
 </script>
 <style>
 html.skip-hero #hero{display:none!important;height:0!important;overflow:hidden!important;}
+body.cms-open #thai-btn-wrap{visibility:hidden!important;opacity:0!important;pointer-events:none!important;}
 /* ── 新 session 開場動畫 ── */
 @keyframes heroFadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
 @keyframes heroFadeIn{from{opacity:0;}to{opacity:1;}}
@@ -6428,7 +6429,7 @@ function moveIC(wrapId, state, dir) {
 <script>
 // ══ MUSIC PLAYER ENGINE (YouTube + Direct Audio) ══
 const K_MUSIC='thaiBL-music';
-const DEF_MUSIC={title:'NEW SEASON',artist:'NuNew',cover:'',audioUrl:'https://open.spotify.com/track/3VcmuNLcc2sH1ZrFh2njnp',enabled:true};
+const DEF_MUSIC={title:'NEW SEASON',artist:'NuNew',cover:'',audioUrl:'https://files.catbox.moe/wo2qjk.mp3',enabled:true};
 let mpData={...DEF_MUSIC};
 let mpPlaying=false,mpVisible=false,mpUserInteracted=false,mpMode='none';
 const audio=document.getElementById('bg-audio');
@@ -7959,7 +7960,7 @@ function cmsLogin(){
     document.getElementById('cms-login').style.display='none';
     document.getElementById('cms-pw').value='';
     document.getElementById('cms-pw-err').textContent='';
-    document.getElementById('cms-panel').style.right='0';var w=document.getElementById('thai-btn-wrap');if(w)w.style.visibility='hidden';
+    document.getElementById('cms-panel').style.right='0';document.body.classList.add('cms-open');
     // Then build content — wrapped in try/catch so errors don't affect panel visibility
     try{loadTxtForm();}catch(e){console.warn('loadTxtForm',e);}
     try{buildRecsMainList();}catch(e){console.warn('buildRecsMainList',e);}
@@ -7980,7 +7981,7 @@ function cmsLogin(){
     document.getElementById('cms-pw').focus();
   }
 }
-function cmsClosePanel(){document.getElementById('cms-panel').style.right='-680px';var w=document.getElementById('thai-btn-wrap');if(w)w.style.visibility='';}
+function cmsClosePanel(){document.getElementById('cms-panel').style.right='-680px';document.body.classList.remove('cms-open');}
 function cmsCloseAll(){document.getElementById('cms-login').style.display='none';cmsClosePanel();document.getElementById('cms-pw').value='';document.getElementById('cms-pw-err').textContent='';}
 function cmsTab(s){
   document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active',t.dataset.s===s));
@@ -8147,15 +8148,18 @@ async function publishToGitHub(){
     const infoRes=await fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch,{
       headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}
     });
-    if(!infoRes.ok){const e=await infoRes.json();throw new Error(e.message||infoRes.status);}
-    const info=await infoRes.json();
+    let sha=null;
+    if(infoRes.ok){const info=await infoRes.json();sha=info.sha;}
+    else if(infoRes.status!==404){const e=await infoRes.json();throw new Error(e.message||infoRes.status);}
     log.textContent='📦 準備上傳內容...';
     const encoded=btoa(unescape(encodeURIComponent(html)));
     log.textContent='🚀 推送到 GitHub...';
+    const body={message:'後台更新 '+new Date().toLocaleString('zh-TW'),content:encoded,branch:branch};
+    if(sha)body.sha=sha;
     const commitRes=await fetch('https://api.github.com/repos/'+repo+'/contents/'+path,{
       method:'PUT',
       headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
-      body:JSON.stringify({message:'後台更新 '+new Date().toLocaleString('zh-TW'),content:encoded,sha:info.sha,branch:branch})
+      body:JSON.stringify(body)
     });
     if(!commitRes.ok){const e=await commitRes.json();throw new Error(e.message||commitRes.status);}
     btn.textContent='✅ 發布成功！';
