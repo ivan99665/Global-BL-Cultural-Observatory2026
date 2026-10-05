@@ -6254,11 +6254,13 @@ function updateItsayHc(){document.getElementById('itsayHcTrack').style.transform
 setInterval(()=>{itsayHcIdx=(itsayHcIdx+1)%itsayHcTotal;updateItsayHc();},4000);
 
 // MAIN CAROUSEL (recs)
-let mainIdx=0;const mainTotal=4;
+let mainIdx=0;
+function mainTotalNow(){return document.querySelectorAll('#mainTrack .carousel-slide').length||1;}
 const mainDotsEl=document.getElementById('mainDots');
-for(let i=0;i<mainTotal;i++){const d=document.createElement('div');d.className='carousel-dot'+(i===0?' active':'');d.onclick=()=>{mainIdx=i;updateMain();};mainDotsEl.appendChild(d);}
-function updateMain(){document.getElementById('mainTrack').style.transform=`translateX(-${mainIdx*100}%)`;document.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===mainIdx));}
-function moveCarousel(dir){mainIdx=(mainIdx+dir+mainTotal)%mainTotal;updateMain();}
+for(let i=0;i<mainTotalNow();i++){const d=document.createElement('div');d.className='carousel-dot'+(i===0?' active':'');d.onclick=()=>{mainIdx=i;updateMain();};mainDotsEl.appendChild(d);}
+function updateMain(){document.getElementById('mainTrack').style.transform=`translateX(-${mainIdx*100}%)`;document.querySelectorAll('#mainDots .carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===mainIdx));}
+function goCarousel(i){mainIdx=i;updateMain();}
+function moveCarousel(dir){const n=mainTotalNow();mainIdx=(mainIdx+dir+n)%n;updateMain();}
 setInterval(()=>moveCarousel(1),5500);
 
 // BIZ CAROUSEL
@@ -7416,8 +7418,16 @@ function loadData(){
   else{tlItems=[...DEF_TL];}
 }
 
-function saveRecsData(){localStorage.setItem(K_RECS,JSON.stringify({main:recsMain,dramas:recsDramas}));}
-function saveTLData(){localStorage.setItem(K_TL,JSON.stringify(tlItems));}
+// localStorage 寫入（容量滿時提示，不再無聲失敗）
+function lsSet(k,v){
+  try{localStorage.setItem(k,v);return true;}
+  catch(e){
+    alert('⚠️ 儲存失敗：瀏覽器儲存空間已滿（約 5MB）。\n\n上傳的照片太多或太大。請到「🚀 發布」分頁設定 ImgBB API Key，之後上傳的照片會改存到 ImgBB，不佔瀏覽器空間；或改用「貼上圖片網址」。');
+    console.error('lsSet',k,e);return false;
+  }
+}
+function saveRecsData(){return lsSet(K_RECS,JSON.stringify({main:recsMain,dramas:recsDramas}));}
+function saveTLData(){return lsSet(K_TL,JSON.stringify(tlItems));}
 
 // ═══════════════════════════════
 // DOM RENDERING
@@ -7439,8 +7449,8 @@ function renderMainCarousel(){
   // Re-init dots
   const dotsEl=document.getElementById('mainDots');
   if(dotsEl){
-    dotsEl.innerHTML=recsMain.map((_,i)=>`<span class="dot${i===0?' active':''}" onclick="goCarousel(${i})"></span>`).join('');
-    carouselIdx=0;
+    dotsEl.innerHTML=recsMain.map((_,i)=>`<div class="carousel-dot${i===0?' active':''}" onclick="goCarousel(${i})"></div>`).join('');
+    mainIdx=0;updateMain();
   }
 }
 
@@ -7683,17 +7693,18 @@ const FIXED_IMGS=[
 ];
 let fixedImgs={};
 function loadFixedImgs(){try{const r=localStorage.getItem(K_IMGS);if(r)fixedImgs=JSON.parse(r);}catch(e){fixedImgs={};}}
-function saveFixedImgs(){try{localStorage.setItem(K_IMGS,JSON.stringify(fixedImgs));}catch(e){alert('圖片儲存空間不足，請改用網址方式。');}}
-function applyFixedImg(def,src){
+function saveFixedImgs(){return lsSet(K_IMGS,JSON.stringify(fixedImgs));}
+function applyFixedImg(def,src,fromCms){
   if(!src)return;
+  if(fromCms&&def.type!=='bg'&&typeof cmsEditForgetImg==='function')cmsEditForgetImg(document.querySelector(def.sel));
   if(def.type==='bg'){const el=document.querySelector(def.sel);if(el)el.style.backgroundImage=`url('${src}')`;}
   else{const el=document.querySelector(def.sel);if(el)el.src=src;}
 }
 function applyAllFixedImgs(){FIXED_IMGS.forEach(def=>{if(fixedImgs[def.key])applyFixedImg(def,fixedImgs[def.key]);});}
 function buildFixedImgList(){
   const el=document.getElementById('img-fixed-list');
-  el.innerHTML='';
-  FIXED_IMGS.forEach(def=>{
+  el.innerHTML='<div style="font-size:.68rem;color:rgba(245,237,216,.45);margin-bottom:.8rem;">其他照片：按上方「✏️ 直接編輯頁面」，再直接點網頁上的照片即可更換。</div>';
+  FIXED_IMGS.filter(def=>document.querySelector(def.sel)).forEach(def=>{
     const cur=fixedImgs[def.key]||'';
     const row=document.createElement('div');
     row.className='ccard';
@@ -7717,12 +7728,13 @@ function buildFixedImgList(){
 }
 function handleFixedImgUpload(key,input){
   const file=input.files[0];if(!file)return;
+  input.value='';
   const p=document.getElementById('fiprev-'+key);
   if(p){p.style.opacity='.4';p.title='上傳中...';}
   cmsUploadImg(file,1600,1000,.82,url=>{
-    fixedImgs[key]=url;saveFixedImgs();
+    fixedImgs[key]=url;if(!saveFixedImgs()){delete fixedImgs[key];if(p)p.style.opacity='1';return;}
     const def=FIXED_IMGS.find(d=>d.key===key);
-    applyFixedImg(def,url);
+    applyFixedImg(def,url,true);
     if(p){p.src=url;p.style.opacity='1';p.title='';}
     buildFixedImgList();
   });
@@ -7730,9 +7742,9 @@ function handleFixedImgUpload(key,input){
 function applyFixedImgUrl(key){
   const url=document.getElementById('fiurl-'+key).value.trim();
   if(!url){alert('請輸入網址');return;}
-  fixedImgs[key]=url;saveFixedImgs();
+  fixedImgs[key]=url;if(!saveFixedImgs()){delete fixedImgs[key];return;}
   const def=FIXED_IMGS.find(d=>d.key===key);
-  applyFixedImg(def,url);
+  applyFixedImg(def,url,true);
   buildFixedImgList();
 }
 function resetFixedImg(key){
@@ -7836,13 +7848,16 @@ function compressImg(file,maxW,maxH,q,cb){
       c.getContext('2d').drawImage(img,0,0,w,h);
       cb(c.toDataURL('image/jpeg',q));
     };
+    img.onerror=()=>alert('❌ 無法讀取這張圖片（'+file.name+'）。\n請改用 JPG / PNG / WebP 格式。');
     img.src=e.target.result;
   };
+  r.onerror=()=>alert('❌ 讀取檔案失敗：'+file.name);
   r.readAsDataURL(file);
 }
 function handleImgUpload(list,i,input){
   const file=input.files[0];if(!file)return;
-  compressImg(file,900,600,.82,b64=>{
+  input.value='';
+  cmsUploadImg(file,900,600,.82,b64=>{
     if(list==='main'){recsMain[i].img=b64;const p=document.getElementById('mprev-'+i);if(p)p.src=b64;const inp=document.getElementById('mimg-'+i);if(inp)inp.value=b64;}
     else if(list==='drama'){recsDramas[i].img=b64;const p=document.getElementById('dprev-'+i);if(p)p.src=b64;const inp=document.getElementById('dimg-'+i);if(inp)inp.value=b64;}
     else if(list==='tl'){tlItems[i].img=b64;const p=document.getElementById('tlprev-'+i);if(p)p.src=b64;const inp=document.getElementById('tlimg-'+i);if(inp)inp.value=b64;}
@@ -7855,7 +7870,8 @@ function applyImgUrl(list,i){
 }
 function handleCastImg(di,ci,input){
   const file=input.files[0];if(!file)return;
-  compressImg(file,200,200,.85,b64=>{
+  input.value='';
+  cmsUploadImg(file,200,200,.85,b64=>{
     recsDramas[di].cast[ci].img=b64;
     const p=document.getElementById('cavprev-'+di+'-'+ci);if(p)p.src=b64;
   });
@@ -7890,7 +7906,7 @@ function setupDrag(el,list){
     if(list==='main'){collectRecsMain();const it=recsMain.splice(src,1)[0];recsMain.splice(dst,0,it);saveRecsData();renderMainCarousel();buildRecsMainList();}
     else if(list==='drama'){collectRecsDramas();const it=recsDramas.splice(src,1)[0];recsDramas.splice(dst,0,it);saveRecsData();renderGenreCarousel();buildRecsDramaList();}
     else if(list==='tl'){collectTL();const it=tlItems.splice(src,1)[0];tlItems.splice(dst,0,it);saveTLData();renderTimeline();buildTLList();}
-    else if(list==='dd'){ddCmsCollect();const it=ddData.splice(src,1)[0];ddData.splice(dst,0,it);ddSaveData();ddBuildFilters();ddRenderGrid();ddCmsBuildList(); ddlCmsBuildList();}
+    else if(list==='ddl'){ddlCmsCollect();const it=ddlData.splice(src,1)[0];ddlData.splice(dst,0,it);ddlSave();ddlRenderAll();ddlCmsBuildList();}
   });
 }
 
@@ -7932,19 +7948,29 @@ function applyTxt(d){
 // ═══════════════════════════════
 // MASTER SAVE
 // ═══════════════════════════════
+// 只有實際修改過的文章表單才會覆寫頁面（避免舊表單蓋掉「直接編輯」的內容）
+const cmsDirty={map:false,aud:false,cult:false};
+['map','aud','cult'].forEach(s=>{
+  const el=document.getElementById('cs-'+s);
+  if(el)el.addEventListener('input',()=>{cmsDirty[s]=true;});
+});
 function cmsSaveAll(){
-  try{saveMap();}catch(e){console.warn('saveMap',e);}
-  try{saveAud();}catch(e){console.warn('saveAud',e);}
-  try{saveCult();}catch(e){console.warn('saveCult',e);}
-  collectRecsMain(); collectRecsDramas(); collectTL();
-  ddCmsCollect(); ddSaveData(); ddBuildFilters(); ddRenderGrid();
-  ddlCmsCollect(); ddlSave(); ddlRenderAll();
-  saveRecsData(); saveTLData();
-  const txt=collectTxt(); localStorage.setItem(K_TXT,JSON.stringify(txt)); applyTxt(txt);
-  renderMainCarousel(); renderGenreCarousel(); renderTimeline();
+  let ok=true;
+  const step=(name,fn)=>{try{if(fn()===false)ok=false;}catch(e){ok=false;console.error('cmsSaveAll · '+name,e);}};
+  if(cmsDirty.map)step('map',saveMap);
+  if(cmsDirty.aud)step('aud',saveAud);
+  if(cmsDirty.cult)step('cult',saveCult);
+  step('recs',()=>{collectRecsMain();collectRecsDramas();return saveRecsData();});
+  step('tl',()=>{collectTL();return saveTLData();});
+  step('ddl',()=>{ddlCmsCollect();const r=ddlSave();ddlRenderAll();return r;});
+  step('txt',()=>{const txt=collectTxt();const r=lsSet(K_TXT,JSON.stringify(txt));applyTxt(txt);return r;});
+  step('render',()=>{renderMainCarousel();renderGenreCarousel();renderTimeline();});
+  if(ok){cmsDirty.map=cmsDirty.aud=cmsDirty.cult=false;}
   const btn=document.getElementById('cms-save-btn');
-  btn.textContent='✅ 已儲存！';btn.style.background='linear-gradient(135deg,#1D9E75,#4BA8A0)';
+  btn.textContent=ok?'✅ 已儲存！':'⚠️ 部分未儲存';
+  btn.style.background=ok?'linear-gradient(135deg,#1D9E75,#4BA8A0)':'linear-gradient(135deg,#8a2b2b,#c94b25)';
   setTimeout(()=>{btn.textContent='💾 儲存套用';btn.style.background='linear-gradient(135deg,#C94B25,#E8863A)';},2500);
+  return ok;
 }
 
 // ═══════════════════════════════
@@ -7970,7 +7996,6 @@ function cmsLogin(){
     try{buildTLList();}catch(e){console.warn('buildTLList',e);}
     try{buildFixedImgList();}catch(e){console.warn('buildFixedImgList',e);}
     try{mpCmsLoad();}catch(e){console.warn('mpCmsLoad',e);}
-    try{ddCmsBuildList();}catch(e){console.warn('ddCmsBuildList',e);}
     try{ddlCmsBuildList();}catch(e){console.warn('ddlCmsBuildList',e);}
     try{loadMapForm();}catch(e){console.warn('loadMapForm',e);}
     try{loadAudForm();}catch(e){console.warn('loadAudForm',e);}
@@ -8068,9 +8093,9 @@ function applyCult(d){
 }
 function loadCultForm(){const raw=localStorage.getItem(K_CULT);if(!raw)return;try{const d=JSON.parse(raw);$s('f-cult-h1',d.h1||'');$s('f-cult-body',d.body||'');if(d.kr){$s('f-kr-reality',d.kr[0]||'');$s('f-kr-fantasy',d.kr[1]||'');}if(d.cn){$s('f-cn-reality',d.cn[0]||'');$s('f-cn-fantasy',d.cn[1]||'');}if(d.th){$s('f-th-reality',d.th[0]||'');$s('f-th-fantasy',d.th[1]||'');}if(d.jp){$s('f-jp-reality',d.jp[0]||'');$s('f-jp-fantasy',d.jp[1]||'');}if(d.tw){$s('f-tw-reality',d.tw[0]||'');$s('f-tw-fantasy',d.tw[1]||'');}if(d.us){$s('f-us-reality',d.us[0]||'');$s('f-us-fantasy',d.us[1]||'');}$s('f-cult-con-h3',d.conH3||'');$s('f-cult-con-body',d.conBody||'');}catch(e){console.warn('loadCultForm',e);}}
 
-function saveMap(){const d=collectMap();localStorage.setItem(K_MAP,JSON.stringify(d));applyMap(d);}
-function saveAud(){const d=collectAud();localStorage.setItem(K_AUD,JSON.stringify(d));applyAud(d);}
-function saveCult(){const d=collectCult();localStorage.setItem(K_CULT,JSON.stringify(d));applyCult(d);}
+function saveMap(){const d=collectMap();applyMap(d);cmsEditForgetWithin('#tab-map');return lsSet(K_MAP,JSON.stringify(d));}
+function saveAud(){const d=collectAud();applyAud(d);cmsEditForgetWithin('#tab-audience');return lsSet(K_AUD,JSON.stringify(d));}
+function saveCult(){const d=collectCult();applyCult(d);cmsEditForgetWithin('#tab-culture');return lsSet(K_CULT,JSON.stringify(d));}
 
 // ══ IMGBB + GITHUB PUBLISH ══
 const K_IMGBB='thaiBL-imgbb-key';
@@ -8111,7 +8136,8 @@ function pubSaveGH(){
 }
 function cmsUploadImg(file,maxW,maxH,q,cb){
   const key=localStorage.getItem(K_IMGBB);
-  if(!key){alert('⚠️ 尚未設定 ImgBB Key！\n請到 ⚙️ 設定分頁填入 ImgBB API Key。');compressImg(file,maxW,maxH,q,cb);return;}
+  // 沒有 ImgBB Key：壓縮後存在瀏覽器（空間有限，lsSet 會在滿時提示）
+  if(!key){compressImg(file,maxW,maxH,q,cb);return;}
   const form=new FormData();
   form.append('image',file);
   form.append('key',key);
@@ -8131,18 +8157,12 @@ async function publishToGitHub(){
   const log=document.getElementById('gh-publish-log');
   const btn=document.getElementById('gh-publish-btn');
   if(!token||!repo||!path){alert('請先在「🚀 發布」頁面填寫 GitHub 設定');return;}
-  cmsSaveAll();
+  if(!cmsSaveAll()){alert('⚠️ 有資料未能儲存，已取消發布。請先處理儲存問題。');return;}
   const bakedAt=Date.now();
-  const allData={
-    bakedAt,
-    txt:JSON.parse(localStorage.getItem(K_TXT)||'null'),
-    recs:JSON.parse(localStorage.getItem(K_RECS)||'null'),
-    tl:JSON.parse(localStorage.getItem(K_TL)||'null'),
-    imgs:JSON.parse(localStorage.getItem(K_IMGS)||'null'),
-    ddl:JSON.parse(localStorage.getItem(K_DDL)||'null'),
-    music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
-  };
-  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData)+';var prev=+(localStorage.getItem("thaiBL-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("thaiBL-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  const keyMap={txt:K_TXT,recs:K_RECS,tl:K_TL,imgs:K_IMGS,ddl:K_DDL,music:K_MUSIC,map:K_MAP,aud:K_AUD,cult:K_CULT,edit:K_EDIT};
+  const allData={bakedAt};
+  Object.keys(keyMap).forEach(k=>{allData[k]=JSON.parse(localStorage.getItem(keyMap[k])||'null');});
+  const bakedScript='<script id="cms-baked-data">(function(){try{var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("thaiBL-bakedAt")||0);if(d.bakedAt<=prev)return;var map='+JSON.stringify(keyMap)+';Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});localStorage.setItem("thaiBL-bakedAt",d.bakedAt);}catch(e){}})();<\/script>';
   let html=document.documentElement.outerHTML;
   html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
   html=html.replace('<head>','<head>\n'+bakedScript);
@@ -8628,7 +8648,7 @@ const DEF_DDL=[
 let ddlData=[...DEF_DDL];
 
 function ddlLoad(){try{const r=localStorage.getItem(K_DDL);if(r)ddlData=JSON.parse(r);}catch(e){ddlData=[...DEF_DDL];}}
-function ddlSave(){localStorage.setItem(K_DDL,JSON.stringify(ddlData));}
+function ddlSave(){return lsSet(K_DDL,JSON.stringify(ddlData));}
 
 // ── Nav Dropdown ──
 function navDdToggle(e){
@@ -8820,7 +8840,7 @@ function ddlCmsMove(i,dir){
   ddlRenderAll();
   ddlCmsBuildList();
 }
-function ddlCmsUploadImg(i,input){const file=input.files[0];if(!file)return;compressImg(file,800,500,.82,b64=>{ddlData[i].cover=b64;const p=document.getElementById('ddlprev-'+i);if(p)p.src=b64;const inp=document.getElementById('ddlimg-'+i);if(inp)inp.value=b64;});}
+function ddlCmsUploadImg(i,input){const file=input.files[0];if(!file)return;input.value='';cmsUploadImg(file,800,500,.82,b64=>{ddlData[i].cover=b64;const p=document.getElementById('ddlprev-'+i);if(p)p.src=b64;const inp=document.getElementById('ddlimg-'+i);if(inp)inp.value=b64;});}
 function ddlCmsApplyImg(i){const v=document.getElementById('ddlimg-'+i)?.value;if(v){ddlData[i].cover=v;const p=document.getElementById('ddlprev-'+i);if(p)p.src=v;}}
 
 
@@ -8912,6 +8932,11 @@ flipBgInit();
   const raw=localStorage.getItem(K_TXT);if(raw){try{applyTxt(JSON.parse(raw));}catch(e){}}
   renderMainCarousel(); renderGenreCarousel(); renderTimeline(); applyAllFixedImgs();
   ddlLoad(); ddlRenderAll();
+  // 套用後台儲存的文章（全球地圖 / 受眾解構 / 文化錯位）
+  [[K_MAP,applyMap],[K_AUD,applyAud],[K_CULT,applyCult]].forEach(([k,fn])=>{
+    const r=localStorage.getItem(k);if(!r)return;
+    try{fn(JSON.parse(r));}catch(e){console.warn('apply '+k,e);}
+  });
   // Page display is handled by FINAL OVERRIDE below
 })();
 </script>
@@ -9342,9 +9367,9 @@ flipBgInit();
 </script>
 
 <!-- ══ 直接編輯模式 浮動工具列 ══ -->
-<div id="edit-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0D1A24,#0A1018);border-top:1px solid rgba(75,168,160,.4);padding:.75rem 1.5rem;display:none;align-items:center;gap:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.6);">
+<div id="edit-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0D1A24,#0A1018);border-top:1px solid rgba(75,168,160,.4);padding:.75rem 1.5rem;align-items:center;gap:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.6);">
   <span style="font-size:.72rem;color:#4BA8A0;letter-spacing:.1em;">✏️ 直接編輯模式</span>
-  <span style="font-size:.65rem;color:rgba(245,237,216,.3);flex:1;">點擊任意文字即可編輯 · 圖片點「🔄」更換</span>
+  <span style="font-size:.65rem;color:rgba(245,237,216,.45);flex:1;">點任意文字即可修改 · 點任意圖片可更換照片 · 可用上方選單切換頁面繼續編輯</span>
   <button id="edit-save-btn" onclick="cmsExitEdit(true)" style="background:linear-gradient(135deg,#1D9E75,#4BA8A0);border:none;border-radius:7px;color:#fff;padding:.5rem 1.2rem;font-family:'Noto Sans TC',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;">💾 儲存所有修改</button>
   <button onclick="cmsExitEdit(false)" style="background:rgba(245,237,216,.06);border:1px solid rgba(245,237,216,.15);border-radius:7px;color:rgba(245,237,216,.5);padding:.5rem 1rem;font-family:'Noto Sans TC',sans-serif;font-size:.78rem;cursor:pointer;">✕ 取消</button>
 </div>
@@ -9352,82 +9377,163 @@ flipBgInit();
 <style>
 .cms-editable{outline:1px dashed rgba(75,168,160,.45)!important;border-radius:3px;cursor:text;transition:outline .15s;}
 .cms-editable:hover,.cms-editable:focus{outline:2px solid rgba(75,168,160,.8)!important;background:rgba(75,168,160,.06)!important;}
-.cms-img-wrap{position:relative;display:inline-block;}
-.cms-img-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(13,26,36,.55);opacity:0;transition:opacity .2s;border-radius:4px;}
-.cms-img-wrap:hover .cms-img-overlay{opacity:1;}
-.cms-img-btn{background:rgba(75,168,160,.9);border:none;border-radius:6px;color:#fff;padding:.35rem .75rem;font-size:.72rem;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;}
+body.cms-editing img.cms-img-target{outline:2px dashed rgba(232,134,58,.7)!important;outline-offset:-2px;cursor:pointer!important;}
+body.cms-editing img.cms-img-target:hover{outline:3px solid #E8863A!important;}
+body.cms-editing{padding-bottom:64px;}
 </style>
 
 <script>
 // ══ DIRECT EDIT MODE ══
+// 可編輯整個網站的文字與圖片；每個修改以「元素在頁面中的位置」為鍵儲存。
+// 儲存格式：{v:2, t:{位置:innerHTML}, i:{位置:src}}
 const K_EDIT='thaiBL-edit';
-const EDIT_SCOPE='#tab-map,#tab-audience,#tab-culture,#page-home .hero-content,#page-home .stat-bar';
-const EDIT_TAGS='p,h1,h2,h3,h4,h5,li,blockquote,span.fa-kw,span.fb-kw,span.cdc-pill,span.cdc-tag,span.epi-tag,span.ax-num,span.epi-n';
+const EDIT_EXCLUDE=[
+  '#cms-panel','#cms-login','#edit-bar','.cms-ui','#music-player','#mp-restore-btn','#thai-btn-wrap',
+  '#yt-player-container','#cur','#cur-o','#nav','nav','.subnav','button','select','input','textarea',
+  // 由後台其他分頁產生/管理的內容（推薦輪播、劇集卡片、時間軸、深度專題清單）
+  '#mainTrack','#mainDots','#genreCarouselTrack','.tl-item','#ddl-grid','#dd-catalog-grid','#nav-dd-items',
+  'script','style','noscript','svg','canvas'
+].join(',');
+const EDIT_BLOCK_TAGS=new Set(['P','H1','H2','H3','H4','H5','H6','LI','BLOCKQUOTE','FIGCAPTION','TD','TH','DT','DD']);
+const EDIT_LEAF_TAGS=new Set(['DIV','SPAN','A','LABEL','SMALL','STRONG','EM','B','I']);
+const EDIT_INLINE_OK=new Set(['BR','EM','STRONG','B','I','SPAN','SMALL','A','SUP','SUB','MARK','U']);
+let cmsEditing=false;
 
-function getEditEls(){return document.querySelectorAll(EDIT_SCOPE+' '+EDIT_TAGS);}
+function cmsExcluded(el){return !!el.closest(EDIT_EXCLUDE);}
+function cmsHasOwnText(el){for(const n of el.childNodes){if(n.nodeType===3&&n.textContent.trim())return true;}return false;}
+function cmsIsTextBlock(el){
+  if(EDIT_BLOCK_TAGS.has(el.tagName))return el.textContent.trim()!=='';
+  if(!EDIT_LEAF_TAGS.has(el.tagName)||!cmsHasOwnText(el))return false;
+  for(const c of el.children){if(!EDIT_INLINE_OK.has(c.tagName))return false;}
+  return true;
+}
+function getEditEls(){
+  const all=[...document.body.querySelectorAll('*')].filter(el=>cmsIsTextBlock(el)&&!cmsExcluded(el));
+  const set=new Set(all);
+  // 只保留最外層的文字區塊（避免巢狀重複）
+  return all.filter(el=>{let p=el.parentElement;while(p&&p!==document.body){if(set.has(p))return false;p=p.parentElement;}return true;});
+}
+function getEditImgs(){return [...document.body.querySelectorAll('img')].filter(img=>!cmsExcluded(img));}
+
+// 元素位置：#最近的唯一 id > tag:nth-child(n) > ...
+function cmsPath(el){
+  const parts=[];
+  while(el&&el!==document.body&&el!==document.documentElement){
+    if(el.id&&document.querySelectorAll('#'+CSS.escape(el.id)).length===1){parts.unshift('#'+CSS.escape(el.id));return parts.join('>');}
+    let i=1,s=el;while((s=s.previousElementSibling))i++;
+    parts.unshift(el.tagName.toLowerCase()+':nth-child('+i+')');
+    el=el.parentElement;
+  }
+  parts.unshift('body');return parts.join('>');
+}
+function cmsQ(path){try{return document.querySelector(path);}catch(e){return null;}}
+function cmsMarkDirty(e){e.currentTarget.dataset.cmsDirty='1';}
+// 清除舊版編輯模式殘留在儲存內容裡的編輯狀態（虛線框、可編輯屬性、換圖外框）
+function cmsCleanEditLeftovers(root){
+  root.querySelectorAll('.cms-img-wrap').forEach(w=>{const img=w.querySelector('img');if(img)w.parentNode.insertBefore(img,w);w.remove();});
+  root.querySelectorAll('.cms-img-overlay').forEach(o=>o.remove());
+  root.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+  root.querySelectorAll('.cms-editable').forEach(el=>el.classList.remove('cms-editable'));
+  root.querySelectorAll('[data-cms-idx]').forEach(el=>el.removeAttribute('data-cms-idx'));
+}
+// 後台分頁（地圖 / 受眾 / 文化）儲存時，移除同區塊內直接編輯的文字覆寫，以後台分頁內容為準
+function cmsEditForgetWithin(rootSel){
+  const root=document.querySelector(rootSel);if(!root)return;
+  const d=cmsEditRead();let changed=false;
+  Object.keys(d.t).forEach(p=>{const el=cmsQ(p);if(el&&root.contains(el)){delete d.t[p];changed=true;}});
+  if(changed)lsSet(K_EDIT,JSON.stringify(d));
+}
+
+function cmsEditRead(){
+  try{const d=JSON.parse(localStorage.getItem(K_EDIT)||'null');
+    if(d&&d.v===2)return{v:2,t:d.t||{},i:d.i||{},legacy:d.legacy};
+    if(d)return{v:2,t:{},i:{},legacy:d};
+  }catch(e){}
+  return{v:2,t:{},i:{}};
+}
+
+// 編輯模式下：點圖片 → 換圖；點文字 → 只編輯，不觸發卡片翻轉 / 換頁等點擊效果
+function cmsEditClick(e){
+  if(!cmsEditing||e.target.closest('#edit-bar,.cms-ui,#cms-panel,#cms-login'))return;
+  if(e.target.closest('.cms-editable')){e.stopPropagation();return;}
+  const img=(e.target.tagName==='IMG'&&!cmsExcluded(e.target))?e.target
+    :document.elementsFromPoint(e.clientX,e.clientY).find(el=>el.tagName==='IMG'&&!cmsExcluded(el));
+  if(img){e.preventDefault();e.stopPropagation();cmsEditImgReplace(img);}
+}
+window.addEventListener('click',cmsEditClick,true);
 
 function cmsEnterEdit(){
-  document.getElementById('cms-panel').style.right='-680px';
+  cmsClosePanel();
+  cmsEditing=true;
+  document.body.classList.add('cms-editing');
   document.getElementById('edit-bar').style.display='flex';
-  getEditEls().forEach((el,i)=>{
-    el.dataset.cmsIdx=i;
+  getEditEls().forEach(el=>{
+    el.dataset.cmsOrig=el.innerHTML;
     el.contentEditable='true';
     el.classList.add('cms-editable');
+    el.addEventListener('input',cmsMarkDirty);
   });
-  // Wrap images
-  document.querySelectorAll(EDIT_SCOPE+' img').forEach(img=>{
-    if(img.closest('.cms-img-wrap'))return;
-    const wrap=document.createElement('div');
-    wrap.className='cms-img-wrap';
-    const ov=document.createElement('div');
-    ov.className='cms-img-overlay';
-    const btn=document.createElement('button');
-    btn.className='cms-img-btn';
-    btn.textContent='🔄 換圖';
-    btn.onclick=e=>{e.stopPropagation();cmsEditImgReplace(img);};
-    ov.appendChild(btn);
-    img.parentNode.insertBefore(wrap,img);
-    wrap.appendChild(img);
-    wrap.appendChild(ov);
-  });
+  getEditImgs().forEach(img=>img.classList.add('cms-img-target'));
 }
 
 function cmsExitEdit(save){
-  if(save)cmsEditSave();
+  const els=[...document.querySelectorAll('.cms-editable')];
+  els.forEach(el=>{el.removeAttribute('contenteditable');el.classList.remove('cms-editable');});
+  document.querySelectorAll('.cms-img-target').forEach(img=>img.classList.remove('cms-img-target'));
+  if(save){
+    if(!cmsEditSave(els))return; // 儲存失敗：留在編輯模式
+  }else{
+    els.forEach(el=>{if(el.dataset.cmsOrig!==undefined)el.innerHTML=el.dataset.cmsOrig;});
+    document.querySelectorAll('img[data-cms-orig-src]').forEach(img=>{img.src=img.dataset.cmsOrigSrc;img.removeAttribute('data-cms-orig-src');delete img.dataset.cmsChanged;});
+  }
+  els.forEach(el=>{delete el.dataset.cmsOrig;delete el.dataset.cmsDirty;el.removeEventListener('input',cmsMarkDirty);});
+  cmsEditing=false;
+  document.body.classList.remove('cms-editing');
   document.getElementById('edit-bar').style.display='none';
-  getEditEls().forEach(el=>{
-    el.removeAttribute('contenteditable');
-    el.classList.remove('cms-editable');
-    delete el.dataset.cmsIdx;
-  });
-  document.querySelectorAll('.cms-img-wrap').forEach(wrap=>{
-    const img=wrap.querySelector('img');
-    if(img)wrap.parentNode.insertBefore(img,wrap);
-    wrap.remove();
-  });
 }
 
-function cmsEditSave(){
-  const data=[];
-  getEditEls().forEach(el=>data.push(el.innerHTML));
-  localStorage.setItem(K_EDIT,JSON.stringify(data));
-  const btn=document.getElementById('edit-save-btn');
-  if(btn){btn.textContent='✅ 已儲存！';setTimeout(()=>btn.textContent='💾 儲存所有修改',2200);}
+function cmsEditSave(els){
+  const d=cmsEditRead();
+  // 只儲存使用者實際輸入過的文字（動畫/計數器等自動變動的內容不會被凍結）
+  els.forEach(el=>{if(el.dataset.cmsDirty)d.t[cmsPath(el)]=el.innerHTML;});
+  document.querySelectorAll('img[data-cms-changed]').forEach(img=>{d.i[cmsPath(img)]=img.getAttribute('src');});
+  if(!lsSet(K_EDIT,JSON.stringify(d))){
+    els.forEach(el=>{el.contentEditable='true';el.classList.add('cms-editable');});
+    getEditImgs().forEach(img=>img.classList.add('cms-img-target'));
+    return false;
+  }
+  document.querySelectorAll('img[data-cms-changed]').forEach(img=>{delete img.dataset.cmsChanged;img.removeAttribute('data-cms-orig-src');});
+  return true;
 }
 
 function cmsEditApply(){
-  const raw=localStorage.getItem(K_EDIT);if(!raw)return;
-  try{
-    const data=JSON.parse(raw);
-    getEditEls().forEach((el,i)=>{if(data[i]!==undefined&&data[i]!==null)el.innerHTML=data[i];});
-  }catch(e){}
+  const d=cmsEditRead();
+  // 舊版（索引陣列）資料：用舊版完全相同的選擇器套用（先套用，新版位置資料優先）
+  if(d.legacy){
+    const arr=Array.isArray(d.legacy)?d.legacy:(d.legacy.t||[]);
+    const old=document.querySelectorAll('#tab-map,#tab-audience,#tab-culture,#page-home .hero-content,#page-home .stat-bar p,h1,h2,h3,h4,h5,li,blockquote,span.fa-kw,span.fb-kw,span.cdc-pill,span.cdc-tag,span.epi-tag,span.ax-num,span.epi-n');
+    old.forEach((el,i)=>{if(arr[i]!=null&&!cmsExcluded(el))el.innerHTML=arr[i];});
+    cmsCleanEditLeftovers(document.body);
+  }
+  Object.keys(d.t).forEach(p=>{const el=cmsQ(p);if(el)el.innerHTML=d.t[p];});
+  Object.keys(d.i).forEach(p=>{const el=cmsQ(p);if(el&&el.tagName==='IMG'&&d.i[p])el.src=d.i[p];});
+}
+
+// 「📷 圖片」分頁更換同一張圖時，移除直接編輯的舊覆寫，避免重新整理後被蓋回去
+function cmsEditForgetImg(el){
+  if(!el)return;
+  const d=cmsEditRead();const p=cmsPath(el);
+  if(d.i[p]){delete d.i[p];lsSet(K_EDIT,JSON.stringify(d));}
 }
 
 function cmsEditImgReplace(img){
+  if(window._eirMenu){window._eirMenu.remove();window._eirMenu=null;}
   const menu=document.createElement('div');
-  menu.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000;background:#0D1A24;border:1px solid rgba(75,168,160,.4);border-radius:12px;padding:1.2rem;width:320px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:"Noto Sans TC",sans-serif;';
+  menu.className='cms-ui';
+  menu.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000;background:#0D1A24;border:1px solid rgba(75,168,160,.4);border-radius:12px;padding:1.2rem;width:340px;max-width:calc(100vw - 32px);box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:"Noto Sans TC",sans-serif;';
   menu.innerHTML=`
-    <div style="font-size:.8rem;color:#4BA8A0;margin-bottom:.8rem;">🔄 更換圖片</div>
+    <div style="font-size:.8rem;color:#4BA8A0;margin-bottom:.7rem;">🔄 更換圖片</div>
+    <img src="${img.getAttribute('src')||''}" style="width:100%;max-height:140px;object-fit:contain;border-radius:6px;background:#111e2b;margin-bottom:.7rem;">
     <input id="_eir_url" class="ci" placeholder="貼上圖片網址..." style="width:100%;margin-bottom:.6rem;">
     <div style="display:flex;gap:.5rem;margin-bottom:.6rem;">
       <label style="flex:1;text-align:center;background:rgba(75,168,160,.1);border:1px solid rgba(75,168,160,.25);color:#4BA8A0;border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">
@@ -9435,22 +9541,19 @@ function cmsEditImgReplace(img){
       </label>
       <button onclick="window._eirApplyUrl()" style="flex:1;background:rgba(232,134,58,.15);border:1px solid rgba(232,134,58,.3);color:#E8863A;border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">套用網址</button>
     </div>
-    <div style="display:flex;gap:.5rem;">
-      <button onclick="document.body.removeChild(window._eirMenu);window._eirMenu=null;" style="flex:1;background:rgba(245,237,216,.05);border:1px solid rgba(245,237,216,.12);color:rgba(245,237,216,.4);border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">取消</button>
-    </div>`;
+    <div id="_eir_status" style="font-size:.65rem;color:#4BA8A0;min-height:1em;margin-bottom:.4rem;"></div>
+    <button onclick="window._eirMenu.remove();window._eirMenu=null;" style="width:100%;background:rgba(245,237,216,.05);border:1px solid rgba(245,237,216,.12);color:rgba(245,237,216,.5);border-radius:6px;padding:.4rem;font-size:.72rem;cursor:pointer;">取消</button>`;
   window._eirMenu=menu;
-  window._eirImg=img;
-  window._eirApplyUrl=function(){
-    const url=document.getElementById('_eir_url').value.trim();
-    if(!url)return;
-    img.src=url;
-    document.body.removeChild(menu);window._eirMenu=null;
+  const setImg=src=>{
+    if(!img.hasAttribute('data-cms-orig-src'))img.dataset.cmsOrigSrc=img.getAttribute('src')||'';
+    img.src=src;img.removeAttribute('srcset');img.dataset.cmsChanged='1';
+    if(window._eirMenu===menu){menu.remove();window._eirMenu=null;}
   };
+  window._eirApplyUrl=function(){const url=document.getElementById('_eir_url').value.trim();if(url)setImg(url);};
   window._eirFile=function(input){
     const file=input.files[0];if(!file)return;
-    const reader=new FileReader();
-    reader.onload=e=>{img.src=e.target.result;document.body.removeChild(menu);window._eirMenu=null;};
-    reader.readAsDataURL(file);
+    const st=document.getElementById('_eir_status');if(st)st.textContent='⏳ 處理中...';
+    cmsUploadImg(file,1600,1000,.82,setImg);
   };
   document.body.appendChild(menu);
   setTimeout(()=>document.getElementById('_eir_url')?.focus(),80);
@@ -9467,7 +9570,7 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
   document.addEventListener('keydown',function(e){
     buf+=e.key;
     if(buf.length>SECRET.length)buf=buf.slice(-SECRET.length);
-    if(buf===SECRET)window.location.href='admin.html';
+    if(buf===SECRET){buf='';cmsOpen();}
   });
 })();
 </script>
