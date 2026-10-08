@@ -10,6 +10,26 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <script>
+/* 全球 BL 後台：獨立的儲存空間（globalBL-*），不再與泰劇後台（thaiBL-*）共用。
+   第一次載入時，把舊的共用資料中屬於全球站的部分複製過來（只做一次）。 */
+(function(){
+  try{
+    if(localStorage.getItem('globalBL-migrated'))return;
+    var copy=['map','aud','cult','edit','music','pw','imgbb-key','gh-token','gh-repo','gh-branch'];
+    copy.forEach(function(k){
+      var v=localStorage.getItem('thaiBL-'+k);
+      if(v!==null&&localStorage.getItem('globalBL-'+k)===null)localStorage.setItem('globalBL-'+k,v);
+    });
+    // 圖片：只搬全球站的固定圖片欄位
+    var GLOBAL_IMG_KEYS=['hero','gal0','gal1','gal2','fa1','fa1b','fa1c','fa2','fa2b','fa2c','fb1','fb1b','fb1c','fb2','fb2b','fb2c','ax1','ax2','ax3','aud1','aud2'];
+    var old=JSON.parse(localStorage.getItem('thaiBL-imgs')||'{}'),mine={};
+    GLOBAL_IMG_KEYS.forEach(function(k){if(old[k])mine[k]=old[k];});
+    if(Object.keys(mine).length&&!localStorage.getItem('globalBL-imgs'))localStorage.setItem('globalBL-imgs',JSON.stringify(mine));
+    var gp=localStorage.getItem('thaiBL-gh-path');if(gp&&!/thai/i.test(gp)&&localStorage.getItem('globalBL-gh-path')===null)localStorage.setItem('globalBL-gh-path',gp);
+    localStorage.setItem('globalBL-migrated','1');
+  }catch(e){}
+})();
+</script><script>
 /* 開場邏輯：
    - F5(reload)      → 不介入，頁面正常顯示，CSS 確保無動畫
    - 新 session      → 加 hero-anim-pending，播開場動畫，強制回頂 */
@@ -6430,7 +6450,7 @@ function moveIC(wrapId, state, dir) {
 
 <script>
 // ══ MUSIC PLAYER ENGINE (YouTube + Direct Audio) ══
-const K_MUSIC='thaiBL-music';
+const K_MUSIC='globalBL-music';
 const DEF_MUSIC={title:'NEW SEASON',artist:'NuNew',cover:'https://lineimg.omusic.com.tw/img/album/7923587.jpg?v=20260316201048',audioUrl:'https://files.catbox.moe/wo2qjk.mp3',enabled:true};
 let mpData={...DEF_MUSIC};
 let mpPlaying=false,mpVisible=false,mpUserInteracted=false,mpMode='none';
@@ -6681,7 +6701,7 @@ mpApply();
 <!-- Login -->
 <div id="cms-login" style="position:fixed;inset:0;z-index:9100;background:rgba(13,26,36,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;">
   <div style="background:#162535;border:1px solid rgba(232,134,58,.22);border-radius:16px;padding:2.5rem;width:360px;text-align:center;">
-    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#F2B07A;font-style:italic;margin-bottom:.3rem;">彩虹經緯 · 後台管理</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#F2B07A;font-style:italic;margin-bottom:.3rem;">🌍 全球 BL 影視 · 後台管理</div>
     <div style="font-size:.64rem;letter-spacing:.2em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-bottom:1.8rem;">Global BL Cultural Observatory · CMS</div>
     <div style="height:1px;background:rgba(232,134,58,.15);margin-bottom:1.8rem;"></div>
     <div style="font-size:.66rem;letter-spacing:.12em;color:rgba(245,237,216,.35);text-align:left;margin-bottom:.45rem;text-transform:uppercase;">管理員密碼</div>
@@ -6697,7 +6717,7 @@ mpApply();
 <div id="cms-panel" style="position:fixed;top:0;right:-680px;width:660px;height:100vh;z-index:9200;background:#0D1A24;border-left:1px solid rgba(232,134,58,.2);display:flex;flex-direction:column;transition:right .4s cubic-bezier(.22,1,.36,1);overflow:hidden;">
   <div style="background:#162535;border-bottom:1px solid rgba(232,134,58,.18);padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
     <div>
-      <div style="font-family:'Playfair Display',serif;font-size:.98rem;color:#F2B07A;font-style:italic;">彩虹經緯 · 後台管理</div>
+      <div style="font-family:'Playfair Display',serif;font-size:.98rem;color:#F2B07A;font-style:italic;">🌍 全球 BL 影視 · 後台管理</div>
       <div style="font-size:.58rem;letter-spacing:.15em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-top:.1rem;">Global BL · CMS v3</div>
     </div>
     <div style="display:flex;gap:.55rem;align-items:center;">
@@ -6709,12 +6729,13 @@ mpApply();
     <button class="ctab active" onclick="cmsEnterEdit()" data-s="edit" style="color:#4BA8A0;border-bottom-color:#4BA8A0;">✏️ 直接編輯頁面</button>
     <button class="ctab" onclick="cmsTab('imgs')" data-s="imgs">📷 圖片</button>
     <button class="ctab" onclick="cmsTab('music')" data-s="music">🎵 音樂</button>
-    <button class="ctab" onclick="cmsTab('hero')" data-s="hero">🏠 英雄區</button>
-    <button class="ctab" onclick="cmsTab('stats')" data-s="stats">📊 數據</button>
-    <button class="ctab" onclick="cmsTab('nav')" data-s="nav">🔗 導覽</button>
-    <button class="ctab" onclick="cmsTab('recs')" data-s="recs">🌟 推薦</button>
-    <button class="ctab" onclick="cmsTab('tl')" data-s="tl">📅 時間軸</button>
-    <button class="ctab" onclick="cmsTab('ddl')" data-s="ddl">🎬 深度專題</button>
+    <!-- 泰劇內容（英雄區/數據/導覽/推薦/時間軸/深度專題）已移到泰劇後台 thai-bl-v1377.html -->
+    <button class="ctab" onclick="cmsTab('hero')" data-s="hero" style="display:none;">🏠 英雄區</button>
+    <button class="ctab" onclick="cmsTab('stats')" data-s="stats" style="display:none;">📊 數據</button>
+    <button class="ctab" onclick="cmsTab('nav')" data-s="nav" style="display:none;">🔗 導覽</button>
+    <button class="ctab" onclick="cmsTab('recs')" data-s="recs" style="display:none;">🌟 推薦</button>
+    <button class="ctab" onclick="cmsTab('tl')" data-s="tl" style="display:none;">📅 時間軸</button>
+    <button class="ctab" onclick="cmsTab('ddl')" data-s="ddl" style="display:none;">🎬 深度專題</button>
     <button class="ctab" onclick="cmsTab('map')" data-s="map">🗺️ 全球地圖</button>
     <button class="ctab" onclick="cmsTab('aud')" data-s="aud">👥 受眾解構</button>
     <button class="ctab" onclick="cmsTab('cult')" data-s="cult">🎭 文化錯位</button>
@@ -7363,7 +7384,7 @@ mpApply();
 // ═══════════════════════════════
 // DATA STORES
 // ═══════════════════════════════
-const K_PW='thaiBL-pw', K_TXT='thaiBL-txt', K_RECS='thaiBL-recs', K_TL='thaiBL-tl', K_IMGS='thaiBL-imgs';
+const K_PW='globalBL-pw', K_TXT='globalBL-txt', K_RECS='globalBL-recs', K_TL='globalBL-tl', K_IMGS='globalBL-imgs';
 // 密碼只以「加鹽 SHA-256 雜湊」存在本機瀏覽器，原始碼中不含任何預設密碼
 const K_PW_HASH='globalBL-pw-hash';
 async function pwHash(pw,salt){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -7966,11 +7987,7 @@ function cmsSaveAll(){
   if(cmsDirty.map)step('map',saveMap);
   if(cmsDirty.aud)step('aud',saveAud);
   if(cmsDirty.cult)step('cult',saveCult);
-  step('recs',()=>{collectRecsMain();collectRecsDramas();return saveRecsData();});
-  step('tl',()=>{collectTL();return saveTLData();});
-  step('ddl',()=>{ddlCmsCollect();const r=ddlSave();ddlRenderAll();return r;});
-  step('txt',()=>{const txt=collectTxt();const r=lsSet(K_TXT,JSON.stringify(txt));applyTxt(txt);return r;});
-  step('render',()=>{renderMainCarousel();renderGenreCarousel();renderTimeline();});
+  // 全球 BL 後台：泰劇內容（推薦/時間軸/深度專題/首頁文字）由泰劇後台管理，這裡不儲存
   if(ok){cmsDirty.map=cmsDirty.aud=cmsDirty.cult=false;}
   const btn=document.getElementById('cms-save-btn');
   btn.textContent=ok?'✅ 已儲存！':'⚠️ 部分未儲存';
@@ -8018,7 +8035,7 @@ async function cmsLogin(){
     try{loadAudForm();}catch(e){console.warn('loadAudForm',e);}
     try{loadCultForm();}catch(e){console.warn('loadCultForm',e);}
     // Show the first tab correctly
-    try{cmsTab('ddl');}catch(e){console.warn('cmsTab',e);}
+    try{cmsTab('map');}catch(e){console.warn('cmsTab',e);}
   }else{
     document.getElementById('cms-pw-err').textContent='密碼錯誤。';
     document.getElementById('cms-pw').value='';
@@ -8042,7 +8059,7 @@ function cmsTab(s){
 async function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(np.length<8){alert('新密碼至少需要 8 碼');return;}await pwSet(np);document.getElementById('f-npw').value='';alert('✅ 密碼已更新');}
 
 // ══ MAP / AUD / CULT CMS ══
-const K_MAP='thaiBL-map', K_AUD='thaiBL-aud', K_CULT='thaiBL-cult';
+const K_MAP='globalBL-map', K_AUD='globalBL-aud', K_CULT='globalBL-cult';
 function $v(id){const el=document.getElementById(id);return el?(el.value||''):''}
 function $s(id,v){const el=document.getElementById(id);if(el)el.value=v;}
 
@@ -8115,11 +8132,11 @@ function saveAud(){const d=collectAud();applyAud(d);cmsEditForgetWithin('#tab-au
 function saveCult(){const d=collectCult();applyCult(d);cmsEditForgetWithin('#tab-culture');return lsSet(K_CULT,JSON.stringify(d));}
 
 // ══ IMGBB + GITHUB PUBLISH ══
-const K_IMGBB='thaiBL-imgbb-key';
-const K_GH_TOKEN='thaiBL-gh-token';
-const K_GH_REPO='thaiBL-gh-repo';
-const K_GH_PATH='thaiBL-gh-path';
-const K_GH_BRANCH='thaiBL-gh-branch';
+const K_IMGBB='globalBL-imgbb-key';
+const K_GH_TOKEN='globalBL-gh-token';
+const K_GH_REPO='globalBL-gh-repo';
+const K_GH_PATH='globalBL-gh-path';
+const K_GH_BRANCH='globalBL-gh-branch';
 
 function pubLoadSettings(){
   const k=localStorage.getItem(K_IMGBB)||'';
@@ -8179,7 +8196,7 @@ async function publishToGitHub(){
   const keyMap={txt:K_TXT,recs:K_RECS,tl:K_TL,imgs:K_IMGS,ddl:K_DDL,music:K_MUSIC,map:K_MAP,aud:K_AUD,cult:K_CULT,edit:K_EDIT};
   const allData={bakedAt};
   Object.keys(keyMap).forEach(k=>{allData[k]=JSON.parse(localStorage.getItem(keyMap[k])||'null');});
-  const bakedScript='<script id="cms-baked-data">(function(){try{var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("thaiBL-bakedAt")||0);if(d.bakedAt<=prev)return;var map='+JSON.stringify(keyMap)+';Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});localStorage.setItem("thaiBL-bakedAt",d.bakedAt);}catch(e){}})();<\/script>';
+  const bakedScript='<script id="cms-baked-data">(function(){try{var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("globalBL-bakedAt")||0);if(d.bakedAt<=prev)return;var map='+JSON.stringify(keyMap)+';Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});localStorage.setItem("globalBL-bakedAt",d.bakedAt);}catch(e){}})();<\/script>';
   let html=document.documentElement.outerHTML;
   html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
   html=html.replace('<head>','<head>\n'+bakedScript);
@@ -8658,7 +8675,7 @@ function mpCmsSave(){
 
 
 // ══ DDL — Single source of truth for all Deep Dive content ══
-const K_DDL='thaiBL-ddl';
+const K_DDL='globalBL-ddl';
 const DEF_DDL=[
   {id:'itsay',eyebrow:'精品BL · Nadao Bangkok',title:'以你的心詮釋我的愛',sub:'ITSAY · S1 2020 / S2 2021',desc:'普吉島夕陽下，一段無從言說的愛。從情感敘事、鏡頭語言到兩季對比，完整解析改變BL美學的里程碑之作。',cover:'index_photo/I-told-sunset-about-you-14.jpg',year:'2020',target:'itsay',status:'live'},
 ];
@@ -9403,12 +9420,14 @@ body.cms-editing{padding-bottom:64px;}
 // ══ DIRECT EDIT MODE ══
 // 可編輯整個網站的文字與圖片；每個修改以「元素在頁面中的位置」為鍵儲存。
 // 儲存格式：{v:2, t:{位置:innerHTML}, i:{位置:src}}
-const K_EDIT='thaiBL-edit';
+const K_EDIT='globalBL-edit';
 const EDIT_EXCLUDE=[
   '#cms-panel','#cms-login','#edit-bar','.cms-ui','#music-player','#mp-restore-btn','#thai-btn-wrap',
   '#yt-player-container','#cur','#cur-o','#nav','nav','.subnav','button','select','input','textarea',
   // 由後台其他分頁產生/管理的內容（推薦輪播、劇集卡片、時間軸、深度專題清單）
   '#mainTrack','#mainDots','#genreCarouselTrack','.tl-item','#ddl-grid','#dd-catalog-grid','#nav-dd-items',
+  // 泰劇頁面歸泰劇後台（thai-bl-v1377.html）管理
+  '#page-home','#page-deeplist','#page-itsay','#page-recs',
   'script','style','noscript','svg','canvas'
 ].join(',');
 const EDIT_BLOCK_TAGS=new Set(['P','H1','H2','H3','H4','H5','H6','LI','BLOCKQUOTE','FIGCAPTION','TD','TH','DT','DD']);

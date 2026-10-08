@@ -335,6 +335,33 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1rem 3rem;display:fl
 .drama-card-name{font-family:'Noto Serif TC',serif;font-size:.95rem;font-weight:600;color:var(--phuket-sand);margin-bottom:.18rem;}
 .drama-card-en{font-size:.7rem;color:var(--sunset-gold);margin-bottom:.6rem;font-style:italic;}
 .drama-card-desc{font-size:.77rem;line-height:1.7;color:rgba(245,237,216,.55);}
+/* 預告片：點圖片播放 */
+.drama-card-img-wrap.has-trailer{cursor:pointer;}
+.drama-play{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;border:none;background:none;padding:0;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+.drama-play-btn{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(13,26,36,.55);backdrop-filter:blur(6px);border:1.5px solid rgba(242,176,122,.75);box-shadow:0 0 0 0 rgba(232,134,58,.45);transition:transform .3s,background .3s,box-shadow .3s;}
+.drama-play-btn svg{width:18px;height:18px;margin-left:3px;fill:#FAD9B5;transition:fill .3s;}
+.drama-play-lbl{font-size:.62rem;letter-spacing:.2em;color:#FAD9B5;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s;text-shadow:0 1px 6px rgba(0,0,0,.7);}
+.drama-card-img-wrap.has-trailer:hover .drama-play-btn,.drama-play:focus-visible .drama-play-btn{transform:scale(1.1);background:linear-gradient(135deg,#C94B25,#E8863A);border-color:transparent;box-shadow:0 0 0 8px rgba(232,134,58,.18);}
+.drama-card-img-wrap.has-trailer:hover .drama-play-btn svg{fill:#fff;}
+.drama-card-img-wrap.has-trailer:hover .drama-play-lbl,.drama-play:focus-visible .drama-play-lbl{opacity:1;transform:none;}
+.drama-play:focus-visible{outline:2px solid #E8863A;outline-offset:-4px;}
+@media (hover:none){.drama-play-lbl{opacity:.85;transform:none;}}
+/* 預告片彈窗 */
+#trailer-modal{position:fixed;inset:0;z-index:9500;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(6,12,18,.88);backdrop-filter:blur(10px);opacity:0;transition:opacity .3s;}
+#trailer-modal.open{display:flex;}
+#trailer-modal.show{opacity:1;}
+.trailer-box{width:min(960px,100%);transform:translateY(14px) scale(.98);transition:transform .35s cubic-bezier(.22,1,.36,1);}
+#trailer-modal.show .trailer-box{transform:none;}
+.trailer-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:.8rem;}
+.trailer-eyebrow{font-size:.6rem;letter-spacing:.25em;color:#E8863A;text-transform:uppercase;margin-bottom:.25rem;}
+.trailer-title{font-family:'Noto Serif TC',serif;font-size:1.15rem;color:#F5EDD8;font-weight:600;}
+.trailer-close{flex-shrink:0;width:38px;height:38px;border-radius:50%;border:1px solid rgba(232,134,58,.35);background:rgba(13,26,36,.6);color:#F5EDD8;font-size:1rem;cursor:pointer;transition:background .2s;}
+.trailer-close:hover{background:rgba(232,134,58,.25);}
+.trailer-frame{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;border:1px solid rgba(232,134,58,.2);box-shadow:0 24px 64px rgba(0,0,0,.6);}
+.trailer-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.trailer-foot{margin-top:.7rem;text-align:right;font-size:.7rem;}
+.trailer-foot a{color:rgba(242,176,122,.8);text-decoration:none;}
+.trailer-foot a:hover{color:#F2B07A;text-decoration:underline;}
 
 /* ══ CAST TOGGLE ══ */
 .cast-toggle{display:flex;justify-content:space-between;align-items:center;padding:.6rem 1.3rem .75rem;cursor:pointer;font-size:.7rem;letter-spacing:.1em;color:var(--sunset-gold);border-top:1px solid rgba(232,134,58,.1);user-select:none;transition:background .2s;text-transform:uppercase;}
@@ -3059,11 +3086,13 @@ function updateItsayHc(){document.getElementById('itsayHcTrack').style.transform
 setInterval(()=>{itsayHcIdx=(itsayHcIdx+1)%itsayHcTotal;updateItsayHc();},4000);
 
 // MAIN CAROUSEL (recs)
-let mainIdx=0;const mainTotal=4;
+let mainIdx=0;
+function mainTotalNow(){return document.querySelectorAll('#mainTrack .carousel-slide').length||1;}
 const mainDotsEl=document.getElementById('mainDots');
-for(let i=0;i<mainTotal;i++){const d=document.createElement('div');d.className='carousel-dot'+(i===0?' active':'');d.onclick=()=>{mainIdx=i;updateMain();};mainDotsEl.appendChild(d);}
-function updateMain(){document.getElementById('mainTrack').style.transform=`translateX(-${mainIdx*100}%)`;document.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===mainIdx));}
-function moveCarousel(dir){mainIdx=(mainIdx+dir+mainTotal)%mainTotal;updateMain();}
+for(let i=0;i<mainTotalNow();i++){const d=document.createElement('div');d.className='carousel-dot'+(i===0?' active':'');d.onclick=()=>{mainIdx=i;updateMain();};mainDotsEl.appendChild(d);}
+function updateMain(){document.getElementById('mainTrack').style.transform=`translateX(-${mainIdx*100}%)`;document.querySelectorAll('#mainDots .carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===mainIdx));}
+function goCarousel(i){mainIdx=i;updateMain();}
+function moveCarousel(dir){const n=mainTotalNow();mainIdx=(mainIdx+dir+n)%n;updateMain();}
 setInterval(()=>moveCarousel(1),5500);
 
 // BIZ CAROUSEL
@@ -3234,7 +3263,7 @@ function moveIC(wrapId, state, dir) {
 
 <script>
 // ══ MUSIC PLAYER ENGINE (YouTube + Direct Audio) ══
-const K_MUSIC='thaiBL-music';
+const K_MUSIC='tb-music';
 const DEF_MUSIC={title:'NEW SEASON',artist:'NuNew',cover:'https://lineimg.omusic.com.tw/img/album/7923587.jpg?v=20260316201048',audioUrl:'https://files.catbox.moe/wo2qjk.mp3',enabled:true};
 let mpData={...DEF_MUSIC};
 let mpPlaying=false,mpVisible=false,mpUserInteracted=false,mpMode='none';
@@ -3452,7 +3481,7 @@ mpApply();
 <!-- Login -->
 <div id="cms-login" style="position:fixed;inset:0;z-index:9100;background:rgba(13,26,36,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;">
   <div style="background:#162535;border:1px solid rgba(232,134,58,.22);border-radius:16px;padding:2.5rem;width:360px;text-align:center;">
-    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#F2B07A;font-style:italic;margin-bottom:.3rem;">後台管理系統</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#F2B07A;font-style:italic;margin-bottom:.3rem;">🇹🇭 泰劇 BL · 後台管理</div>
     <div style="font-size:.64rem;letter-spacing:.2em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-bottom:1.8rem;">Content Management · Thai BL</div>
     <div style="height:1px;background:rgba(232,134,58,.15);margin-bottom:1.8rem;"></div>
     <div style="font-size:.66rem;letter-spacing:.12em;color:rgba(245,237,216,.35);text-align:left;margin-bottom:.45rem;text-transform:uppercase;">管理員密碼</div>
@@ -3468,8 +3497,9 @@ mpApply();
 <div id="cms-panel" style="position:fixed;top:0;right:-680px;width:660px;height:100vh;z-index:9200;background:#0D1A24;border-left:1px solid rgba(232,134,58,.2);display:flex;flex-direction:column;transition:right .4s cubic-bezier(.22,1,.36,1);overflow:hidden;">
   <div style="background:#162535;border-bottom:1px solid rgba(232,134,58,.18);padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
     <div>
-      <div style="font-family:'Playfair Display',serif;font-size:.98rem;color:#F2B07A;font-style:italic;">後台管理</div>
+      <div style="font-family:'Playfair Display',serif;font-size:.98rem;color:#F2B07A;font-style:italic;">🇹🇭 泰劇 BL · 後台管理</div>
       <div style="font-size:.58rem;letter-spacing:.15em;color:rgba(245,237,216,.3);text-transform:uppercase;margin-top:.1rem;">Thai BL · CMS v3</div>
+      <div style="font-size:.6rem;letter-spacing:.08em;color:rgba(232,134,58,.7);margin-top:.15rem;background:rgba(232,134,58,.08);border:1px solid rgba(232,134,58,.22);border-radius:4px;padding:1px 7px;display:inline-block;">📄 thai-bl-v1377.html</div>
     </div>
     <div style="display:flex;gap:.55rem;align-items:center;">
       <button id="cms-save-btn" onclick="cmsSaveAll()" style="background:linear-gradient(135deg,#C94B25,#E8863A);border:none;color:#fff;border-radius:7px;padding:6px 15px;font-family:'Noto Sans TC',sans-serif;font-size:.74rem;font-weight:500;cursor:pointer;">💾 儲存套用</button>
@@ -3783,7 +3813,7 @@ mpApply();
 // ═══════════════════════════════
 // DATA STORES
 // ═══════════════════════════════
-const K_PW='thaiBL-pw', K_TXT='thaiBL-txt', K_RECS='thaiBL-recs', K_TL='thaiBL-tl', K_IMGS='thaiBL-imgs';
+const K_PW='tb-pw', K_TXT='tb-txt', K_RECS='tb-recs', K_TL='tb-tl', K_IMGS='tb-imgs';
 // 密碼只以「加鹽 SHA-256 雜湊」存在本機瀏覽器，原始碼中不含任何預設密碼
 const K_PW_HASH='tb-pw-hash';
 async function pwHash(pw,salt){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -3879,8 +3909,16 @@ function loadData(){
   else{tlItems=[...DEF_TL];}
 }
 
-function saveRecsData(){localStorage.setItem(K_RECS,JSON.stringify({main:recsMain,dramas:recsDramas}));}
-function saveTLData(){localStorage.setItem(K_TL,JSON.stringify(tlItems));}
+// localStorage 寫入（容量滿時提示，不再無聲失敗）
+function lsSet(k,v){
+  try{localStorage.setItem(k,v);return true;}
+  catch(e){
+    alert('⚠️ 儲存失敗：瀏覽器儲存空間已滿（約 5MB）。\n\n上傳的照片太多或太大。請到「🚀 發布」分頁設定 ImgBB API Key，之後上傳的照片會改存到 ImgBB，不佔瀏覽器空間；或改用「貼上圖片網址」。');
+    console.error('lsSet',k,e);return false;
+  }
+}
+function saveRecsData(){return lsSet(K_RECS,JSON.stringify({main:recsMain,dramas:recsDramas}));}
+function saveTLData(){return lsSet(K_TL,JSON.stringify(tlItems));}
 
 // ═══════════════════════════════
 // DOM RENDERING
@@ -3902,8 +3940,8 @@ function renderMainCarousel(){
   // Re-init dots
   const dotsEl=document.getElementById('mainDots');
   if(dotsEl){
-    dotsEl.innerHTML=recsMain.map((_,i)=>`<span class="dot${i===0?' active':''}" onclick="goCarousel(${i})"></span>`).join('');
-    carouselIdx=0;
+    dotsEl.innerHTML=recsMain.map((_,i)=>`<div class="carousel-dot${i===0?' active':''}" onclick="goCarousel(${i})"></div>`).join('');
+    mainIdx=0;updateMain();
   }
 }
 
@@ -3913,10 +3951,14 @@ function renderGenreCarousel(){
   track.innerHTML=recsDramas.map((d,i)=>`
     <div class="ic-slide" style="flex:0 0 300px;">
       <div class="drama-card">
-        <div class="drama-card-img-wrap">
+        <div class="drama-card-img-wrap has-trailer" onclick="openTrailer(${i})">
           <img src="${d.img||''}" alt="${d.name}" ${!d.img?'style="display:none"':''}>
           <span class="drama-card-badge">${d.badge||''}</span>
           <span class="drama-card-year">${d.year||''}</span>
+          <button type="button" class="drama-play" aria-label="播放《${d.name||''}》預告片" onclick="event.stopPropagation();openTrailer(${i})">
+            <span class="drama-play-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="drama-play-lbl">觀看預告</span>
+          </button>
         </div>
         <div class="drama-card-body">
           <div class="drama-card-name">${d.name||''}</div>
@@ -3944,8 +3986,47 @@ function renderGenreCarousel(){
       </div>
     </div>
   `).join('');
-  if(typeof genreState!=='undefined')genreState.idx=0;
+  if(typeof genreState!=='undefined'){genreState.idx=0;genreState.total=recsDramas.length;}
 }
+
+// ═══ 預告片彈窗 ═══
+// 有填 YouTube 網址 → 彈窗內嵌播放；沒填 → 開新分頁搜尋該劇官方預告
+let trailerResumeMusic=false;
+function openTrailer(i){
+  const d=recsDramas[i];if(!d)return;
+  const id=ytId(d.trailer||'');
+  if(!id){
+    const q=((d.en||'')+' '+(d.name||'')+' official trailer').trim();
+    window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q),'_blank','noopener');
+    return;
+  }
+  let m=document.getElementById('trailer-modal');
+  if(!m){
+    m=document.createElement('div');m.id='trailer-modal';
+    m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');
+    m.innerHTML='<div class="trailer-box"><div class="trailer-head"><div><div class="trailer-eyebrow">Official Trailer · 預告片</div><div class="trailer-title" id="trailer-title"></div></div><button type="button" class="trailer-close" aria-label="關閉預告片" onclick="closeTrailer()">✕</button></div><div class="trailer-frame" id="trailer-frame"></div><div class="trailer-foot"><a id="trailer-yt-link" target="_blank" rel="noopener">無法播放？到 YouTube 觀看 ↗</a></div></div>';
+    m.addEventListener('click',e=>{if(e.target===m)closeTrailer();});
+    document.body.appendChild(m);
+  }
+  document.getElementById('trailer-title').textContent=(d.name||'')+(d.en?'  ·  '+d.en:'');
+  document.getElementById('trailer-yt-link').href='https://www.youtube.com/watch?v='+id;
+  document.getElementById('trailer-frame').innerHTML='<iframe src="https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="'+(d.name||'預告片').replace(/"/g,'&quot;')+' 預告片" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+  // 播預告時暫停背景音樂，關閉後再恢復
+  trailerResumeMusic=typeof mpPlaying!=='undefined'&&mpPlaying;
+  if(trailerResumeMusic&&typeof mpToggle==='function')mpToggle();
+  m.classList.add('open');requestAnimationFrame(()=>m.classList.add('show'));
+  document.body.style.overflow='hidden';
+  m.querySelector('.trailer-close').focus();
+}
+function closeTrailer(){
+  const m=document.getElementById('trailer-modal');if(!m||!m.classList.contains('open'))return;
+  m.classList.remove('show');
+  setTimeout(()=>{m.classList.remove('open');document.getElementById('trailer-frame').innerHTML='';},300);
+  document.body.style.overflow='';
+  if(trailerResumeMusic&&typeof mpToggle==='function'&&!mpPlaying)mpToggle();
+  trailerResumeMusic=false;
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTrailer();});
 
 function renderTimeline(){
   const items=document.querySelectorAll('#page-home .tl-item');
@@ -4048,6 +4129,7 @@ function buildRecsDramaList(){
         </div>
         <div class="cf"><label class="cl">作品名稱（中文）</label><input class="ci" id="dname-${i}" value="${dr.name||''}"></div>
         <div class="cf"><label class="cl">描述</label><textarea class="cta" id="ddesc-${i}">${dr.desc||''}</textarea></div>
+        <div class="cf"><label class="cl">🎬 YouTube 預告片網址 <span class="cbadge">留空＝點擊時搜尋預告</span></label><input class="ci" id="dtrailer-${i}" value="${dr.trailer||''}" placeholder="https://www.youtube.com/watch?v=... 或 https://youtu.be/..."></div>
         <div style="height:1px;background:rgba(232,134,58,.1);margin:.7rem 0;"></div>
         <div style="font-size:.7rem;color:#F2B07A;margin-bottom:.6rem;">演員陣容</div>
         <div id="cast-list-${i}">${(dr.cast||[]).map((c,ci)=>castRowHTML(i,ci,c)).join('')}</div>
@@ -4126,7 +4208,7 @@ const FIXED_IMGS=[
 ];
 let fixedImgs={};
 function loadFixedImgs(){try{const r=localStorage.getItem(K_IMGS);if(r)fixedImgs=JSON.parse(r);}catch(e){fixedImgs={};}}
-function saveFixedImgs(){try{localStorage.setItem(K_IMGS,JSON.stringify(fixedImgs));}catch(e){alert('圖片儲存空間不足，請改用網址方式。');}}
+function saveFixedImgs(){return lsSet(K_IMGS,JSON.stringify(fixedImgs));}
 function applyFixedImg(def,src){
   if(!src)return;
   if(def.type==='bg'){const el=document.querySelector(def.sel);if(el)el.style.backgroundImage=`url('${src}')`;}
@@ -4160,8 +4242,9 @@ function buildFixedImgList(){
 }
 function handleFixedImgUpload(key,input){
   const file=input.files[0];if(!file)return;
+  input.value='';
   cmsUploadImg(file,1600,1000,.82,url=>{
-    fixedImgs[key]=url;saveFixedImgs();
+    fixedImgs[key]=url;if(!saveFixedImgs()){delete fixedImgs[key];return;}
     const def=FIXED_IMGS.find(d=>d.key===key);
     applyFixedImg(def,url);
     const p=document.getElementById('fiprev-'+key);if(p)p.src=url;
@@ -4171,7 +4254,7 @@ function handleFixedImgUpload(key,input){
 function applyFixedImgUrl(key){
   const url=document.getElementById('fiurl-'+key).value.trim();
   if(!url){alert('請輸入網址');return;}
-  fixedImgs[key]=url;saveFixedImgs();
+  fixedImgs[key]=url;if(!saveFixedImgs()){delete fixedImgs[key];return;}
   const def=FIXED_IMGS.find(d=>d.key===key);
   applyFixedImg(def,url);
   buildFixedImgList();
@@ -4202,6 +4285,7 @@ function collectRecsDramas(){
     name:(document.getElementById('dname-'+i)||{value:dr.name}).value,
     desc:(document.getElementById('ddesc-'+i)||{value:dr.desc}).value,
     img:(document.getElementById('dimg-'+i)||{value:dr.img}).value,
+    trailer:((document.getElementById('dtrailer-'+i)||{value:dr.trailer||''}).value||'').trim(),
     cast:(dr.cast||[]).map((c,ci)=>({
       name:(document.getElementById('cname-'+i+'-'+ci)||{value:c.name}).value,
       nameT:(document.getElementById('cnameT-'+i+'-'+ci)||{value:c.nameT}).value,
@@ -4231,7 +4315,7 @@ function recsAddMain(){
 }
 function recsAddDrama(){
   collectRecsDramas();
-  recsDramas.push({badge:'新作',year:'2025',name:'新劇集',en:'',desc:'請填寫劇情簡介...',img:'',cast:[]});
+  recsDramas.push({badge:'新作',year:'2025',name:'新劇集',en:'',desc:'請填寫劇情簡介...',img:'',trailer:'',cast:[]});
   saveRecsData(); renderGenreCarousel(); buildRecsDramaList();
   setTimeout(()=>{const items=document.querySelectorAll('#recs-drama-list .dyn-item');if(items.length){const last=items[items.length-1];const h=last.querySelector('.dyn-item-head');if(h)toggleDynBody(h);}},50);
 }
@@ -4277,8 +4361,10 @@ function compressImg(file,maxW,maxH,q,cb){
       c.getContext('2d').drawImage(img,0,0,w,h);
       cb(c.toDataURL('image/jpeg',q));
     };
+    img.onerror=()=>alert('❌ 無法讀取這張圖片（'+file.name+'）。\n請改用 JPG / PNG / WebP 格式。');
     img.src=e.target.result;
   };
+  r.onerror=()=>alert('❌ 讀取檔案失敗：'+file.name);
   r.readAsDataURL(file);
 }
 function handleImgUpload(list,i,input){
@@ -4374,15 +4460,18 @@ function applyTxt(d){
 // MASTER SAVE
 // ═══════════════════════════════
 function cmsSaveAll(){
-  collectRecsMain(); collectRecsDramas(); collectTL();
-  ddCmsCollect(); ddSaveData(); ddBuildFilters(); ddRenderGrid();
-  ddlCmsCollect(); ddlSave(); ddlRenderAll();
-  saveRecsData(); saveTLData();
-  const txt=collectTxt(); localStorage.setItem(K_TXT,JSON.stringify(txt)); applyTxt(txt);
-  renderMainCarousel(); renderGenreCarousel(); renderTimeline();
+  let ok=true;
+  const step=(name,fn)=>{try{if(fn()===false)ok=false;}catch(e){ok=false;console.error('cmsSaveAll · '+name,e);}};
+  step('recs',()=>{collectRecsMain();collectRecsDramas();return saveRecsData();});
+  step('tl',()=>{collectTL();return saveTLData();});
+  step('ddl',()=>{ddlCmsCollect();const r=ddlSave();ddlRenderAll();return r;});
+  step('txt',()=>{const txt=collectTxt();const r=lsSet(K_TXT,JSON.stringify(txt));applyTxt(txt);return r;});
+  step('render',()=>{renderMainCarousel();renderGenreCarousel();renderTimeline();});
   const btn=document.getElementById('cms-save-btn');
-  btn.textContent='✅ 已儲存！';btn.style.background='linear-gradient(135deg,#1D9E75,#4BA8A0)';
+  btn.textContent=ok?'✅ 已儲存！':'⚠️ 部分未儲存';
+  btn.style.background=ok?'linear-gradient(135deg,#1D9E75,#4BA8A0)':'linear-gradient(135deg,#8a2b2b,#c94b25)';
   setTimeout(()=>{btn.textContent='💾 儲存套用';btn.style.background='linear-gradient(135deg,#C94B25,#E8863A)';},2500);
+  return ok;
 }
 
 // ═══════════════════════════════
@@ -4863,14 +4952,14 @@ function mpCmsSave(){
 
 
 // ══ DDL — Single source of truth for all Deep Dive content ══
-const K_DDL='thaiBL-ddl';
+const K_DDL='tb-ddl';
 const DEF_DDL=[
   {id:'itsay',eyebrow:'精品BL · Nadao Bangkok',title:'以你的心詮釋我的愛',sub:'ITSAY · S1 2020 / S2 2021',desc:'普吉島夕陽下，一段無從言說的愛。從情感敘事、鏡頭語言到兩季對比，完整解析改變BL美學的里程碑之作。',cover:'thaibl-main/index_photo/I-told-sunset-about-you-14.jpg',year:'2020',target:'itsay',status:'live'},
 ];
 let ddlData=[...DEF_DDL];
 
 function ddlLoad(){try{const r=localStorage.getItem(K_DDL);if(r){const p=JSON.parse(r);if(p.length){p.forEach(function(d){if(d.cover&&!d.cover.startsWith('thaibl-main/')&&!d.cover.startsWith('http'))d.cover='thaibl-main/'+d.cover;});ddlData=p;}else{ddlData=[...DEF_DDL];}}else{ddlData=[...DEF_DDL];}}catch(e){ddlData=[...DEF_DDL];}}
-function ddlSave(){localStorage.setItem(K_DDL,JSON.stringify(ddlData));}
+function ddlSave(){return lsSet(K_DDL,JSON.stringify(ddlData));}
 
 // ── Nav Dropdown ──
 function navDdToggle(e){
@@ -5067,11 +5156,11 @@ function ddlCmsUploadImg(i,input){const file=input.files[0];if(!file)return;cmsU
 // ═══════════════════════════════
 // IMGBB + GITHUB PUBLISH
 // ═══════════════════════════════
-const K_IMGBB='thaiBL-imgbb-key';
-const K_GH_TOKEN='thaiBL-gh-token';
-const K_GH_REPO='thaiBL-gh-repo';
-const K_GH_PATH='thaiBL-gh-path';
-const K_GH_BRANCH='thaiBL-gh-branch';
+const K_IMGBB='tb-imgbb-key';
+const K_GH_TOKEN='tb-gh-token';
+const K_GH_REPO='tb-gh-repo';
+const K_GH_PATH='tb-gh-path';
+const K_GH_BRANCH='tb-gh-branch';
 
 // 載入 publish 頁面時填入已儲存的設定
 function pubLoadSettings(){
@@ -5132,7 +5221,7 @@ async function publishToGitHub(){
   if(!token||!repo||!path){alert('請先在「🚀 發布」頁面填寫 GitHub 設定');return;}
 
   // 先儲存所有後台變更
-  cmsSaveAll();
+  if(!cmsSaveAll()){alert('⚠️ 有資料未能儲存，已取消發布。請先處理儲存問題。');return;}
 
   // 蒐集所有 localStorage 資料
   const bakedAt=Date.now();
@@ -5145,7 +5234,7 @@ async function publishToGitHub(){
     ddl:JSON.parse(localStorage.getItem(K_DDL)||'null'),
     music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
   };
-  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData)+';var prev=+(localStorage.getItem("thaiBL-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("thaiBL-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
 
   // 取得當前 HTML，注入資料，移除舊 baked script
   let html=document.documentElement.outerHTML;
@@ -5297,6 +5386,19 @@ showPage=function(id){
 
 
 // ═══════════════════════════════
+// MIGRATE OLD thaiBL- KEYS → tb-
+// ═══════════════════════════════
+(function(){
+  const map={'tb-txt':'thaiBL-txt','tb-recs':'thaiBL-recs','tb-tl':'thaiBL-tl','tb-imgs':'thaiBL-imgs','tb-ddl':'thaiBL-ddl','tb-music':'thaiBL-music'};
+  Object.entries(map).forEach(([nk,ok])=>{if(!localStorage.getItem(nk)&&localStorage.getItem(ok))localStorage.setItem(nk,localStorage.getItem(ok));});
+  // 泰劇後台的密碼 / ImgBB / GitHub 設定獨立於全球後台（只在第一次載入時沿用舊設定）
+  if(!localStorage.getItem('tb-settings-migrated')){
+    ['pw','imgbb-key','gh-token','gh-repo','gh-branch'].forEach(k=>{const v=localStorage.getItem('thaiBL-'+k);if(v!==null&&localStorage.getItem('tb-'+k)===null)localStorage.setItem('tb-'+k,v);});
+    const gp=localStorage.getItem('thaiBL-gh-path');if(gp&&/thai/i.test(gp)&&!localStorage.getItem('tb-gh-path'))localStorage.setItem('tb-gh-path',gp);
+    localStorage.setItem('tb-settings-migrated','1');
+  }
+})();
+// ═══════════════════════════════
 // AUTO-INIT ON PAGE LOAD
 // ═══════════════════════════════
 (function(){
@@ -5389,7 +5491,7 @@ showPage=function(id){
   document.addEventListener('keydown',function(e){
     buf+=e.key;
     if(buf.length>SECRET.length)buf=buf.slice(-SECRET.length);
-    if(buf===SECRET)window.location.href='admin.html';
+    if(buf===SECRET){buf='';cmsOpen();}
   });
 })();
 </script>
