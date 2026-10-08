@@ -7364,7 +7364,13 @@ mpApply();
 // DATA STORES
 // ═══════════════════════════════
 const K_PW='thaiBL-pw', K_TXT='thaiBL-txt', K_RECS='thaiBL-recs', K_TL='thaiBL-tl', K_IMGS='thaiBL-imgs';
-function getPW(){return localStorage.getItem(K_PW)||'900211';}
+// 密碼只以「加鹽 SHA-256 雜湊」存在本機瀏覽器，原始碼中不含任何預設密碼
+const K_PW_HASH='globalBL-pw-hash';
+async function pwHash(pw,salt){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function pwRead(){try{const r=localStorage.getItem(K_PW_HASH);return r?JSON.parse(r):null;}catch(e){return null;}}
+async function pwSet(pw){const salt=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem(K_PW_HASH,JSON.stringify({salt,hash:await pwHash(pw,salt)}));}
+async function pwCheck(pw){const s=pwRead();if(!s)return false;return (await pwHash(pw,s.salt))===s.hash;}
+(async function(){try{const old=localStorage.getItem(K_PW);if(old){if(!pwRead())await pwSet(old);localStorage.removeItem(K_PW);}}catch(e){}})();
 
 // ── DEFAULT DATA ──
 const DEF_MAIN_CAROUSEL=[
@@ -7980,10 +7986,21 @@ function cmsOpen(){
   const loginEl=document.getElementById('cms-login');
   if(!loginEl){console.error('cms-login not found');return;}
   loginEl.style.display='flex';
-  setTimeout(()=>{const pw=document.getElementById('cms-pw');if(pw)pw.focus();},80);
+  const first=!pwRead();
+  const pwEl=document.getElementById('cms-pw');
+  if(pwEl)pwEl.placeholder=first?'首次使用：請設定管理密碼（至少 8 碼）':'輸入密碼...';
+  document.getElementById('cms-pw-err').textContent=first?'此瀏覽器尚未設定密碼，輸入的密碼將成為管理密碼。':'';
+  setTimeout(()=>{if(pwEl)pwEl.focus();},80);
 }
-function cmsLogin(){
-  if(document.getElementById('cms-pw').value===getPW()){
+async function cmsLogin(){
+  const pwEl=document.getElementById('cms-pw');const entered=pwEl.value;
+  if(!pwRead()){
+    if(entered.length<8){document.getElementById('cms-pw-err').textContent='密碼至少需要 8 碼。';return;}
+    const again=prompt('請再輸入一次密碼以確認：');
+    if(again!==entered){document.getElementById('cms-pw-err').textContent='兩次輸入不一致，請重新設定。';pwEl.value='';return;}
+    await pwSet(entered);
+  }
+  if(await pwCheck(entered)){
     // Close login, open panel FIRST before anything else
     document.getElementById('cms-login').style.display='none';
     document.getElementById('cms-pw').value='';
@@ -8022,7 +8039,7 @@ function cmsTab(s){
   if(s==='aud')loadAudForm();
   if(s==='cult')loadCultForm();
 }
-function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(!np){alert('請輸入新密碼');return;}localStorage.setItem(K_PW,np);document.getElementById('f-npw').value='';alert('✅ 密碼已更新：'+np);}
+async function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(np.length<8){alert('新密碼至少需要 8 碼');return;}await pwSet(np);document.getElementById('f-npw').value='';alert('✅ 密碼已更新');}
 
 // ══ MAP / AUD / CULT CMS ══
 const K_MAP='thaiBL-map', K_AUD='thaiBL-aud', K_CULT='thaiBL-cult';

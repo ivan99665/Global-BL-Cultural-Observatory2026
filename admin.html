@@ -187,11 +187,22 @@ body{
 </div>
 
 <script>
-const PASSWORD = '900211'; // ← 可以改成您想要的密碼
+// 密碼只以「加鹽 SHA-256 雜湊」存在本機瀏覽器，原始碼中不含任何預設密碼
+const ADMIN_PW_HASH='admin-pw-hash';
+async function pwHash(pw,salt){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function pwRead(){try{const r=localStorage.getItem(ADMIN_PW_HASH);return r?JSON.parse(r):null;}catch(e){return null;}}
+async function pwSet(pw){const salt=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem(ADMIN_PW_HASH,JSON.stringify({salt,hash:await pwHash(pw,salt)}));}
+async function pwCheck(pw){const s=pwRead();if(!s)return false;return (await pwHash(pw,s.salt))===s.hash;}
+if(!pwRead()){document.getElementById('pw-input').placeholder='首次使用：請設定密碼（至少 8 碼）';}
 
-function checkPW(){
+async function checkPW(){
   const val = document.getElementById('pw-input').value;
-  if(val === PASSWORD){
+  if(!pwRead()){
+    if(val.length<8){ alert('密碼至少需要 8 碼'); return; }
+    if(prompt('請再輸入一次密碼以確認：')!==val){ alert('兩次輸入不一致，請重新設定'); return; }
+    await pwSet(val);
+  }
+  if(await pwCheck(val)){
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'flex';
   } else {

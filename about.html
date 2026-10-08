@@ -481,7 +481,13 @@ const GH_RAW = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${
 const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 const IMGBB_KEY = '1f8d50dc921cf0e59ee9467807a74b03';
 
-function aGetPW(){ return localStorage.getItem(ABOUT_PW_KEY)||'900211'; }
+// 密碼只以「加鹽 SHA-256 雜湊」存在本機瀏覽器，原始碼中不含任何預設密碼
+const ABOUT_PW_HASH='aboutCMS_pw_hash';
+async function aPwHash(pw,salt){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function aPwRead(){try{const r=localStorage.getItem(ABOUT_PW_HASH);return r?JSON.parse(r):null;}catch(e){return null;}}
+async function aPwSet(pw){const salt=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem(ABOUT_PW_HASH,JSON.stringify({salt,hash:await aPwHash(pw,salt)}));}
+async function aPwCheck(pw){const s=aPwRead();if(!s)return false;return (await aPwHash(pw,s.salt))===s.hash;}
+(async function(){try{const old=localStorage.getItem(ABOUT_PW_KEY);if(old){if(!aPwRead())await aPwSet(old);localStorage.removeItem(ABOUT_PW_KEY);}}catch(e){}})();
 function aGetToken(){ return localStorage.getItem(ABOUT_GH_TOKEN_KEY)||''; }
 
 async function aLoad(){
@@ -540,12 +546,17 @@ function aApply(d){
 window.addEventListener('DOMContentLoaded', async ()=>{ aApply(await aLoad()); });
 
 // Admin open/close
-function aOpenLogin(){ document.getElementById('a-login').style.display='flex'; document.getElementById('a-pw').value=''; document.getElementById('a-pw-err').textContent=''; }
+function aOpenLogin(){ document.getElementById('a-login').style.display='flex'; const first=!aPwRead(); const el=document.getElementById('a-pw'); el.value=''; el.placeholder=first?'首次使用：請設定管理密碼（至少 8 碼）':'輸入密碼...'; document.getElementById('a-pw-err').textContent=first?'此瀏覽器尚未設定密碼，輸入的密碼將成為管理密碼。':''; }
 function aCloseAll(){ document.getElementById('a-login').style.display='none'; document.getElementById('a-panel').style.right='-680px'; }
 function aOpenPanel(){ document.getElementById('a-login').style.display='none'; document.getElementById('a-panel').style.right='0'; aFillForm(); }
-function aLogin(){
+async function aLogin(){
   const v=document.getElementById('a-pw').value;
-  if(v===aGetPW()){ aOpenPanel(); }
+  if(!aPwRead()){
+    if(v.length<8){ document.getElementById('a-pw-err').textContent='密碼至少需要 8 碼'; return; }
+    if(prompt('請再輸入一次密碼以確認：')!==v){ document.getElementById('a-pw-err').textContent='兩次輸入不一致，請重新設定'; return; }
+    await aPwSet(v);
+  }
+  if(await aPwCheck(v)){ aOpenPanel(); }
   else{ document.getElementById('a-pw-err').textContent='密碼錯誤'; }
 }
 
@@ -646,12 +657,12 @@ function aClearAvatar(){
   aSetAvatarPreview('');
 }
 
-function aChgPW(){
+async function aChgPW(){
   const np=document.getElementById('f-npw').value.trim();
-  if(!np){ alert('請輸入新密碼'); return; }
-  localStorage.setItem(ABOUT_PW_KEY,np);
+  if(np.length<8){ alert('新密碼至少需要 8 碼'); return; }
+  await aPwSet(np);
   document.getElementById('f-npw').value='';
-  alert('✅ 密碼已更新：'+np);
+  alert('✅ 密碼已更新');
 }
 
 // Trigger: logo ×5 or Ctrl+Shift+A
@@ -682,7 +693,6 @@ document.addEventListener('keydown',e=>{
     <button onclick="aLogin()" style="margin-top:1rem;width:100%;padding:.85rem;background:var(--spring-river);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans TC',sans-serif;font-size:.86rem;font-weight:500;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--mountain-soil)'" onmouseout="this.style.background='var(--spring-river)'">登入後台</button>
     <div id="a-pw-err" style="margin-top:.5rem;font-size:.74rem;color:#b05030;min-height:1.2em;"></div>
     <button onclick="aCloseAll()" style="margin-top:.5rem;background:none;border:none;color:var(--text-soft);font-size:.7rem;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">取消</button>
-    <div style="margin-top:1rem;font-size:.62rem;color:rgba(97,127,114,.4);">預設密碼：900211</div>
   </div>
 </div>
 
@@ -801,8 +811,7 @@ document.addEventListener('keydown',e=>{
         · 右下角 ⚙️ 或 Ctrl+Shift+A 開啟後台<br>
         · 點擊 Logo 連續 5 次也可開啟<br>
         · 資料同步至 GitHub，所有裝置共享<br>
-        · 圖片上傳至 ImgBB，永久公開連結<br>
-        · 預設密碼：900211
+        · 圖片上傳至 ImgBB，永久公開連結
       </div>
     </div>
 
