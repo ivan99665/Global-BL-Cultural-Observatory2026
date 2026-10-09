@@ -5341,7 +5341,7 @@ function ddlCmsUploadImg(i,input){const file=input.files[0];if(!file)return;cmsU
 // ═══════════════════════════════
 const K_IMGBB='tb-imgbb-key';
 // GitHub 錯誤訊息翻成看得懂的中文
-function ghErrZh(m){m=String(m||'');if(/Bad credentials|401/i.test(m))return 'GitHub Token 無效或已過期，請到「⚙️」貼上新的 Token';if(/Resource not accessible|403|Not Found|404/i.test(m))return '這組 Token 沒有寫入權限（需要此儲存庫的 Contents: Read and write）';if(/Failed to fetch|NetworkError/i.test(m))return '連不上 GitHub，請檢查網路';return m;}
+function ghErrZh(m){m=String(m||'');if(/Bad credentials|401/i.test(m))return 'GitHub Token 無效或已過期，請到「🚀 發布」分頁貼上新的 Token 並按「💾 儲存設定」';if(/Resource not accessible|403|Not Found|404/i.test(m))return '這組 Token 沒有寫入權限（需要此儲存庫的 Contents: Read and write）';if(/Failed to fetch|NetworkError/i.test(m))return '連不上 GitHub，請檢查網路';return m;}
 const K_GH_TOKEN='tb-gh-token';
 const K_GH_REPO='tb-gh-repo';
 const K_GH_PATH='tb-gh-path';
@@ -5396,7 +5396,12 @@ function cmsUploadImg(file,maxW,maxH,q,cb){
 }
 
 // 發布到 GitHub
+// 發布：任何意外錯誤都顯示在按鈕下方，不會默默停住
 async function publishToGitHub(){
+  try{return await publishToGitHubRun();}
+  catch(e){const log=document.getElementById('gh-publish-log');if(log)log.innerHTML='❌ 發布失敗：'+ghErrZh(e&&e.message);const b=document.getElementById('gh-publish-btn');if(b)b.disabled=false;console.error(e);}
+}
+async function publishToGitHubRun(){
   const token=localStorage.getItem(K_GH_TOKEN);
   const repo=localStorage.getItem(K_GH_REPO);
   const path=localStorage.getItem(K_GH_PATH);
@@ -5421,9 +5426,8 @@ async function publishToGitHub(){
     ddlboard:JSON.parse(localStorage.getItem(K_DDLBOARD)||'null'),
     recshead:JSON.parse(localStorage.getItem(K_RECSHEAD)||'null'),
     recsx:JSON.parse(localStorage.getItem(K_REX)||'null'),
-    music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
   };
-  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",ddlboard:"'+K_DDLBOARD+'",recshead:"'+K_RECSHEAD+'",recsx:"'+K_REX+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",ddlboard:"'+K_DDLBOARD+'",recshead:"'+K_RECSHEAD+'",recsx:"'+K_REX+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
 
   // 取得當前 HTML，注入資料，移除舊 baked script
   const featEdEl=document.getElementById('feat-ed');if(featEdEl)featEdEl.remove();
