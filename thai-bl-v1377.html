@@ -1472,6 +1472,14 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 .rx-cp-pair b{color:var(--sunset-gold);font-weight:400;}
 .rx-cp-row{font-size:.76rem;color:rgba(245,237,216,.7);margin-top:.8rem;line-height:1.6;}
 .rx-cp-row span,.rx-cp-moment span{display:block;font-size:.6rem;letter-spacing:.14em;color:rgba(242,176,122,.75);margin-bottom:.15rem;}
+.rx-cp-gif,.rx-cp-video,.rx-cp-iframe{display:block;width:100%;aspect-ratio:16/9;margin-top:.6rem;border-radius:6px;border:0;object-fit:cover;background:#000;}
+.rx-cp-gif{aspect-ratio:auto;max-height:260px;object-fit:contain;}
+.rx-cp-video{position:relative;padding:0;cursor:pointer;overflow:hidden;}
+.rx-cp-video img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85;transition:opacity .2s;}
+.rx-cp-video:hover img{opacity:1;}
+.rx-cp-play{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--sunset-gold);color:#1A0F08;font-size:1rem;line-height:46px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.5);}
+.rx-cp-link{display:inline-block;margin-top:.6rem;font-size:.74rem;color:var(--sunset-peach);border:1px solid rgba(232,134,58,.4);border-radius:14px;padding:.25rem .8rem;text-decoration:none;font-style:normal;}
+.rx-cp-link:hover{background:var(--sunset-gold);color:#1A0F08;}
 .rx-cp-moment{margin-top:.8rem;padding:.7rem .8rem;border-left:2px solid var(--sunset-gold);background:rgba(232,134,58,.06);font-size:.78rem;line-height:1.7;color:var(--sunset-peach);border-radius:0 6px 6px 0;}
 @media(max-width:860px){.rx-guide-grid{grid-template-columns:1fr;}.rx-sec{padding:3.5rem 16px;}}
 /* 後台 */
@@ -5749,6 +5757,27 @@ function recExtraHTML(d){
   }
   return h;
 }
+// 名場面媒體：GIF／圖片 → 直接顯示；YouTube → 縮圖點了才嵌入（可從指定秒數開始）；其他連結 → 開新分頁
+function rxMomentMedia(u,label){
+  u=String(u||'').trim();if(!/^https?:\/\//i.test(u))return '';
+  const yt=u.match(/(?:youtube\.com\/(?:watch\?[^#]*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/i);
+  if(yt){
+    const tm=u.match(/[?&#](?:t|start)=(\d+h)?(\d+m)?(\d+)s?/i);
+    let st=0;if(tm)st=(parseInt(tm[1]||0,10)*3600)+(parseInt(tm[2]||0,10)*60)+parseInt(tm[3]||0,10);
+    return '<button type="button" class="rx-cp-video" data-yt="'+yt[1]+'" data-st="'+st+'" onclick="rxPlayMoment(this)" aria-label="播放'+rxEsc(label)+'的名場面">'
+      +'<img src="https://i.ytimg.com/vi/'+yt[1]+'/hqdefault.jpg" alt="" loading="lazy"><span class="rx-cp-play">▶</span></button>';
+  }
+  if(/\.(gif|webp|png|jpe?g)(\?.*)?$/i.test(u)||/(giphy\.com\/media|media\d*\.giphy\.com|tenor\.com\/.*\.gif)/i.test(u))
+    return '<img class="rx-cp-gif" src="'+rxEsc(u)+'" alt="'+rxEsc(label)+' 的名場面" loading="lazy">';
+  return '<a class="rx-cp-link" href="'+rxEsc(u)+'" target="_blank" rel="noopener">▶ 觀看名場面 ↗</a>';
+}
+function rxPlayMoment(btn){
+  const id=btn.dataset.yt,st=+btn.dataset.st||0;
+  const fr=document.createElement('iframe');
+  fr.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0&playsinline=1'+(st?'&start='+st:'');
+  fr.allow='autoplay; encrypted-media; picture-in-picture';fr.allowFullscreen=true;fr.title='名場面影片';
+  fr.className='rx-cp-iframe';btn.replaceWith(fr);
+}
 function rxDramaByName(n){n=String(n||'').trim();return (typeof recsDramas!=='undefined'?recsDramas:[]).find(function(d){return d.name===n;});}
 function rxRender(){
   const g=document.getElementById('rx-guide'),c=document.getElementById('rx-cp');
@@ -5773,7 +5802,7 @@ function rxRender(){
         +'<div class="rx-cp-body"><div class="rx-cp-name">'+rxEsc(p.name)+'</div>'
         +((p.a||p.b)?'<div class="rx-cp-pair">'+rxEsc(p.a||'')+' <b>×</b> '+rxEsc(p.b||'')+'</div>':'')
         +(p.works?'<div class="rx-cp-row"><span>合作作品</span>'+rxEsc(p.works)+'</div>':'')
-        +(p.moment?'<div class="rx-cp-moment"><span>十三最愛的發糖名場面</span>'+rxEsc(p.moment)+'</div>':'')
+        +((p.moment||p.media)?'<div class="rx-cp-moment"><span>十三最愛的發糖名場面</span>'+rxEsc(p.moment||'')+rxMomentMedia(p.media,p.name)+'</div>':'')
         +'</div></article>';
     }).join('');
   }
@@ -5799,7 +5828,7 @@ function rxCmsBuild(reload){
     return '<div class="rx-cms-box"><div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.5rem;"><b style="font-size:.72rem;color:#E8863A;">CP '+(i+1)+'</b><span style="flex:1"></span>'
       +'<button class="dyn-order-btn" onclick="rxCmsMoveCp('+i+',-1)">↑</button><button class="dyn-order-btn" onclick="rxCmsMoveCp('+i+',1)">↓</button><button class="dyn-del-btn" onclick="rxCmsDelCp('+i+')">刪除</button></div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">'+f('name','CP 名稱','例：MileApo',true)+f('a','演員 A','Mile Phakphum')+f('b','演員 B','Apo Nattawin')
-      +f('works','合作作品','例：黑幫少爺愛上我、Man Suang',true)+f('moment','最愛的發糖名場面','用一兩句話描述',true)
+      +f('works','合作作品','例：黑幫少爺愛上我、Man Suang',true)+f('moment','最愛的發糖名場面','用一兩句話描述',true)+f('media','名場面 GIF／影片連結（選填）','GIF 網址（.gif）或 YouTube 連結，可加 ?t=90 從第 90 秒開始',true)
       +'<div class="cf" style="grid-column:1/-1;"><label class="cl">照片網址 <label class="img-upload-mini" style="cursor:pointer;margin-left:.4rem;">📁 上傳<input type="file" accept="image/*" style="display:none;" onchange="rxCmsUpload('+i+',this)"></label></label><input class="ci" data-rx="c.'+i+'.img" value="'+rxEsc(p.img||'')+'" placeholder="thaibl-main/acter/xxx.jpg"></div>'
       +'</div></div>';
   }).join('')||'<div style="text-align:center;color:rgba(245,237,216,.3);padding:1rem;font-size:.76rem;">還沒有 CP 檔案</div>';
@@ -5813,7 +5842,7 @@ function rxCmsCollect(){
 }
 function rxCmsAddPick(li){rxCmsCollect();rexData.guide.levels[li].items.push({drama:'',reason:''});rxCmsBuild();}
 function rxCmsDelPick(li,ii){rxCmsCollect();rexData.guide.levels[li].items.splice(ii,1);rxCmsBuild();}
-function rxCmsAddCp(){rxCmsCollect();rexData.cps.push({name:'',a:'',b:'',works:'',moment:'',img:''});rxCmsBuild();}
+function rxCmsAddCp(){rxCmsCollect();rexData.cps.push({name:'',a:'',b:'',works:'',moment:'',media:'',img:''});rxCmsBuild();}
 function rxCmsDelCp(i){if(!confirm('確定刪除 CP '+(i+1)+'？'))return;rxCmsCollect();rexData.cps.splice(i,1);rxCmsBuild();}
 function rxCmsMoveCp(i,d){rxCmsCollect();const n=i+d,a=rexData.cps;if(n<0||n>=a.length)return;const t=a[i];a[i]=a[n];a[n]=t;rxCmsBuild();}
 function rxCmsUpload(i,input){const file=input.files[0];if(!file)return;rxCmsCollect();cmsUploadImg(file,900,700,.84,function(url){rexData.cps[i].img=url;rxCmsBuild();});}
