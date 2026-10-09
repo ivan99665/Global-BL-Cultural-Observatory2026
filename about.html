@@ -164,33 +164,36 @@ footer a{color:var(--fa-amber-soft);text-decoration:none;}
 .d4{transition-delay:.32s;}.d5{transition-delay:.4s;}.d6{transition-delay:.48s;}
 @media(prefers-reduced-motion:reduce){body::after,.fa-leak{animation:none;}.reveal,.reveal-left,.reveal-right{opacity:1;transform:none;transition:none;}}
 
-/* ── 後台面板（沿用原本配色）── */
+/* ── 後台面板（暖棕深色，與關於我頁面一致）── */
 :root{
-  --spring-river:#617F72;
-  --turquoise:#ABC4B3;
+  --spring-river:#E8863A;   /* 主要按鈕、重點 */
+  --turquoise:#3A2A1E;      /* 頭像預覽底 */
   --rose-dust:#C7B9B7;
-  --clay-hills:#9D754A;
+  --clay-hills:#E8863A;     /* 分頁底線 */
   --meadow-dew:#ACA37A;
-  --silver:#E8E4DD;
+  --silver:#1A130F;         /* 面板底色 */
   --vintage-rust:#814F28;
-  --mountain-soil:#4C3622;
-  --bg:#617F72;
+  --mountain-soil:#F2B07A;  /* 分頁選中、強調文字 */
+  --bg:#241A14;             /* 輸入框、分頁列底色 */
   --bg-deep:#4A6260;
   --bg-alt:#4C3622;
-  --text-dark:#E8E4DD;
+  --text-dark:#F2E9DA;
   --text-mid:#D4C8C6;
-  --text-soft:rgba(232,228,221,.6);
+  --text-soft:rgba(242,233,218,.62);
 }
-.atab{padding:.55rem 1rem;font-size:.72rem;background:none;border:none;color:rgba(76,54,34,.55);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+#a-panel,#a-login{color:#F2E9DA;}
+#a-panel ::placeholder,#a-login ::placeholder{color:rgba(242,233,218,.35);}
+#a-panel ::-webkit-scrollbar{width:8px;}#a-panel ::-webkit-scrollbar-thumb{background:rgba(232,134,58,.3);border-radius:4px;}
+.atab{padding:.55rem 1rem;font-size:.72rem;background:none;border:none;color:rgba(242,233,218,.5);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
 .atab:hover{color:var(--mountain-soil);}
 .atab.active{color:var(--mountain-soil);border-bottom-color:var(--clay-hills);font-weight:600;}
 .af{margin-bottom:1rem;}
-.al{display:block;font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:#7A9088;margin-bottom:.38rem;}
-.ai{width:100%;padding:.7rem .9rem;border:1px solid rgba(97,127,114,.25);border-radius:8px;background:#E8E4DD;font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#4C3622;outline:none;transition:border-color .2s;box-sizing:border-box;}
+.al{display:block;font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(242,176,122,.8);margin-bottom:.38rem;}
+.ai{width:100%;padding:.7rem .9rem;border:1px solid rgba(232,134,58,.22);border-radius:8px;background:#241A14;font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#F2E9DA;outline:none;transition:border-color .2s;box-sizing:border-box;}
 .ai:focus{border-color:var(--spring-river);}
-.ata{width:100%;padding:.7rem .9rem;border:1px solid rgba(97,127,114,.25);border-radius:8px;background:#E8E4DD;font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#4C3622;outline:none;resize:vertical;min-height:80px;transition:border-color .2s;box-sizing:border-box;}
+.ata{width:100%;padding:.7rem .9rem;border:1px solid rgba(232,134,58,.22);border-radius:8px;background:#241A14;font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#F2E9DA;outline:none;resize:vertical;min-height:80px;transition:border-color .2s;box-sizing:border-box;}
 .ata:focus{border-color:var(--spring-river);}
-.asec{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--spring-river);margin:1.4rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid rgba(97,127,114,.25);}
+.asec{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--spring-river);margin:1.4rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid rgba(232,134,58,.22);}
 </style>
 </head>
 <body>
@@ -621,36 +624,36 @@ document.addEventListener('keydown',e=>{
 </script>
 
 <!-- 登入面板 -->
-<div id="a-login" style="position:fixed;inset:0;z-index:9100;background:rgba(76,54,34,.88);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;">
-  <div style="background:var(--silver);border:1px solid rgba(97,127,114,.3);border-radius:20px;padding:2.5rem;width:360px;text-align:center;box-shadow:0 24px 60px rgba(76,54,34,.3);">
+<div id="a-login" style="position:fixed;inset:0;z-index:9100;background:rgba(10,7,5,.88);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--silver);border:1px solid rgba(232,134,58,.3);border-radius:20px;padding:2.5rem;width:360px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5);">
     <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--spring-river);font-style:italic;margin-bottom:.3rem;">後台管理系統</div>
     <div style="font-size:.63rem;letter-spacing:.2em;color:var(--text-soft);text-transform:uppercase;margin-bottom:1.8rem;">About · CMS</div>
-    <div style="height:1px;background:rgba(97,127,114,.2);margin-bottom:1.8rem;"></div>
+    <div style="height:1px;background:rgba(232,134,58,.2);margin-bottom:1.8rem;"></div>
     <div style="font-size:.66rem;letter-spacing:.12em;color:var(--text-soft);text-align:left;margin-bottom:.45rem;text-transform:uppercase;">管理員密碼</div>
-    <input id="a-pw" type="password" placeholder="輸入密碼..." onkeydown="if(event.key==='Enter')aLogin()" style="width:100%;background:var(--bg);border:1px solid rgba(97,127,114,.25);border-radius:10px;padding:.75rem 1rem;color:var(--text-dark);font-family:'Noto Sans TC',sans-serif;font-size:.88rem;outline:none;box-sizing:border-box;">
-    <button onclick="aLogin()" style="margin-top:1rem;width:100%;padding:.85rem;background:var(--spring-river);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans TC',sans-serif;font-size:.86rem;font-weight:500;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--mountain-soil)'" onmouseout="this.style.background='var(--spring-river)'">登入後台</button>
-    <div id="a-pw-err" style="margin-top:.5rem;font-size:.74rem;color:#b05030;min-height:1.2em;"></div>
+    <input id="a-pw" type="password" placeholder="輸入密碼..." onkeydown="if(event.key==='Enter')aLogin()" style="width:100%;background:var(--bg);border:1px solid rgba(232,134,58,.25);border-radius:10px;padding:.75rem 1rem;color:var(--text-dark);font-family:'Noto Sans TC',sans-serif;font-size:.88rem;outline:none;box-sizing:border-box;">
+    <button onclick="aLogin()" style="margin-top:1rem;width:100%;padding:.85rem;background:var(--spring-river);border:none;border-radius:10px;color:#1A0F08;font-family:'Noto Sans TC',sans-serif;font-size:.86rem;font-weight:500;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--mountain-soil)'" onmouseout="this.style.background='var(--spring-river)'">登入後台</button>
+    <div id="a-pw-err" style="margin-top:.5rem;font-size:.74rem;color:#FF9A7A;min-height:1.2em;"></div>
     <button onclick="aCloseAll()" style="margin-top:.5rem;background:none;border:none;color:var(--text-soft);font-size:.7rem;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">取消</button>
   </div>
 </div>
 
 <!-- 後台面板 -->
-<div id="a-panel" style="position:fixed;top:0;right:-680px;width:660px;height:100vh;z-index:9200;background:var(--silver);border-left:2px solid rgba(97,127,114,.25);display:flex;flex-direction:column;transition:right .4s cubic-bezier(.22,1,.36,1);overflow:hidden;box-shadow:-8px 0 40px rgba(76,54,34,.15);">
+<div id="a-panel" style="position:fixed;top:0;right:-680px;width:660px;height:100vh;z-index:9200;background:var(--silver);border-left:2px solid rgba(232,134,58,.25);display:flex;flex-direction:column;transition:right .4s cubic-bezier(.22,1,.36,1);overflow:hidden;box-shadow:-8px 0 40px rgba(76,54,34,.15);">
 
   <!-- 標題列 -->
-  <div style="background:var(--spring-river);padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+  <div style="background:#2A1E16;border-bottom:1px solid rgba(232,134,58,.25);padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
     <div>
-      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#fff;font-style:italic;">後台管理</div>
-      <div style="font-size:.58rem;letter-spacing:.15em;color:rgba(255,255,255,.6);text-transform:uppercase;margin-top:.1rem;">About · CMS</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#FAD9B5;font-style:italic;">後台管理</div>
+      <div style="font-size:.58rem;letter-spacing:.15em;color:rgba(242,176,122,.75);text-transform:uppercase;margin-top:.1rem;">About · CMS</div>
     </div>
     <div style="display:flex;gap:.5rem;align-items:center;">
-      <button id="a-save-btn" onclick="aSaveAll()" style="background:#fff;border:none;color:var(--spring-river);border-radius:8px;padding:6px 16px;font-family:'Noto Sans TC',sans-serif;font-size:.74rem;font-weight:600;cursor:pointer;">💾 儲存套用</button>
+      <button id="a-save-btn" onclick="aSaveAll()" style="background:#E8863A;border:none;color:#1A0F08;border-radius:8px;padding:6px 16px;font-family:'Noto Sans TC',sans-serif;font-size:.74rem;font-weight:600;cursor:pointer;">💾 儲存套用</button>
       <button onclick="aCloseAll()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:5px 11px;font-size:.8rem;cursor:pointer;">✕</button>
     </div>
   </div>
 
   <!-- Tab 列 -->
-  <div style="display:flex;background:var(--bg);border-bottom:1px solid rgba(97,127,114,.2);flex-shrink:0;overflow-x:auto;">
+  <div style="display:flex;background:var(--bg);border-bottom:1px solid rgba(232,134,58,.2);flex-shrink:0;overflow-x:auto;">
     <button class="atab active" onclick="aTab('hero')" data-s="hero">🏠 簡介</button>
     <button class="atab" onclick="aTab('about')" data-s="about">📝 關於我</button>
     <button class="atab" onclick="aTab('stats')" data-s="stats">📊 數據</button>
@@ -671,14 +674,14 @@ document.addEventListener('keydown',e=>{
 
       <!-- 預覽 -->
       <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1rem;">
-        <div id="avatar-preview" style="width:80px;height:80px;border-radius:50%;background:var(--turquoise);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem;border:3px solid rgba(97,127,114,.3);">🌿</div>
+        <div id="avatar-preview" style="width:80px;height:80px;border-radius:50%;background:var(--turquoise);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem;border:3px solid rgba(232,134,58,.3);">🌿</div>
         <div style="font-size:.75rem;color:var(--text-soft);line-height:1.8;">目前頭像預覽<br><span style="color:var(--spring-river);font-size:.68rem;">儲存套用後會更新頁面</span></div>
       </div>
 
       <!-- 上傳方式 1：本地檔案 -->
       <div class="af">
         <label class="al">📁 從電腦上傳圖片</label>
-        <label style="display:flex;align-items:center;gap:.7rem;padding:.75rem 1rem;border:2px dashed rgba(97,127,114,.35);border-radius:10px;cursor:pointer;transition:all .2s;background:rgba(97,127,114,.04);" onmouseover="this.style.borderColor='var(--spring-river)';this.style.background='rgba(97,127,114,.08)'" onmouseout="this.style.borderColor='rgba(97,127,114,.35)';this.style.background='rgba(97,127,114,.04)'">
+        <label style="display:flex;align-items:center;gap:.7rem;padding:.75rem 1rem;border:2px dashed rgba(232,134,58,.35);border-radius:10px;cursor:pointer;transition:all .2s;background:rgba(232,134,58,.04);" onmouseover="this.style.borderColor='var(--spring-river)';this.style.background='rgba(232,134,58,.08)'" onmouseout="this.style.borderColor='rgba(232,134,58,.35)';this.style.background='rgba(232,134,58,.04)'">
           <span style="font-size:1.5rem;">🖼️</span>
           <div>
             <div style="font-size:.82rem;color:var(--mountain-soil);font-weight:500;">點擊選擇圖片</div>
@@ -693,12 +696,12 @@ document.addEventListener('keydown',e=>{
         <label class="al">🔗 或貼上圖片網址</label>
         <div style="display:flex;gap:.5rem;">
           <input class="ai" id="f-avatar" placeholder="https://..." style="flex:1;">
-          <button onclick="aPreviewUrl()" style="padding:.7rem 1rem;background:var(--spring-river);color:#fff;border:none;border-radius:8px;font-size:.78rem;cursor:pointer;white-space:nowrap;">預覽</button>
+          <button onclick="aPreviewUrl()" style="padding:.7rem 1rem;background:var(--spring-river);color:#1A0F08;border:none;border-radius:8px;font-size:.78rem;cursor:pointer;white-space:nowrap;">預覽</button>
         </div>
       </div>
 
       <!-- 清除 -->
-      <button onclick="aClearAvatar()" style="font-size:.72rem;color:var(--text-soft);background:none;border:1px solid rgba(97,127,114,.2);border-radius:6px;padding:.4rem .9rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='#b05030';this.style.borderColor='#b05030'" onmouseout="this.style.color='var(--text-soft)';this.style.borderColor='rgba(97,127,114,.2)'">✕ 清除頭像</button>
+      <button onclick="aClearAvatar()" style="font-size:.72rem;color:var(--text-soft);background:none;border:1px solid rgba(232,134,58,.2);border-radius:6px;padding:.4rem .9rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='#b05030';this.style.borderColor='#b05030'" onmouseout="this.style.color='var(--text-soft)';this.style.borderColor='rgba(232,134,58,.2)'">✕ 清除頭像</button>
     </div>
 
     <!-- 關於我 -->
@@ -749,8 +752,8 @@ document.addEventListener('keydown',e=>{
       </div>
       <div class="asec" style="margin-top:1.2rem;">⚙️ 更改後台密碼</div>
       <div class="af"><label class="al">新密碼</label><input class="ai" id="f-npw" type="password" placeholder="輸入新密碼..."></div>
-      <button onclick="aChgPW()" style="padding:.75rem 1.5rem;background:var(--spring-river);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans TC',sans-serif;font-size:.82rem;cursor:pointer;">更新密碼</button>
-      <div style="margin-top:1.5rem;padding:1rem;background:rgba(97,127,114,.08);border-radius:10px;font-size:.72rem;color:var(--text-soft);line-height:1.9;">
+      <button onclick="aChgPW()" style="padding:.75rem 1.5rem;background:var(--spring-river);color:#1A0F08;border:none;border-radius:10px;font-family:'Noto Sans TC',sans-serif;font-size:.82rem;cursor:pointer;">更新密碼</button>
+      <div style="margin-top:1.5rem;padding:1rem;background:rgba(232,134,58,.08);border-radius:10px;font-size:.72rem;color:var(--text-soft);line-height:1.9;">
         💡 使用說明<br>
         · 右下角 ⚙️ 或 Ctrl+Shift+A 開啟後台<br>
         · 點擊 Logo 連續 5 次也可開啟<br>
