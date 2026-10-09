@@ -1437,6 +1437,47 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 
 
 </style>
+<style id="rx-css">
+/* 劇卡：在哪裡看＋私心小評 */
+.dr-meta{font-size:.72rem;color:var(--ocean-light);margin-top:.7rem;letter-spacing:.03em;}
+.dr-mine{margin-top:.8rem;padding:.7rem .8rem;border-radius:8px;background:rgba(232,134,58,.06);border:1px dashed rgba(232,134,58,.25);}
+.dr-mine-h{font-size:.6rem;letter-spacing:.14em;color:rgba(242,176,122,.75);margin-bottom:.35rem;}
+.dr-rate{display:flex;align-items:center;gap:.6rem;font-size:.7rem;color:rgba(245,237,216,.6);line-height:1.6;}
+.dr-rate span{width:2.6em;}
+.dr-stars{color:var(--sunset-gold);letter-spacing:.08em;font-size:.78rem;}
+.dr-stars i{font-style:normal;color:rgba(245,237,216,.15);}
+.dr-take{font-size:.74rem;line-height:1.6;color:var(--sunset-peach);margin-top:.35rem;font-style:italic;}
+/* 新手入坑指南、CP 檔案 */
+.rx-sec{max-width:1100px;margin:0 auto;padding:4.5rem 2rem;}
+.rx-sec[hidden]{display:none;}
+.rx-guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+.rx-level{background:linear-gradient(160deg,rgba(232,134,58,.08),rgba(13,26,36,.4));border:1px solid rgba(232,134,58,.18);border-radius:14px;padding:1.4rem 1.3rem;}
+.rx-level-no{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.24em;color:var(--sunset-gold);}
+.rx-level-name{font-family:'Noto Serif TC',serif;font-size:1.5rem;color:var(--sunset-glow);margin-top:.2rem;}
+.rx-level-tag{font-size:.76rem;color:rgba(245,237,216,.5);margin:.2rem 0 1rem;}
+.rx-pick{display:flex;gap:.8rem;align-items:flex-start;padding:.7rem 0;border-top:1px solid rgba(232,134,58,.12);}
+.rx-pick img,.rx-pick-noimg{width:72px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#1E3347;display:block;}
+.rx-pick-t{font-size:.86rem;color:var(--phuket-sand);font-weight:500;}
+.rx-pick-t small{font-size:.66rem;color:rgba(245,237,216,.4);font-weight:400;margin-left:.3rem;}
+.rx-pick-r{font-size:.74rem;line-height:1.65;color:rgba(245,237,216,.58);margin-top:.15rem;}
+.rx-cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem;}
+.rx-cp-card{background:#132331;border:1px solid rgba(232,134,58,.15);border-radius:14px;overflow:hidden;transition:transform .3s,border-color .3s;}
+.rx-cp-card:hover{transform:translateY(-4px);border-color:rgba(232,134,58,.4);}
+.rx-cp-img{position:relative;aspect-ratio:4/3;background:linear-gradient(135deg,#1E3347,#0D1A24);}
+.rx-cp-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.rx-cp-no{position:absolute;left:.8rem;bottom:.7rem;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.2em;color:#FAD9B5;background:rgba(13,26,36,.75);padding:.2rem .5rem;border-radius:3px;}
+.rx-cp-body{padding:1.1rem 1.2rem 1.3rem;}
+.rx-cp-name{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--sunset-glow);}
+.rx-cp-pair{font-size:.78rem;color:rgba(245,237,216,.6);margin-top:.15rem;}
+.rx-cp-pair b{color:var(--sunset-gold);font-weight:400;}
+.rx-cp-row{font-size:.76rem;color:rgba(245,237,216,.7);margin-top:.8rem;line-height:1.6;}
+.rx-cp-row span,.rx-cp-moment span{display:block;font-size:.6rem;letter-spacing:.14em;color:rgba(242,176,122,.75);margin-bottom:.15rem;}
+.rx-cp-moment{margin-top:.8rem;padding:.7rem .8rem;border-left:2px solid var(--sunset-gold);background:rgba(232,134,58,.06);font-size:.78rem;line-height:1.7;color:var(--sunset-peach);border-radius:0 6px 6px 0;}
+@media(max-width:860px){.rx-guide-grid{grid-template-columns:1fr;}.rx-sec{padding:3.5rem 16px;}}
+/* 後台 */
+#cs-rx .rx-cms-box{background:#1E3347;border:1px solid rgba(232,134,58,.13);border-radius:10px;padding:.8rem;margin-bottom:.7rem;}
+#cs-rx .rx-cms-row{display:grid;grid-template-columns:1fr 1.3fr auto;gap:.4rem;margin-bottom:.4rem;align-items:center;}
+</style>
 <style id="pl-css">
 /* 後台「🎵 歌單」分頁 */
 #cs-pl .pl-cms-song{background:#1E3347;border:1px solid rgba(232,134,58,.13);border-radius:10px;padding:.8rem;margin-bottom:.6rem;}
@@ -3104,6 +3145,22 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
   </div>
 </div>
 
+<!-- 新手入坑指南（後台「🧭 指南/CP」編輯，沒內容時隱藏） -->
+<section class="rx-sec" id="rx-guide" hidden>
+  <p class="section-eyebrow">新手入坑指南 · Starter Guide</p>
+  <h2 class="section-title">不知道從哪部開始？</h2>
+  <div class="divider"></div>
+  <div class="rx-guide-grid" id="rx-guide-grid"></div>
+</section>
+
+<!-- CP 檔案 -->
+<section class="rx-sec" id="rx-cp" hidden>
+  <p class="section-eyebrow">CP 檔案 · CP Files</p>
+  <h2 class="section-title">十三的 CP 觀察筆記</h2>
+  <div class="divider"></div>
+  <div class="rx-cp-grid" id="rx-cp-grid"></div>
+</section>
+
  
 
   <footer>
@@ -3318,6 +3375,7 @@ function moveIC(wrapId, state, dir) {
   <div style="display:flex;background:#111e2b;border-bottom:1px solid rgba(232,134,58,.14);flex-shrink:0;overflow-x:auto;">
     <button class="ctab active" onclick="cmsTab('ddl')" data-s="ddl">🎬 深度專題管理</button>
     <button class="ctab" onclick="cmsTab('recs')" data-s="recs">🌟 推薦管理</button>
+    <button class="ctab" onclick="cmsTab('rx')" data-s="rx">🧭 指南/CP</button>
     <button class="ctab" onclick="cmsTab('tl')" data-s="tl">📅 時間軸</button>
     <button class="ctab" onclick="cmsTab('hero')" data-s="hero">🏠 英雄區</button>
     <button class="ctab" onclick="cmsTab('stats')" data-s="stats">📊 數據</button>
@@ -3366,6 +3424,16 @@ function moveIC(wrapId, state, dir) {
     </div>
 
     <!-- ══ RECOMMENDATIONS ══ -->
+    <div id="cs-rx" style="display:none;">
+      <div class="cloc">🧭 作品推薦頁的「新手入坑指南」與「CP 檔案」（沒有內容時不顯示）</div>
+      <div style="font-size:.72rem;color:#F2B07A;margin:.4rem 0 .6rem;">📘 新手入坑指南（從「推薦管理」的劇集中挑選）</div>
+      <div id="rx-cms-guide"></div>
+      <div style="font-size:.72rem;color:#F2B07A;margin:1.2rem 0 .6rem;">💞 CP 檔案</div>
+      <div id="rx-cms-cp"></div>
+      <button class="cadd-btn" style="width:100%;margin-bottom:.6rem;" onclick="rxCmsAddCp()">＋ 新增 CP 檔案</button>
+      <button class="cadd-btn" style="width:100%;background:linear-gradient(135deg,#C94B25,#E8863A);color:#fff;border:none;" onclick="rxCmsSave(this)">💾 儲存指南與 CP 檔案</button>
+    </div>
+
     <div id="cs-recs" style="display:none;">
       <div class="cloc">🌟 推薦作品管理 — 可新增、刪除、拖曳排序</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem;">
@@ -3747,6 +3815,7 @@ function renderGenreCarousel(){
           <div class="drama-card-name">${d.name||''}</div>
           <div class="drama-card-en">${d.en||''}</div>
           <p class="drama-card-desc">${d.desc||''}</p>
+          ${recExtraHTML(d)}
         </div>
         ${(d.cast&&d.cast.length)?`
         <div class="cast-toggle" onclick="toggleCast(this)"><span>查看演員陣容</span><span class="cast-arrow">▾</span></div>
@@ -3771,6 +3840,7 @@ function renderGenreCarousel(){
     </div>
   `).join('');
   if(typeof genreState!=='undefined'){genreState.idx=0;genreState.total=recsDramas.length;}
+  if(typeof rxRender==='function')rxRender();
 }
 
 // ═══ 預告片彈窗 ═══
@@ -3914,6 +3984,15 @@ function buildRecsDramaList(){
         <div class="cf"><label class="cl">作品名稱（中文）</label><input class="ci" id="dname-${i}" value="${dr.name||''}"></div>
         <div class="cf"><label class="cl">描述</label><textarea class="cta" id="ddesc-${i}">${dr.desc||''}</textarea></div>
         <div class="cf"><label class="cl">🎬 YouTube 預告片網址 <span class="cbadge">留空＝點擊時搜尋預告</span></label><input class="ci" id="dtrailer-${i}" value="${dr.trailer||''}" placeholder="https://www.youtube.com/watch?v=... 或 https://youtu.be/..."></div>
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:.6rem;">
+          <div class="cf"><label class="cl">📺 在哪裡看（播出平台）</label><input class="ci" id="dplat-${i}" value="${rxEsc(dr.platform)}" placeholder="例：Netflix、GagaOOLala"></div>
+          <div class="cf"><label class="cl">集數</label><input class="ci" id="deps-${i}" value="${rxEsc(dr.eps)}" placeholder="例：14 集"></div>
+        </div>
+        <div style="font-size:.7rem;color:#F2B07A;margin:.2rem 0 .4rem;">十三的私心小評（0＝不顯示）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;">
+          ${[['dsweet','甜度','sweet'],['dangst','虐度','angst'],['dlaugh','笑點','laugh']].map(([id,lab,k])=>'<div class="cf"><label class="cl">'+lab+'</label><select class="ci" id="'+id+'-'+i+'" style="cursor:pointer;">'+[0,1,2,3,4,5].map(n=>'<option value="'+n+'"'+((parseInt(dr[k],10)||0)===n?' selected':'')+'>'+(n?'★'.repeat(n):'—')+'</option>').join('')+'</select></div>').join('')}
+        </div>
+        <div class="cf"><label class="cl">一句話私心短評</label><input class="ci" id="dtake-${i}" value="${rxEsc(dr.take)}" placeholder="例：前三集笑到肚子痛，後面哭到不行"></div>
         <div style="height:1px;background:rgba(232,134,58,.1);margin:.7rem 0;"></div>
         <div style="font-size:.7rem;color:#F2B07A;margin-bottom:.6rem;">演員陣容</div>
         <div id="cast-list-${i}">${(dr.cast||[]).map((c,ci)=>castRowHTML(i,ci,c)).join('')}</div>
@@ -4074,6 +4153,12 @@ function collectRecsDramas(){
     desc:(document.getElementById('ddesc-'+i)||{value:dr.desc}).value,
     img:(document.getElementById('dimg-'+i)||{value:dr.img}).value,
     trailer:((document.getElementById('dtrailer-'+i)||{value:dr.trailer||''}).value||'').trim(),
+    platform:((document.getElementById('dplat-'+i)||{value:dr.platform||''}).value||'').trim(),
+    eps:((document.getElementById('deps-'+i)||{value:dr.eps||''}).value||'').trim(),
+    sweet:+((document.getElementById('dsweet-'+i)||{value:dr.sweet||0}).value||0),
+    angst:+((document.getElementById('dangst-'+i)||{value:dr.angst||0}).value||0),
+    laugh:+((document.getElementById('dlaugh-'+i)||{value:dr.laugh||0}).value||0),
+    take:((document.getElementById('dtake-'+i)||{value:dr.take||''}).value||'').trim(),
     cast:(dr.cast||[]).map((c,ci)=>({
       name:(document.getElementById('cname-'+i+'-'+ci)||{value:c.name}).value,
       nameT:(document.getElementById('cnameT-'+i+'-'+ci)||{value:c.nameT}).value,
@@ -4317,6 +4402,7 @@ function cmsTab(s){
   if(s==='music')mpCmsLoad();
   if(s==='ddl'){ddlCmsBuildList();}
   if(s==='pl')plCmsOpen();
+  if(s==='rx')rxCmsBuild(true);
   if(s==='publish')pubLoadSettings();
 }
 async function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(np.length<8){alert('新密碼至少需要 8 碼');return;}await pwSet(np);document.getElementById('f-npw').value='';alert('✅ 密碼已更新');}
@@ -5093,9 +5179,10 @@ async function publishToGitHub(){
     imgs:JSON.parse(localStorage.getItem(K_IMGS)||'null'),
     ddl:JSON.parse(localStorage.getItem(K_DDL)||'null'),
     ddlhero:JSON.parse(localStorage.getItem(K_DDLHERO)||'null'),
+    recsx:JSON.parse(localStorage.getItem(K_REX)||'null'),
     music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
   };
-  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",recsx:"'+K_REX+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
 
   // 取得當前 HTML，注入資料，移除舊 baked script
   const featEdEl=document.getElementById('feat-ed');if(featEdEl)featEdEl.remove();
@@ -5639,6 +5726,105 @@ async function plCmsSave(btn){
   catch(e){if(btn)btn.textContent='⚠️ 已存在這台電腦，但上傳失敗：'+e.message;}
   if(btn)setTimeout(function(){btn.textContent=o;btn.disabled=false;},4000);
 }
+// ══ 作品推薦加值：在哪裡看／十三的私心小評（劇卡上）、新手入坑指南、CP 檔案 ══
+const K_REX='tb-recs-extra';
+const DEF_REX={guide:{levels:[
+  {name:'入門',tag:'剛入坑先從這裡開始',items:[]},
+  {name:'進階',tag:'想看更多不同題材',items:[]},
+  {name:'深坑',tag:'準備好一起沉下去了嗎',items:[]}]},cps:[]};
+let rexData=JSON.parse(JSON.stringify(DEF_REX));
+function rxEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+function rxImg(u){u=String(u||'').trim();return /^(javascript|vbscript|data:(?!image\/))/i.test(u)?'':u;}
+function rxLoad(){try{const r=localStorage.getItem(K_REX);if(r){const p=JSON.parse(r);rexData={guide:Object.assign({},DEF_REX.guide,p.guide||{}),cps:Array.isArray(p.cps)?p.cps:[]};if(!Array.isArray(rexData.guide.levels))rexData.guide.levels=JSON.parse(JSON.stringify(DEF_REX.guide.levels));}}catch(e){}}
+function rxStars(n){n=Math.max(0,Math.min(5,parseInt(n,10)||0));return '<span class="dr-stars" aria-label="'+n+' / 5">'+'★'.repeat(n)+'<i>'+'★'.repeat(5-n)+'</i></span>';}
+// 劇卡上：播出平台／集數＋私心小評
+function recExtraHTML(d){
+  let h='';
+  if(d.platform||d.eps)h+='<div class="dr-meta">📺 '+rxEsc(d.platform||'')+(d.platform&&d.eps?' · ':'')+rxEsc(d.eps||'')+'</div>';
+  const rows=[['甜度',d.sweet],['虐度',d.angst],['笑點',d.laugh]].filter(function(r){return parseInt(r[1],10)>0;});
+  if(rows.length||d.take){
+    h+='<div class="dr-mine"><div class="dr-mine-h">十三的私心小評 · 純屬個人口味</div>'
+      +rows.map(function(r){return '<div class="dr-rate"><span>'+r[0]+'</span>'+rxStars(r[1])+'</div>';}).join('')
+      +(d.take?'<p class="dr-take">「'+rxEsc(d.take)+'」</p>':'')+'</div>';
+  }
+  return h;
+}
+function rxDramaByName(n){n=String(n||'').trim();return (typeof recsDramas!=='undefined'?recsDramas:[]).find(function(d){return d.name===n;});}
+function rxRender(){
+  const g=document.getElementById('rx-guide'),c=document.getElementById('rx-cp');
+  if(g){
+    const lv=(rexData.guide.levels||[]).filter(function(l){return l&&(l.items||[]).some(function(it){return it.drama;});});
+    g.hidden=!lv.length;
+    if(lv.length)document.getElementById('rx-guide-grid').innerHTML=lv.map(function(l,li){
+      return '<div class="rx-level"><div class="rx-level-no">LEVEL 0'+(li+1)+'</div><div class="rx-level-name">'+rxEsc(l.name)+'</div><div class="rx-level-tag">'+rxEsc(l.tag||'')+'</div>'
+        +(l.items||[]).filter(function(it){return it.drama;}).map(function(it){
+          const d=rxDramaByName(it.drama);const im=d?rxImg(d.img):'';
+          return '<div class="rx-pick">'+(im?'<img src="'+rxEsc(im)+'" alt="" loading="lazy">':'<span class="rx-pick-noimg"></span>')
+            +'<div><div class="rx-pick-t">'+rxEsc(it.drama)+(d&&d.year?' <small>'+rxEsc(d.year)+'</small>':'')+'</div><div class="rx-pick-r">'+rxEsc(it.reason||'')+'</div></div></div>';
+        }).join('')+'</div>';
+    }).join('');
+  }
+  if(c){
+    const cps=(rexData.cps||[]).filter(function(p){return p&&p.name;});
+    c.hidden=!cps.length;
+    if(cps.length)document.getElementById('rx-cp-grid').innerHTML=cps.map(function(p,i){
+      const im=rxImg(p.img);
+      return '<article class="rx-cp-card"><div class="rx-cp-img">'+(im?'<img src="'+rxEsc(im)+'" alt="'+rxEsc(p.name)+'" loading="lazy">':'')+'<span class="rx-cp-no">CP FILE · '+String(i+1).padStart(2,'0')+'</span></div>'
+        +'<div class="rx-cp-body"><div class="rx-cp-name">'+rxEsc(p.name)+'</div>'
+        +((p.a||p.b)?'<div class="rx-cp-pair">'+rxEsc(p.a||'')+' <b>×</b> '+rxEsc(p.b||'')+'</div>':'')
+        +(p.works?'<div class="rx-cp-row"><span>合作作品</span>'+rxEsc(p.works)+'</div>':'')
+        +(p.moment?'<div class="rx-cp-moment"><span>十三最愛的發糖名場面</span>'+rxEsc(p.moment)+'</div>':'')
+        +'</div></article>';
+    }).join('');
+  }
+}
+// ── 後台：🧭 指南 / CP ──
+function rxCmsBuild(reload){
+  if(reload)rxLoad();
+  const names=(typeof recsDramas!=='undefined'?recsDramas:[]).map(function(d){return d.name;}).filter(Boolean);
+  const sel=function(li,ii,v){return '<select class="ci" data-rx="g.'+li+'.'+ii+'.drama" style="cursor:pointer;"><option value="">（選擇推薦作品）</option>'
+    +names.map(function(n){return '<option'+(n===v?' selected':'')+'>'+rxEsc(n)+'</option>';}).join('')
+    +(v&&names.indexOf(v)<0?'<option selected>'+rxEsc(v)+'</option>':'')+'</select>';};
+  document.getElementById('rx-cms-guide').innerHTML=(rexData.guide.levels||[]).map(function(l,li){
+    return '<div class="rx-cms-box"><div style="display:grid;grid-template-columns:1fr 2fr;gap:.5rem;">'
+      +'<div class="cf"><label class="cl">層級名稱</label><input class="ci" data-rx="g.'+li+'.name" value="'+rxEsc(l.name)+'"></div>'
+      +'<div class="cf"><label class="cl">一句說明</label><input class="ci" data-rx="g.'+li+'.tag" value="'+rxEsc(l.tag||'')+'"></div></div>'
+      +(l.items||[]).map(function(it,ii){return '<div class="rx-cms-row">'+sel(li,ii,it.drama)
+        +'<input class="ci" data-rx="g.'+li+'.'+ii+'.reason" value="'+rxEsc(it.reason||'')+'" placeholder="為什麼推薦（一句話）">'
+        +'<button class="dyn-del-btn" onclick="rxCmsDelPick('+li+','+ii+')">刪除</button></div>';}).join('')
+      +'<button class="cadd-btn" style="margin-top:.4rem;" onclick="rxCmsAddPick('+li+')">＋ 加入一部作品</button></div>';
+  }).join('');
+  document.getElementById('rx-cms-cp').innerHTML=(rexData.cps||[]).map(function(p,i){
+    const f=function(k,label,ph,wide){return '<div class="cf"'+(wide?' style="grid-column:1/-1;"':'')+'><label class="cl">'+label+'</label><input class="ci" data-rx="c.'+i+'.'+k+'" value="'+rxEsc(p[k]||'')+'" placeholder="'+rxEsc(ph||'')+'"></div>';};
+    return '<div class="rx-cms-box"><div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.5rem;"><b style="font-size:.72rem;color:#E8863A;">CP '+(i+1)+'</b><span style="flex:1"></span>'
+      +'<button class="dyn-order-btn" onclick="rxCmsMoveCp('+i+',-1)">↑</button><button class="dyn-order-btn" onclick="rxCmsMoveCp('+i+',1)">↓</button><button class="dyn-del-btn" onclick="rxCmsDelCp('+i+')">刪除</button></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">'+f('name','CP 名稱','例：MileApo',true)+f('a','演員 A','Mile Phakphum')+f('b','演員 B','Apo Nattawin')
+      +f('works','合作作品','例：黑幫少爺愛上我、Man Suang',true)+f('moment','最愛的發糖名場面','用一兩句話描述',true)
+      +'<div class="cf" style="grid-column:1/-1;"><label class="cl">照片網址 <label class="img-upload-mini" style="cursor:pointer;margin-left:.4rem;">📁 上傳<input type="file" accept="image/*" style="display:none;" onchange="rxCmsUpload('+i+',this)"></label></label><input class="ci" data-rx="c.'+i+'.img" value="'+rxEsc(p.img||'')+'" placeholder="thaibl-main/acter/xxx.jpg"></div>'
+      +'</div></div>';
+  }).join('')||'<div style="text-align:center;color:rgba(245,237,216,.3);padding:1rem;font-size:.76rem;">還沒有 CP 檔案</div>';
+}
+function rxCmsCollect(){
+  document.querySelectorAll('#cs-rx [data-rx]').forEach(function(el){
+    const p=el.dataset.rx.split('.');const v=el.value.trim();
+    if(p[0]==='g'){const l=rexData.guide.levels[+p[1]];if(!l)return;if(p.length===3)l[p[2]]=v;else if(l.items[+p[2]])l.items[+p[2]][p[3]]=v;}
+    else{const c=rexData.cps[+p[1]];if(c)c[p[2]]=v;}
+  });
+}
+function rxCmsAddPick(li){rxCmsCollect();rexData.guide.levels[li].items.push({drama:'',reason:''});rxCmsBuild();}
+function rxCmsDelPick(li,ii){rxCmsCollect();rexData.guide.levels[li].items.splice(ii,1);rxCmsBuild();}
+function rxCmsAddCp(){rxCmsCollect();rexData.cps.push({name:'',a:'',b:'',works:'',moment:'',img:''});rxCmsBuild();}
+function rxCmsDelCp(i){if(!confirm('確定刪除 CP '+(i+1)+'？'))return;rxCmsCollect();rexData.cps.splice(i,1);rxCmsBuild();}
+function rxCmsMoveCp(i,d){rxCmsCollect();const n=i+d,a=rexData.cps;if(n<0||n>=a.length)return;const t=a[i];a[i]=a[n];a[n]=t;rxCmsBuild();}
+function rxCmsUpload(i,input){const file=input.files[0];if(!file)return;rxCmsCollect();cmsUploadImg(file,900,700,.84,function(url){rexData.cps[i].img=url;rxCmsBuild();});}
+function rxCmsSave(btn){
+  rxCmsCollect();
+  rexData.guide.levels.forEach(function(l){l.items=(l.items||[]).filter(function(it){return it.drama;});});
+  rexData.cps=(rexData.cps||[]).filter(function(p){return p.name;});
+  if(!lsSet(K_REX,JSON.stringify(rexData)))return;
+  rxRender();rxCmsBuild();
+  if(btn){const o=btn.textContent;btn.textContent='✅ 已儲存（記得到「🚀 發布」上傳）';setTimeout(function(){btn.textContent=o;},2600);}
+}
 function ddlCmsApplyImg(i){const v=document.getElementById('ddlimg-'+i)?.value;if(v){ddlData[i].cover=v;const p=document.getElementById('ddlprev-'+i);if(p)p.src=v;}}
 
 
@@ -5764,6 +5950,7 @@ showPage=function(id){
   loadData(); loadFixedImgs();
   const raw=localStorage.getItem(K_TXT);if(raw){try{applyTxt(JSON.parse(raw));}catch(e){}}
   renderMainCarousel(); renderGenreCarousel(); renderTimeline(); applyAllFixedImgs();
+  rxLoad(); rxRender();
   ddlLoad(); ddlRenderAll();
   // Default to global page on first visit; honour URL hash (e.g. #page-home)
   const hashPage=location.hash.replace('#page-','');
