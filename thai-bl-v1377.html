@@ -3412,6 +3412,24 @@ function moveIC(wrapId, state, dir) {
         <select class="ci" id="ddl-hero-style" style="cursor:pointer;" onchange="ddlHeroSetStyle(this.value)">
           <option value="">原本（簡潔）</option><option value="A">A 底片印樣</option><option value="B">B 戲院看板</option><option value="C">C 轉動膠捲</option>
         </select></div>
+      <details style="margin-bottom:1rem;background:rgba(232,134,58,.05);border:1px solid rgba(232,134,58,.18);border-radius:9px;padding:.6rem .8rem;">
+        <summary style="cursor:pointer;font-size:.74rem;color:#F2B07A;">🎟 戲院看板設定（樣式 B「NOW SHOWING」）</summary>
+        <div style="margin-top:.7rem;">
+          <div class="cf"><label class="cl">看板標題</label><input class="ci" id="bd-title" placeholder="NOW SHOWING"></div>
+          <div class="cf"><label class="cl">看板列表</label>
+            <select class="ci" id="bd-mode" style="cursor:pointer;" onchange="document.getElementById('bd-rows-wrap').style.display=this.value==='custom'?'':'none';document.getElementById('bd-next-wrap').style.display=this.value==='custom'?'none':'';">
+              <option value="auto">自動（依下方專題的狀態：可閱讀＝上映中、即將推出＝即將上映）</option>
+              <option value="custom">自訂文字</option>
+            </select></div>
+          <label id="bd-next-wrap" style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:rgba(245,237,216,.7);margin-bottom:.7rem;cursor:pointer;"><input type="checkbox" id="bd-next"> 最後加一列「下一部專題 · COMING SOON」</label>
+          <div class="cf" id="bd-rows-wrap" style="display:none;"><label class="cl">自訂列表（一行一列：名稱｜狀態；狀態含「上映中」會亮起）</label>
+            <textarea class="cta" id="bd-rows" style="min-height:80px;" placeholder="以你的心詮釋我的愛｜上映中&#10;通往天堂的門票｜即將上映&#10;下一部專題｜COMING SOON"></textarea></div>
+          <div class="cf"><label class="cl">背景拼貼圖片（一行一個網址；留空＝自動用專題封面）
+            <label class="img-upload-mini" style="cursor:pointer;margin-left:.4rem;">📁 上傳<input type="file" accept="image/*" multiple style="display:none;" onchange="ddlBoardUpload(this)"></label></label>
+            <textarea class="cta" id="bd-imgs" style="min-height:70px;" placeholder="thaibl-main/index_photo/xxx.jpg"></textarea></div>
+          <button class="cadd-btn" style="width:100%;" onclick="ddlBoardSave(this)">💾 套用看板設定</button>
+        </div>
+      </details>
 
       <!-- Add + info bar -->
       <div style="display:flex;gap:.6rem;margin-bottom:.9rem;align-items:center;">
@@ -4954,10 +4972,20 @@ function ddlHeroApply(){
     add('<div class="dh-x dh-strip">'+items.map(frame).join('')+soonFrames(Math.max(2,5-items.length))+'</div>');
     add('<div class="dh-x dh-leak a"></div><div class="dh-x dh-leak b"></div>');
   }else if(v==='B'){
-    const pool=[];while(items.length&&pool.length<8)items.forEach(d=>pool.length<8&&pool.push(d.cover));
-    add('<div class="dh-x dh-board"><h4>NOW SHOWING</h4>'
-      +ddlData.map(d=>'<div class="row'+(d.status==='live'?'':' soon')+'"><span>'+esc(d.title)+'</span><span>'+(d.status==='live'?'上映中':'即將上映')+'</span></div>').join('')
-      +'<div class="row soon"><span>下一部專題</span><span>COMING SOON</span></div></div>');
+    const bd=ddlBoardGet();
+    const imgs=String(bd.imgs||'').split('\n').map(x=>x.trim()).filter(x=>x&&!/^(javascript|data:(?!image\/))/i.test(x));
+    const src=imgs.length?imgs:items.map(d=>d.cover);
+    const pool=[];while(src.length&&pool.length<8)src.forEach(u=>pool.length<8&&pool.push(u));
+    let rows;
+    const custom=String(bd.rows||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    if(bd.mode==='custom'&&custom.length){
+      rows=custom.map(l=>{const p=l.split(/\s*[｜|]\s*/);return {t:p[0],s:p.slice(1).join(' ')||'',on:/上映中|NOW|LIVE/i.test(p.slice(1).join(' '))};});
+    }else{
+      rows=ddlData.map(d=>({t:d.title,s:d.status==='live'?'上映中':'即將上映',on:d.status==='live'}));
+      if(bd.next!==false)rows.push({t:'下一部專題',s:'COMING SOON',on:false});
+    }
+    add('<div class="dh-x dh-board"><h4>'+esc(bd.title||'NOW SHOWING')+'</h4>'
+      +rows.map(r=>'<div class="row'+(r.on?'':' soon')+'"><span>'+esc(r.t)+'</span><span>'+esc(r.s)+'</span></div>').join('')+'</div>');
     add('<div class="dh-x dh-shade"></div>');
     add('<div class="dh-x dh-collage">'+pool.map(u=>'<img src="'+esc(u)+'" alt="">').join('')+'</div>');
   }else{
@@ -4967,6 +4995,26 @@ function ddlHeroApply(){
     add('<div class="dh-x dh-reelwrap"><div class="dh-tail">'+items.map(frame).join('')+soonFrames(Math.max(1,3-items.length))+'</div>'+reel+'</div>');
     add('<div class="dh-x dh-leak a"></div>');
   }
+}
+const K_DDLBOARD='tb-ddlboard';
+function ddlBoardGet(){try{return Object.assign({title:'NOW SHOWING',mode:'auto',rows:'',imgs:'',next:true},JSON.parse(localStorage.getItem(K_DDLBOARD)||'{}'));}catch(e){return {title:'NOW SHOWING',mode:'auto',rows:'',imgs:'',next:true};}}
+function ddlBoardFill(){
+  const b=ddlBoardGet();const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('bd-title',b.title);set('bd-mode',b.mode);set('bd-rows',b.rows);set('bd-imgs',b.imgs);
+  const nx=document.getElementById('bd-next');if(nx)nx.checked=b.next!==false;
+  const r=document.getElementById('bd-rows-wrap');if(r)r.style.display=b.mode==='custom'?'':'none';
+  const n=document.getElementById('bd-next-wrap');if(n)n.style.display=b.mode==='custom'?'none':'';
+}
+function ddlBoardSave(btn){
+  const v=id=>(document.getElementById(id)||{value:''}).value;
+  const b={title:v('bd-title').trim()||'NOW SHOWING',mode:v('bd-mode')||'auto',rows:v('bd-rows').trim(),imgs:v('bd-imgs').trim(),next:!!(document.getElementById('bd-next')||{}).checked};
+  if(!lsSet(K_DDLBOARD,JSON.stringify(b)))return;
+  ddlHeroApply();
+  if(btn){const o=btn.textContent;btn.textContent='✅ 已套用（記得到「🚀 發布」上傳）';setTimeout(()=>{btn.textContent=o;},2600);}
+}
+function ddlBoardUpload(input){
+  const files=Array.from(input.files||[]);if(!files.length)return;let left=files.length;const out=[];
+  files.forEach((file,k)=>cmsUploadImg(file,1200,800,.84,url=>{out[k]=url;if(--left===0){const t=document.getElementById('bd-imgs');t.value=(t.value.trim()?t.value.trim()+'\n':'')+out.join('\n');}}));
 }
 function ddlHeroSetStyle(v){lsSet(K_DDLHERO,JSON.stringify(v||''));ddlHeroApply();}
 // 測試切換列：網址加 ?ddlhero=A（或 B、C、0）
@@ -4992,6 +5040,7 @@ function ddlOpen(t){
   history.replaceState(null,'','#feat-'+encodeURIComponent(t));
 }
 function ddlCmsBuildList(){
+  ddlBoardFill();
   const hs=document.getElementById('ddl-hero-style');if(hs){const t=ddlHeroTest;ddlHeroTest='';hs.value=ddlHeroStyle();ddlHeroTest=t;}
   const el=document.getElementById('ddl-cms-list');
   if(!el)return;
@@ -5187,10 +5236,11 @@ async function publishToGitHub(){
     imgs:JSON.parse(localStorage.getItem(K_IMGS)||'null'),
     ddl:JSON.parse(localStorage.getItem(K_DDL)||'null'),
     ddlhero:JSON.parse(localStorage.getItem(K_DDLHERO)||'null'),
+    ddlboard:JSON.parse(localStorage.getItem(K_DDLBOARD)||'null'),
     recsx:JSON.parse(localStorage.getItem(K_REX)||'null'),
     music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
   };
-  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",recsx:"'+K_REX+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",ddlboard:"'+K_DDLBOARD+'",recsx:"'+K_REX+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
 
   // 取得當前 HTML，注入資料，移除舊 baked script
   const featEdEl=document.getElementById('feat-ed');if(featEdEl)featEdEl.remove();
