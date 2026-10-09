@@ -886,10 +886,10 @@ html{overflow-x:hidden;}@supports(overflow:clip){html{overflow-x:clip;}}
     el.textContent='';el.appendChild(a);el.appendChild(b);
   }
   function run(){
-    document.querySelectorAll('.nav-logo').forEach(function(el){
-      split(el);
-      if(!el.__mnav){el.__mnav=1;new MutationObserver(function(){split(el);}).observe(el,{childList:true,characterData:true,subtree:true});}
-    });
+    document.querySelectorAll('.nav-logo').forEach(split);
+    // Logo 可能被其他程式整個換掉（換字或換節點），所以監看整條導覽列
+    var nav=document.querySelector('nav')||document.body;
+    if(!nav.__mnav){nav.__mnav=1;new MutationObserver(function(){document.querySelectorAll('.nav-logo').forEach(split);}).observe(nav,{childList:true,characterData:true,subtree:true});}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 })();
