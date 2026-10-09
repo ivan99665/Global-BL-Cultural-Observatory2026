@@ -369,7 +369,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1rem 3rem;display:fl
 .cast-arrow{transition:transform .35s cubic-bezier(.22,1,.36,1);display:inline-block;}
 .cast-arrow.open{transform:rotate(180deg);}
 .cast-panel{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.22,1,.36,1);}
-.cast-panel.open{max-height:500px;}
+.cast-panel.open{max-height:900px;}
 .cast-list{padding:.75rem 1.3rem 1.1rem;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.15);}
 .cast-member{display:flex;align-items:flex-start;gap:.8rem;padding:.42rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
 .cast-member:last-child{border-bottom:none;padding-bottom:0;}
@@ -378,6 +378,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1rem 3rem;display:fl
 .cast-name{font-size:.8rem;color:var(--phuket-sand);font-weight:500;line-height:1.3;}
 .cast-name-th{font-size:.65rem;color:rgba(245,237,216,.4);display:block;margin-top:.08rem;}
 .cast-note{font-size:.68rem;color:rgba(245,237,216,.45);margin-top:.12rem;line-height:1.5;}
+.cast-links{display:flex;gap:.35rem;margin-top:.4rem;}
+.cast-links a{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:22px;padding:0 .5rem;border-radius:11px;border:1px solid rgba(232,134,58,.35);font-size:.62rem;font-weight:600;letter-spacing:.04em;color:var(--sunset-peach);text-decoration:none;transition:all .2s;}
+.cast-links a:hover{background:var(--sunset-gold);border-color:var(--sunset-gold);color:#1A0F08;}
 
 .rec-split{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;margin-top:2.5rem;}
 @media(max-width:700px){.rec-split{grid-template-columns:1fr;gap:2rem;}}
@@ -3258,7 +3261,10 @@ function moveIC(wrapId, state, dir) {
     const cardWidth = 300 + 20;
     const container = document.getElementById(wrapId);
     const maxTranslate = Math.max(0, state.total * cardWidth - 20 - container.clientWidth);
-    state.idx = Math.max(0, Math.min(state.idx + dir, state.total - 1));
+    // 到最右邊再按右鍵 → 回到第一部；在最左邊按左鍵 → 跳到最後
+    const maxIdx = Math.ceil(maxTranslate / cardWidth);
+    const next = state.idx + dir;
+    state.idx = next > maxIdx ? 0 : next < 0 ? maxIdx : next;
     const moveDist = Math.min(state.idx * cardWidth, maxTranslate);
     track.style.transform = `translateX(-${moveDist}px)`;
   } else {
@@ -3702,6 +3708,26 @@ function renderMainCarousel(){
   }
 }
 
+// 演員社群連結：可填帳號（@xxx）或完整網址，只接受 Instagram / X 的網址
+function castSocialUrl(v,kind){
+  v=String(v||'').trim();if(!v)return '';
+  if(/^https?:\/\//i.test(v)){
+    const ok=kind==='ig'?/^https?:\/\/(www\.)?instagram\.com\//i:/^https?:\/\/(www\.)?(x|twitter)\.com\//i;
+    return ok.test(v)?v:'';
+  }
+  const h=v.replace(/^@/,'');
+  if(!/^[A-Za-z0-9._]{1,40}$/.test(h))return '';
+  return kind==='ig'?'https://www.instagram.com/'+h:'https://x.com/'+h;
+}
+function castSocialHTML(c){
+  const esc=t=>String(t||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const ig=castSocialUrl(c.ig,'ig'),x=castSocialUrl(c.x,'x');
+  if(!ig&&!x)return '';
+  return '<div class="cast-links">'
+    +(ig?'<a href="'+esc(ig)+'" target="_blank" rel="noopener" aria-label="'+esc(c.name)+' 的 Instagram">IG</a>':'')
+    +(x?'<a href="'+esc(x)+'" target="_blank" rel="noopener" aria-label="'+esc(c.name)+' 的 X">𝕏</a>':'')
+    +'</div>';
+}
 function renderGenreCarousel(){
   const track=document.getElementById('genreCarouselTrack');
   if(!track)return;
@@ -3736,6 +3762,7 @@ function renderGenreCarousel(){
                 <div class="cast-name">${c.name||''}</div>
                 <div class="cast-name-th">${c.nameT||''}</div>
                 <div class="cast-note">${c.note||''}</div>
+                ${castSocialHTML(c)}
               </div>
             </div>`).join('')}
           </div>
@@ -3908,6 +3935,10 @@ function castRowHTML(di,ci,c){
       <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cname-${di}-${ci}" value="${c.name||''}" placeholder="演員名字（英文）" style="font-size:.76rem;"></div>
       <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cnameT-${di}-${ci}" value="${c.nameT||''}" placeholder="泰文名" style="font-size:.76rem;"></div>
       <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cnote-${di}-${ci}" value="${c.note||''}" placeholder="飾演角色、說明..." style="font-size:.76rem;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem;">
+        <input class="ci" id="cig-${di}-${ci}" value="${c.ig||''}" placeholder="IG 帳號或網址" style="font-size:.72rem;">
+        <input class="ci" id="cx-${di}-${ci}" value="${c.x||''}" placeholder="X 帳號或網址" style="font-size:.72rem;">
+      </div>
       <button class="del-cast-btn" onclick="delCast(${di},${ci})">刪除</button>
     </div>
   </div>`;
@@ -4047,6 +4078,8 @@ function collectRecsDramas(){
       name:(document.getElementById('cname-'+i+'-'+ci)||{value:c.name}).value,
       nameT:(document.getElementById('cnameT-'+i+'-'+ci)||{value:c.nameT}).value,
       note:(document.getElementById('cnote-'+i+'-'+ci)||{value:c.note}).value,
+      ig:((document.getElementById('cig-'+i+'-'+ci)||{value:c.ig||''}).value||'').trim(),
+      x:((document.getElementById('cx-'+i+'-'+ci)||{value:c.x||''}).value||'').trim(),
       img:c.img||'',
     })),
   }));
