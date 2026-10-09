@@ -1434,6 +1434,29 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 
 
 </style>
+<style id="feat-css">
+/* ── 通用深度專題：後台編輯器 ── */
+#feat-ed{display:none;position:fixed;inset:0;z-index:9300;background:rgba(8,14,20,.97);overflow-y:auto;color:#F5EDD8;font-family:'Noto Sans TC',sans-serif;}
+#feat-ed .fe-top{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:1rem 1.5rem;background:#0D1A24;border-bottom:1px solid rgba(232,134,58,.2);}
+#feat-ed .fe-ttl{font-size:1rem;color:#E8863A;font-weight:600;}
+#feat-ed .fe-sub{font-size:.7rem;color:rgba(245,237,216,.45);margin-top:.2rem;}
+#feat-ed .fe-btns{display:flex;gap:.5rem;flex-wrap:wrap;}
+#feat-ed .fe-btn{border:none;border-radius:8px;padding:.5rem .9rem;font-size:.75rem;cursor:pointer;background:linear-gradient(135deg,#C94B25,#E8863A);color:#fff;font-family:inherit;}
+#feat-ed .fe-btn.ghost{background:rgba(255,255,255,.05);border:1px solid rgba(232,134,58,.25);color:rgba(245,237,216,.75);}
+#feat-ed-body{max-width:900px;margin:0 auto;padding:1.5rem 16px 4rem;}
+#feat-ed .fe-sec{margin-bottom:2.2rem;}
+#feat-ed .fe-sec h3{font-size:.9rem;color:#FAD9B5;margin:0 0 .8rem;border-bottom:1px solid rgba(232,134,58,.15);padding-bottom:.4rem;font-weight:600;}
+#feat-ed .fe-hint{font-size:.7rem;color:rgba(245,237,216,.5);line-height:1.7;margin:0 0 .9rem;}
+#feat-ed .fe-card{border:1px solid rgba(232,134,58,.16);border-radius:10px;padding:.9rem;margin-bottom:.9rem;background:rgba(255,255,255,.02);}
+#feat-ed .fe-card-head{display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;}
+#feat-ed .fe-card-head b{font-size:.75rem;color:#E8863A;white-space:nowrap;}
+#feat-ed .fe-card-head .ci{flex:1;min-width:140px;width:auto;}
+#feat-ed .fe-card-head select.ci{flex:0 1 auto;}
+#feat-ed .fe-2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+#feat-ed .cl{display:flex;}
+#feat-ed .fe-upl{margin-left:auto;cursor:pointer;text-transform:none;letter-spacing:0;}
+@media(max-width:640px){#feat-ed .fe-2{grid-template-columns:1fr;}#feat-ed .fe-top{padding:.8rem 16px;}}
+</style>
 </head>
 <body>
 
@@ -2726,6 +2749,9 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 </div><!-- /page-itsay -->
 
 
+<!-- ══════════════════ PAGE: 通用深度專題（後台編輯） ══════════════════ -->
+<div id="page-feature" class="page"><div id="feat-root"></div></div>
+
 <!-- ══════════════════ PAGE 3: RECS ══════════════════ -->
 <div id="page-recs" class="page">
 
@@ -3008,7 +3034,7 @@ function showPage(id){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   const page=document.getElementById('page-'+id);
   if(page)page.classList.add('active');
-  const tabMap={global:0,style:0,audience:0,culture:0,home:1,deeplist:1,itsay:1,recs:2};
+  const tabMap={global:0,style:0,audience:0,culture:0,home:1,deeplist:1,itsay:1,feature:1,recs:2};
   const tabIdx=tabMap[id];
   const tabs=document.querySelectorAll('.nav-tab');
   if(tabIdx!==undefined&&tabs[tabIdx])tabs[tabIdx].classList.add('active');
@@ -3068,8 +3094,8 @@ window.addEventListener('scroll',()=>{const n=document.getElementById('nav');if(
 
 // TABS (ITSAY)
 function switchTab(idx){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
-  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  document.querySelectorAll('#page-itsay .tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('#page-itsay .tab-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
   sessionStorage.setItem('currentTab', idx);
 }
 
@@ -5040,7 +5066,15 @@ function ddlRenderCatalog(){
 }
 
 function ddlRenderAll(){navDdRender();ddlRender();ddlRenderCatalog();}
-function ddlOpen(t){if(t)showPage(t);}
+function ddlOpen(t){
+  if(!t)return;
+  if(t!=='feature'&&document.getElementById('page-'+t)){showPage(t);return;}
+  const d=ddlData.find(function(x){return x.target===t&&x.page;});
+  if(!d)return;
+  featRender(d);showPage('feature');
+  sessionStorage.setItem('currentFeature',t);
+  history.replaceState(null,'','#feat-'+encodeURIComponent(t));
+}
 function ddlCmsBuildList(){
   const el=document.getElementById('ddl-cms-list');
   if(!el)return;
@@ -5095,9 +5129,12 @@ function ddlCmsBuildList(){
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">'
           +'<div class="cf"><label class="cl">狀態</label>'
             +'<select class="ci" id="ddlstat-'+i+'" style="cursor:pointer;">'+sOpts+'</select></div>'
-          +'<div class="cf"><label class="cl">目標頁面 ID <span class="cbadge">itsay 或留空</span></label>'
-            +'<input class="ci" id="ddltarget-'+i+'" value="'+(d.target||'')+'" placeholder="itsay"></div>'
+          +'<div class="cf"><label class="cl">網址代號 <span class="cbadge">英文小寫，例 2gether</span></label>'
+            +'<input class="ci" id="ddltarget-'+i+'" value="'+(d.target||'')+'" placeholder="留空會自動產生"></div>'
         +'</div>'
+        +(d.target==='itsay'
+          ?'<div style="font-size:.65rem;color:rgba(245,237,216,.4);margin-top:.3rem;line-height:1.6;">「以你的心」的內文寫在網頁程式裡，不在這裡編輯。</div>'
+          :'<button class="cadd-btn" style="margin-top:.5rem;width:100%;" onclick="featEdOpen('+i+')">✏️ 編輯專題內文（以你的心版型）'+(d.page?' · 已有內容':'')+'</button>')
       +'</div>';
     el.appendChild(div);
     setupDrag(div,'ddl');
@@ -5107,16 +5144,16 @@ function ddlCmsBuildList(){
 function ddlCmsCollect(){
   const g=function(id){const el=document.getElementById(id);return el?el.value:'';};
   ddlData=ddlData.map(function(d,i){
-    return {
+    return Object.assign({},d,{
       title:g('ddlt-'+i)||d.title,
       year:g('ddly-'+i)||d.year,
       eyebrow:g('ddley-'+i)||d.eyebrow,
       sub:g('ddlsub-'+i)||d.sub,
       desc:g('ddldesc-'+i)||d.desc,
       status:g('ddlstat-'+i)||d.status||'soon',
-      target:g('ddltarget-'+i)||d.target||'',
+      target:(g('ddltarget-'+i)||d.target||'').trim().toLowerCase().replace(/[^a-z0-9-]/g,''),
       cover:d.cover||'',
-    };
+    });
   });
 }
 function ddlCmsAdd(){
@@ -5237,7 +5274,11 @@ async function publishToGitHub(){
   const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
 
   // 取得當前 HTML，注入資料，移除舊 baked script
+  const featEdEl=document.getElementById('feat-ed');if(featEdEl)featEdEl.remove();
+  const featRootEl=document.getElementById('feat-root');const featRootHtml=featRootEl?featRootEl.innerHTML:'';
+  if(featRootEl)featRootEl.innerHTML='';
   let html=document.documentElement.outerHTML;
+  if(featRootEl)featRootEl.innerHTML=featRootHtml;
   html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
   html=html.replace('<head>','<head>\n'+bakedScript);
 
@@ -5279,6 +5320,266 @@ async function publishToGitHub(){
     log.innerHTML='❌ 發布失敗：'+e.message;
     console.error(e);
   }
+}
+// ══ 通用深度專題頁：以「以你的心」版型為範本，內容由後台「編輯專題內文」填寫 ══
+// 文字格式：空一行＝分段；**文字**＝橘色粗體；清單一行一項，欄位用「｜」分隔
+const FEAT_SEP=/\s*[｜|]\s*/;
+function featEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function featUrl(u){u=String(u||'').trim();return /^(javascript:|vbscript:|data:(?!image\/))/i.test(u)?'':u;}
+function featInline(s){return featEsc(s).replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--sunset-peach)">$1</strong>').replace(/\n/g,'<br>');}
+function featParas(t){return String(t||'').split(/\n\s*\n/).map(function(p){return p.trim();}).filter(Boolean).map(function(p){return '<p>'+featInline(p)+'</p>';}).join('');}
+function featLines(t){return String(t||'').split('\n').map(function(l){return l.trim();}).filter(Boolean);}
+function featCols(l,n){const a=l.split(FEAT_SEP);while(a.length<n)a.push('');return a.slice(0,n-1).concat([a.slice(n-1).join('｜')]);}
+
+let featIC={},featHcIdx=0,featHcTotal=0;
+function featCarousel(imgs,h,cap){
+  const list=featLines(imgs).map(featUrl).filter(Boolean);
+  if(!list.length)return '';
+  const id='fic'+Object.keys(featIC).length;
+  featIC[id]={idx:0,total:list.length};
+  return '<div class="ic-wrap" id="'+id+'" style="margin-top:1.5rem;"><div class="ic-track" id="'+id+'Track">'
+    +list.map(function(u){return '<div class="ic-slide"><img src="'+featEsc(u)+'" alt="" loading="lazy" style="height:'+h+'px;"></div>';}).join('')
+    +'</div>'
+    +(list.length>1?'<button class="ic-btn ic-prev" onclick="featMove(\''+id+'\',-1)">&#8592;</button><button class="ic-btn ic-next" onclick="featMove(\''+id+'\',1)">&#8594;</button>':'')
+    +'</div>'+(cap?'<p class="ic-cap">'+featEsc(cap)+'</p>':'');
+}
+function featMove(id,dir){
+  const st=featIC[id];if(!st)return;
+  st.idx=(st.idx+dir+st.total)%st.total;
+  const t=document.getElementById(id+'Track');if(t)t.style.transform='translateX(-'+(st.idx*100)+'%)';
+}
+function featHcGo(i){
+  featHcIdx=i;
+  const t=document.getElementById('featHcTrack');if(t)t.style.transform='translateX(-'+(i*100)+'%)';
+  document.querySelectorAll('#featHcDots .itsay-hc-dot').forEach(function(d,j){d.classList.toggle('active',j===i);});
+}
+setInterval(function(){
+  const pg=document.getElementById('page-feature');
+  if(!pg||!pg.classList.contains('active'))return;
+  if(featHcTotal>1)featHcGo((featHcIdx+1)%featHcTotal);
+  Object.keys(featIC).forEach(function(id){if(featIC[id].total>1)featMove(id,1);});
+},4000);
+function featTabGo(i){
+  document.querySelectorAll('#feat-tabs .tab').forEach(function(t,j){t.classList.toggle('active',j===i);});
+  document.querySelectorAll('#feat-root .feat-panel').forEach(function(p,j){p.classList.toggle('active',j===i);});
+}
+function featDetail(l){
+  let c=l.split(FEAT_SEP);
+  if(c.length<3)c=['•'].concat(c);
+  c=featCols(c.join('｜'),3);
+  return '<div class="detail-item"><div class="detail-icon">'+featEsc(c[0])+'</div><div><div class="detail-label">'+featEsc(c[1])+'</div><div class="detail-value">'+featEsc(c[2])+'</div></div></div>';
+}
+function featSide(t){
+  const lines=featLines(t.side);
+  if(!lines.length&&!t.sideTitle)return '';
+  let body;
+  if(t.sideType==='tags')body='<div class="symbols">'+lines.map(function(l){return '<span class="sym-tag">'+featEsc(l)+'</span>';}).join('')+'</div>';
+  else if(t.sideType==='details')body=lines.map(featDetail).join('');
+  else body='<ul class="ep-list">'+lines.map(function(l,i){const c=featCols(l,2);return '<li class="ep-item"><span class="ep-num">'+String(i+1).padStart(2,'0')+'</span><div><div class="ep-title">'+featEsc(c[0])+'</div><p class="ep-desc">'+featEsc(c[1])+'</p></div></li>';}).join('')+'</ul>';
+  return '<div class="panel-hl">'+(t.sideTitle?'<h4>'+featEsc(t.sideTitle)+'</h4>':'')+body+'</div>';
+}
+function featTab(t){
+  if(t.layout==='compare'){
+    const rows=featLines(t.rows).map(function(l){return featCols(l,3);});
+    return '<div class="season-compare-header">'
+      +'<div class="season-badge s1-badge"><h3>'+featEsc(t.aTitle)+'</h3><p>'+featInline(t.aText)+'</p></div>'
+      +'<div class="vs-circle">VS</div>'
+      +'<div class="season-badge s2-badge"><h3>'+featEsc(t.bTitle)+'</h3><p>'+featInline(t.bText)+'</p></div></div>'
+      +(rows.length?'<table class="compare-table"><thead><tr><th class="col-dim">比較維度</th><th style="color:var(--sunset-peach);">'+featEsc(t.aCol||t.aTitle)+'</th><th style="color:var(--ocean-light);">'+featEsc(t.bCol||t.bTitle)+'</th></tr></thead><tbody>'
+        +rows.map(function(r){return '<tr><td class="col-dim">'+featEsc(r[0])+'</td><td class="col-s1">'+featEsc(r[1])+'</td><td class="col-s2">'+featEsc(r[2])+'</td></tr>';}).join('')+'</tbody></table>':'')
+      +(t.text?'<div class="panel-text">'+featParas(t.text)+'</div>':'')
+      +featCarousel(t.imgs,300,t.cap);
+  }
+  if(t.layout==='info'){
+    return '<div class="panel-grid">'+[[t.p1Title,t.p1],[t.p2Title,t.p2]]
+      .filter(function(p){return p[0]||featLines(p[1]).length;})
+      .map(function(p){return '<div class="panel-hl">'+(p[0]?'<h4>'+featEsc(p[0])+'</h4>':'')+featLines(p[1]).map(featDetail).join('')+'</div>';}).join('')+'</div>';
+  }
+  return '<div class="panel-grid"><div class="panel-text">'+featParas(t.text)+featCarousel(t.imgs,220,t.cap)+'</div><div>'+featSide(t)+'</div></div>';
+}
+function featCast(p){
+  const cast=(p.cast||[]).filter(function(c){return c&&c.name;});
+  if(!cast.length)return '';
+  return '<div class="actor-section"><div class="inner">'
+    +'<p class="section-eyebrow">演員介紹 · Cast Profiles</p>'
+    +'<h2 class="section-title">'+featInline(p.castTitle||'演員介紹')+'</h2><div class="divider"></div>'
+    +(p.castIntro?'<p style="font-size:.88rem;line-height:1.85;color:rgba(245,237,216,.6);max-width:600px;">'+featInline(p.castIntro)+'</p>':'')
+    +'<div class="actor-grid">'+cast.map(function(c,i){
+      const img=featUrl(c.img);
+      const facts=featLines(c.facts),links=featLines(c.links);
+      return '<div class="actor-card '+(i%2?'pp-card':'billkin')+'"><div class="actor-card-header">'
+        +(img?'<img src="'+featEsc(img)+'" alt="'+featEsc(c.name)+'">':'')
+        +'<div class="actor-header-text"><div class="actor-name-th">'+featEsc(c.name)+'</div>'
+        +(c.nameEn?'<div class="actor-name-en">'+featEsc(c.nameEn)+'</div>':'')
+        +(c.role?'<span class="actor-role">'+featEsc(c.role)+'</span>':'')
+        +'</div></div><div class="actor-body">'
+        +(c.bio?'<p class="actor-bio">'+featInline(c.bio)+'</p>':'')
+        +(facts.length?'<div class="actor-facts">'+facts.map(function(l){const x=featCols(l,2);return '<div class="actor-fact"><div class="actor-fact-label">'+featEsc(x[0])+'</div><div class="actor-fact-value">'+featEsc(x[1])+'</div></div>';}).join('')+'</div>':'')
+        +(links.length?'<div class="actor-socials">'+links.map(function(l){const x=featCols(l,2);const u=x[1].trim();return /^https?:\/\//i.test(u)?'<a class="actor-social-btn" href="'+featEsc(u)+'" target="_blank" rel="noopener">'+featEsc(x[0])+'</a>':'';}).join('')+'</div>':'')
+        +'</div></div>';
+    }).join('')+'</div></div></div>';
+}
+function featRender(d){
+  const root=document.getElementById('feat-root');if(!root)return;
+  const p=d.page||{};
+  featIC={};
+  const hero=featLines(p.heroImgs).map(featUrl).filter(Boolean);
+  if(!hero.length&&d.cover)hero.push(d.cover);
+  const tabs=(p.tabs||[]).filter(function(t){return t&&t.name;});
+  let h='<div class="itsay-hero-overlay"><div class="itsay-hero-carousel"><div class="itsay-hc-track" id="featHcTrack">'
+    +hero.map(function(u){return '<div class="itsay-hc-slide"><img src="'+featEsc(u)+'" alt=""></div>';}).join('')
+    +'</div><div class="itsay-hc-dots" id="featHcDots">'
+    +(hero.length>1?hero.map(function(u,i){return '<div class="itsay-hc-dot'+(i?'':' active')+'" onclick="featHcGo('+i+')"></div>';}).join(''):'')
+    +'</div></div>'
+    +'<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(13,26,36,.9) 80%,#0D1A24 100%);pointer-events:none;height:100%;z-index:2;"></div>'
+    +'<div class="itsay-hero-text" style="z-index:3;"><p class="section-eyebrow" style="margin-bottom:.7rem;">'+featEsc(p.heroEyebrow||'深度專題 · Deep Dive')+'</p>'
+    +'<h2>'+featEsc(p.heroTitle||d.title)+'</h2><p>'+featEsc(p.heroSub||d.sub||'')+'</p></div></div>';
+  h+='<div class="section-wrap">'+(p.quote?'<div class="itsay-quote">'+featInline(p.quote)+'</div>':'');
+  if(tabs.length){
+    h+='<div class="tabs" id="feat-tabs">'+tabs.map(function(t,i){return '<button class="tab'+(i?'':' active')+'" onclick="featTabGo('+i+')">'+featEsc(t.name)+'</button>';}).join('')+'</div>'
+      +tabs.map(function(t,i){return '<div class="tab-panel feat-panel'+(i?'':' active')+'">'+featTab(t)+'</div>';}).join('');
+  }
+  h+='</div>'+featCast(p);
+  h+='<div class="section-wrap" style="padding-bottom:3rem;"><p class="section-eyebrow">深度探索 · Deep Dive Series</p><h2 class="section-title">更多深度專題</h2><div class="divider"></div>'
+    +'<div id="feat-catalog-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;"></div></div>';
+  h+='<footer><div class="footer-title">'+featEsc(p.footTitle||d.title)+'</div>'
+    +(p.footSub?'<div class="footer-sub">'+featEsc(p.footSub)+'</div>':'')
+    +'<div class="footer-div"></div><p class="footer-note">'+featEsc(p.footNote||'深度專題分析 · 學術評論目的 · 劇集版權歸原製作公司所有')+'</p></footer>';
+  root.innerHTML=h;
+  featHcIdx=0;featHcTotal=hero.length;
+  const cg=document.getElementById('dd-catalog-grid'),fg=document.getElementById('feat-catalog-grid');
+  if(cg&&fg)fg.innerHTML=cg.innerHTML;
+}
+
+// ── 後台：編輯專題內文 ──
+let featEdIdx=-1,featDraft=null;
+function featTemplate(){
+  return {heroImgs:'',heroEyebrow:'深度專題 · Deep Dive',heroTitle:'',heroSub:'',quote:'',
+    tabs:[
+      {name:'故事架構',layout:'std',sideTitle:'集數情感弧線',sideType:'list'},
+      {name:'情感敘事',layout:'std',sideTitle:'情感符號系統',sideType:'tags'},
+      {name:'鏡頭語言',layout:'std',sideTitle:'鏡頭與色彩',sideType:'details'},
+      {name:'兩季對比',layout:'compare',aTitle:'第一季',bTitle:'第二季'},
+      {name:'文化背景',layout:'std',sideTitle:'文化符號解讀',sideType:'details'},
+      {name:'基本資料',layout:'info',p1Title:'製作資訊',p2Title:'獎項與影響力'}],
+    castTitle:'',castIntro:'',cast:[{},{}],footTitle:'',footSub:'',footNote:''};
+}
+function featGet(p){const v=p.split('.').reduce(function(o,k){return o==null?undefined:o[k];},featDraft);return v==null?'':v;}
+function featSet(p,v){const ks=p.split('.');let o=featDraft;for(let i=0;i<ks.length-1;i++){if(o[ks[i]]==null)o[ks[i]]={};o=o[ks[i]];}o[ks[ks.length-1]]=v;}
+function featFI(p,label,ph){return '<div class="cf"><div class="cl">'+label+'</div><input class="ci" data-fp="'+p+'" value="'+featEsc(featGet(p))+'" placeholder="'+featEsc(ph||'')+'"></div>';}
+function featFT(p,label,ph,h,upl){
+  return '<div class="cf"><div class="cl">'+label
+    +(upl?'<label class="img-upload-mini fe-upl">📁 上傳圖片<input type="file" accept="image/*"'+(/\.img$/.test(p)?'':' multiple')+' style="display:none;" onchange="featEdUpload(\''+p+'\',this)"></label>':'')
+    +'</div><textarea class="cta" data-fp="'+p+'" style="min-height:'+(h||70)+'px;" placeholder="'+featEsc(ph||'')+'">'+featEsc(featGet(p))+'</textarea></div>';
+}
+function featSel(p,opts,cur){return '<select class="ci" data-fp="'+p+'" data-rebuild="1" style="cursor:pointer;">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';}
+function featEdEnsure(){
+  if(document.getElementById('feat-ed'))return;
+  const w=document.createElement('div');w.id='feat-ed';
+  w.innerHTML='<div class="fe-top"><div><div class="fe-ttl">✏️ 編輯專題內文</div><div class="fe-sub" id="feat-ed-sub"></div></div>'
+    +'<div class="fe-btns"><button class="fe-btn ghost" onclick="featEdTemplate()">重設為以你的心版型</button><button class="fe-btn ghost" onclick="featEdClose()">關閉</button>'
+    +'<button class="fe-btn" onclick="featEdSave(false)">💾 儲存</button><button class="fe-btn" onclick="featEdSave(true)">👁 儲存並預覽</button></div></div>'
+    +'<div id="feat-ed-body"></div>';
+  document.body.appendChild(w);
+  w.addEventListener('input',function(e){const p=e.target.dataset&&e.target.dataset.fp;if(p)featSet(p,e.target.value);});
+  w.addEventListener('change',function(e){const p=e.target.dataset&&e.target.dataset.fp;if(p){featSet(p,e.target.value);if(e.target.dataset.rebuild)featEdBuild();}});
+}
+function featEdOpen(i){
+  ddlCmsCollect();
+  const d=ddlData[i];if(!d)return;
+  if(!d.target||document.getElementById('page-'+d.target))d.target='f'+Date.now().toString(36);
+  ddlSave();ddlCmsBuildList();
+  featEdIdx=i;
+  featDraft=JSON.parse(JSON.stringify(d.page||featTemplate()));
+  featEdEnsure();featEdBuild();
+  document.getElementById('feat-ed-sub').textContent=(d.title||'')+' · 網址代號：'+d.target;
+  const w=document.getElementById('feat-ed');w.style.display='block';w.scrollTop=0;
+}
+function featEdBuild(){
+  const D=featDraft,b=document.getElementById('feat-ed-body');if(!b)return;
+  const top=document.getElementById('feat-ed').scrollTop;
+  let h='<div class="fe-sec"><h3>① 頁首</h3>'
+    +featFT('heroImgs','頁首輪播大圖（一行一個圖片網址）','thaibl-main/index_photo/xxx.jpg',70,1)
+    +'<div class="fe-2">'+featFI('heroTitle','大標題','留空＝用專題標題')+featFI('heroEyebrow','大標題上方小字','深度專題 · Deep Dive')+'</div>'
+    +featFI('heroSub','大標題下方副標','原文劇名 · 英文劇名 · 年份')
+    +featFT('quote','引言金句（頁首下方的斜體文字，可換行）','',70)+'</div>';
+  h+='<div class="fe-sec"><h3>② 分頁內容</h3><p class="fe-hint">每個分頁可選三種版型：<b>文字＋圖片＋右側重點</b>（像「故事架構」）、<b>對比表</b>（像「兩季對比」）、<b>資料卡</b>（像「基本資料」）。<br>內文空一行＝分段；用 **兩個星號** 包住的文字會變成橘色粗體；清單一行一項，欄位用「｜」分隔。名稱留空的分頁不會顯示。</p>';
+  (D.tabs||[]).forEach(function(t,i){
+    const P='tabs.'+i+'.',L=t.layout||'std';
+    h+='<div class="fe-card"><div class="fe-card-head"><b>分頁 '+(i+1)+'</b>'
+      +'<input class="ci" data-fp="'+P+'name" value="'+featEsc(t.name||'')+'" placeholder="分頁名稱">'
+      +featSel(P+'layout',[['std','文字＋圖片＋右側重點'],['compare','對比表'],['info','資料卡']],L)
+      +'<button class="dyn-order-btn" onclick="featEdMove(\'tabs\','+i+',-1)">↑</button><button class="dyn-order-btn" onclick="featEdMove(\'tabs\','+i+',1)">↓</button>'
+      +'<button class="dyn-del-btn" onclick="featEdDel(\'tabs\','+i+')">刪除</button></div>';
+    if(L==='compare'){
+      h+='<div class="fe-2">'+featFI(P+'aTitle','左側標題','第一季')+featFI(P+'bTitle','右側標題','第二季')+'</div>'
+        +'<div class="fe-2">'+featFT(P+'aText','左側說明（可換行）','英文劇名\n2020 · 普吉島 · 5集\n導演：…',70)+featFT(P+'bText','右側說明（可換行）','',70)+'</div>'
+        +'<div class="fe-2">'+featFI(P+'aCol','表格左欄名稱','第一季 · 普吉島的夏天')+featFI(P+'bCol','表格右欄名稱','第二季 · 曼谷的現實')+'</div>'
+        +featFT(P+'rows','比較表（一行一列：維度｜左欄｜右欄）','場景設定｜普吉島老城區、海灘…｜曼谷大學校園、公寓…',120)
+        +featFT(P+'text','表格下方補充文字（選填）','',60)
+        +featFT(P+'imgs','表格下方輪播圖（選填，一行一個網址）','',50,1)+featFI(P+'cap','圖片說明','');
+    }else if(L==='info'){
+      h+='<div class="fe-2">'+featFI(P+'p1Title','左卡標題','製作資訊')+featFI(P+'p2Title','右卡標題','獎項與影響力')+'</div>'
+        +'<div class="fe-2">'+featFT(P+'p1','左卡內容（一行一項：圖示｜項目｜內容）','🎬｜製作公司｜GMMTV\n📅｜播出時間｜2024年',130)
+        +featFT(P+'p2','右卡內容（一行一項：圖示｜項目｜內容）','⭐｜IMDb評分｜約 8.0 / 10',130)+'</div>';
+    }else{
+      const sT=t.sideType||'list';
+      const sh={list:'一行一項：標題｜描述，會自動編號 01、02…',tags:'一行一個標籤，例：🌺 扶桑花 — 微妙的愛',details:'一行一項：圖示｜項目｜內容'}[sT];
+      h+=featFT(P+'text','左側內文','',150)
+        +featFT(P+'imgs','左側輪播圖（一行一個網址）','',50,1)+featFI(P+'cap','圖片說明','')
+        +'<div class="fe-2">'+featFI(P+'sideTitle','右側重點框標題','集數情感弧線')
+        +'<div class="cf"><div class="cl">右側重點框樣式</div>'+featSel(P+'sideType',[['list','編號清單'],['tags','標籤'],['details','圖示資料']],sT)+'</div></div>'
+        +featFT(P+'side','右側重點框內容（'+sh+'）','',120);
+    }
+    h+='</div>';
+  });
+  h+='<button class="cadd-btn" onclick="featEdAdd(\'tabs\')">＋ 新增分頁</button></div>';
+  h+='<div class="fe-sec"><h3>③ 演員介紹（選填，沒填藝名的不會顯示）</h3>'
+    +featFI('castTitle','區塊標題','Billkin × PP')+featFT('castIntro','區塊介紹','',60);
+  (D.cast||[]).forEach(function(c,i){
+    const P='cast.'+i+'.';
+    h+='<div class="fe-card"><div class="fe-card-head"><b>演員 '+(i+1)+'</b><span style="flex:1"></span>'
+      +'<button class="dyn-order-btn" onclick="featEdMove(\'cast\','+i+',-1)">↑</button><button class="dyn-order-btn" onclick="featEdMove(\'cast\','+i+',1)">↓</button>'
+      +'<button class="dyn-del-btn" onclick="featEdDel(\'cast\','+i+')">刪除</button></div>'
+      +'<div class="fe-2">'+featFI(P+'name','藝名','Billkin')+featFI(P+'nameEn','本名','')+'</div>'
+      +featFI(P+'role','飾演角色','飾 德兒 Teh')
+      +featFT(P+'img','照片網址','thaibl-main/acter/xxx.webp',40,1)
+      +featFT(P+'bio','介紹','',90)
+      +'<div class="fe-2">'+featFT(P+'facts','小資料（一行一項：項目｜內容）','生日｜2000年9月\n代表作品｜…',80)
+      +featFT(P+'links','社群連結（一行一個：顯示文字｜網址）','📷 Instagram｜https://www.instagram.com/…',80)+'</div></div>';
+  });
+  h+='<button class="cadd-btn" onclick="featEdAdd(\'cast\')">＋ 新增演員</button></div>';
+  h+='<div class="fe-sec"><h3>④ 頁尾</h3><div class="fe-2">'+featFI('footTitle','頁尾標題','留空＝用專題標題')+featFI('footSub','頁尾副標','GMMTV · 2024')+'</div>'
+    +featFI('footNote','版權說明','深度專題分析 · 學術評論目的 · 劇集版權歸原製作公司所有')+'</div>';
+  b.innerHTML=h;
+  document.getElementById('feat-ed').scrollTop=top;
+}
+function featEdUpload(p,input){
+  const files=Array.from(input.files||[]);if(!files.length)return;
+  let left=files.length;const out=[];
+  files.forEach(function(file,k){
+    cmsUploadImg(file,1600,1000,.84,function(url){
+      out[k]=url;
+      if(--left===0){
+        const cur=String(featGet(p)||'').trim();
+        featSet(p,/\.img$/.test(p)?out[0]:(cur?cur+'\n':'')+out.join('\n'));
+        featEdBuild();
+      }
+    });
+  });
+}
+function featEdAdd(k){featDraft[k]=featDraft[k]||[];featDraft[k].push(k==='tabs'?{name:'新分頁',layout:'std',sideType:'list'}:{});featEdBuild();}
+function featEdDel(k,i){if(!confirm('確定刪除這個'+(k==='tabs'?'分頁':'演員')+'？'))return;featDraft[k].splice(i,1);featEdBuild();}
+function featEdMove(k,i,dir){const a=featDraft[k],n=i+dir;if(n<0||n>=a.length)return;const tmp=a[i];a[i]=a[n];a[n]=tmp;featEdBuild();}
+function featEdTemplate(){if(!confirm('重設會清空這篇專題目前填的內容，確定嗎？'))return;featDraft=featTemplate();featEdBuild();}
+function featEdClose(){if(confirm('關閉編輯器？還沒按「儲存」的修改會遺失。'))document.getElementById('feat-ed').style.display='none';}
+function featEdSave(preview){
+  const d=ddlData[featEdIdx];if(!d)return;
+  d.page=JSON.parse(JSON.stringify(featDraft));
+  if(!ddlSave())return;
+  ddlRenderAll();ddlCmsBuildList();
+  if(preview){document.getElementById('feat-ed').style.display='none';ddlOpen(d.target);}
+  else{const s=document.getElementById('feat-ed-sub');if(s){const o=s.textContent;s.textContent='✅ 已儲存（記得到「🚀 發布」上傳到網站）';setTimeout(function(){s.textContent=o;},2500);}}
 }
 function ddlCmsApplyImg(i){const v=document.getElementById('ddlimg-'+i)?.value;if(v){ddlData[i].cover=v;const p=document.getElementById('ddlprev-'+i);if(p)p.src=v;}}
 
@@ -5410,7 +5711,11 @@ showPage=function(id){
   const hashPage=location.hash.replace('#page-','');
   const validPages=['global','style','audience','culture','home','deeplist','itsay','recs'];
   const savedPage2=sessionStorage.getItem('currentPage');
-  if(hashPage && validPages.includes(hashPage)){showPage(hashPage);}
+  const featHash=location.hash.indexOf('#feat-')===0?decodeURIComponent(location.hash.slice(6)):'';
+  const featOk=function(t){return t&&ddlData.some(function(x){return x.target===t&&x.page;});};
+  if(featOk(featHash)){ddlOpen(featHash);}
+  else if(hashPage && validPages.includes(hashPage)){showPage(hashPage);}
+  else if(savedPage2==='feature'){const cf=sessionStorage.getItem('currentFeature');if(featOk(cf))ddlOpen(cf);else showPage('deeplist');}
   else if(savedPage2){showPage(savedPage2);}
   else{showPage('home');}
 })();
