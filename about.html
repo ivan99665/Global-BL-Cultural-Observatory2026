@@ -437,18 +437,38 @@ async function aLoad(){
   return {};
 }
 
+let aSaveErr='';
 async function aSaveGitHub(d){
-  const token = aGetToken();
-  if(!token){ alert('請先在「⚙️ 設定」頁輸入 GitHub Token'); return false; }
-  let sha = '';
-  try{
-    const ri = await fetch(GH_API, { headers:{ Authorization:'Bearer '+token } });
-    if(ri.ok){ const info=await ri.json(); sha=info.sha; }
-  }catch(e){}
+  aSaveErr='';
+  const token = aGetToken().trim();
+  if(!token){ aSaveErr='還沒有填 GitHub Token（到「⚙️ 密碼」分頁填）'; return false; }
+  const H={ Authorization:'Bearer '+token, Accept:'application/vnd.github+json' };
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(d, null, 2))));
-  const body = JSON.stringify({ message:'Update about data', content, ...(sha?{sha}:{}) });
-  const rp = await fetch(GH_API, { method:'PUT', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body });
-  return rp.ok;
+  for(let attempt=0; attempt<3; attempt++){
+    let sha='';
+    try{
+      // 加時間參數＋no-store：避免瀏覽器拿到舊的版本編號（sha），連續儲存時會衝突
+      const ri = await fetch(GH_API+'?ref=main&t='+Date.now(), { headers:H, cache:'no-store' });
+      if(ri.ok){ sha=(await ri.json()).sha; }
+      else if(ri.status===401){ aSaveErr='GitHub Token 無效或已過期，請到 GitHub 重新產生一組再貼上'; return false; }
+      else if(ri.status===403){ aSaveErr='這組 Token 沒有寫入權限（需要此儲存庫的 Contents: Read and write）'; return false; }
+      else if(ri.status!==404){ aSaveErr='讀取 GitHub 失敗（'+ri.status+'）'; return false; }
+    }catch(e){ aSaveErr='連不上 GitHub，請檢查網路'; return false; }
+    let rp;
+    try{
+      rp = await fetch(GH_API, { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},H), cache:'no-store',
+        body: JSON.stringify({ message:'Update about data', content, branch:'main', ...(sha?{sha}:{}) }) });
+    }catch(e){ aSaveErr='連不上 GitHub，請檢查網路'; return false; }
+    if(rp.ok) return true;
+    if(rp.status===409||rp.status===422){ await new Promise(r=>setTimeout(r,800)); continue; }   // 版本衝突 → 重抓 sha 再試
+    let m=''; try{ m=(await rp.json()).message||''; }catch(e){}
+    aSaveErr = rp.status===401 ? 'GitHub Token 無效或已過期，請到 GitHub 重新產生一組再貼上'
+      : rp.status===403||rp.status===404 ? '這組 Token 沒有寫入權限（需要此儲存庫的 Contents: Read and write）'
+      : '儲存失敗（'+rp.status+(m?'：'+m:'')+'）';
+    return false;
+  }
+  aSaveErr='GitHub 版本衝突，請等幾秒再按一次儲存';
+  return false;
 }
 
 async function aUploadImgBB(file){
@@ -613,7 +633,7 @@ async function aSaveAll(){
   btn.disabled=true;
   const ok = await aSaveGitHub(d);
   if(ok){ aApply(d); btn.textContent='✅ 已同步'; }
-  else{ btn.textContent='❌ 失敗'; }
+  else{ btn.textContent='❌ 失敗'; alert('儲存失敗：'+(aSaveErr||'未知原因')); }
   setTimeout(()=>{ btn.textContent='💾 儲存套用'; btn.disabled=false; },2200);
 }
 
