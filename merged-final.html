@@ -7711,28 +7711,7 @@ flipBgInit();
   loop();
 })();
 </script>
-<script>
-/* Touch toggle for flip cards on mobile */
-(function(){
-  function addTouchFlip(sel,cls){
-    document.querySelectorAll(sel).forEach(function(el){
-      el.addEventListener('touchend',function(e){
-        e.preventDefault();
-        el.classList.toggle(cls);
-      },{passive:false});
-    });
-  }
-  /* .bud-flip-wrap uses .flipped class */
-  addTouchFlip('.bud-flip-wrap','flipped');
-  /* .fcard already has onclick toggle but also support touch explicitly */
-  document.querySelectorAll('.fcard').forEach(function(el){
-    el.addEventListener('touchend',function(e){
-      e.preventDefault();
-      el.classList.toggle('flipped');
-    },{passive:false});
-  });
-})();
-</script>
+<!-- 翻轉卡片的觸控處理已移到頁尾 tflip-js -->
 
 <!-- ══ 直接編輯模式 浮動工具列 ══ -->
 <div id="edit-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0D1A24,#0A1018);border-top:1px solid rgba(75,168,160,.4);padding:.75rem 1.5rem;align-items:center;gap:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.6);">
@@ -8021,6 +8000,27 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
     if(!nav.__mnav){nav.__mnav=1;new MutationObserver(function(){document.querySelectorAll('.nav-logo').forEach(split);}).observe(nav,{childList:true,characterData:true,subtree:true});}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+})();
+</script>
+
+<!-- 觸控裝置的翻轉卡片：點一下翻面，再點一下翻回 -->
+<style id="tflip-css">
+.bud-flip-wrap.flipped .bud-flip-inner{transform:rotateY(180deg);}
+@media (hover:none){
+  .bud-flip-wrap:hover .bud-flip-inner,.fcard:hover .fcard-inner{transform:none;}
+  .bud-flip-wrap.flipped .bud-flip-inner,.fcard.flipped .fcard-inner{transform:rotateY(180deg);}
+}
+</style>
+<script id="tflip-js">
+(function(){
+  // .fcard 本身已有 onclick 切換；這裡只處理 .bud-flip-wrap（用 click，滑動不會觸發）
+  document.addEventListener('click',function(e){
+    var w=e.target.closest&&e.target.closest('.bud-flip-wrap');
+    if(w&&!e.target.closest('a,button,input,textarea,select'))w.classList.toggle('flipped');
+  });
+  if(window.matchMedia&&matchMedia('(hover: none)').matches){
+    document.querySelectorAll('.bud-flip-hint').forEach(function(h){h.textContent=h.textContent.replace('懸停','點一下');});
+  }
 })();
 </script>
 </body>

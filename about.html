@@ -487,7 +487,9 @@ let aCards=[];
 function aEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 // 圖示是網址（http(s) 或站內圖片路徑）就當圖片顯示，否則當 emoji／文字
 function aIsImg(v){v=String(v||'').trim();return /^https?:\/\//i.test(v)||/^[\w./-]+\.(gif|webp|png|jpe?g|svg)(\?.*)?$/i.test(v);}
-function aIconHTML(v){return aIsImg(v)?'<img src="'+aEsc(String(v).trim())+'" alt="" loading="lazy">':aEsc(v);}
+// 外部 GIF／圖片先經縮圖服務縮成小圖（動畫保留、檔案小很多）；縮圖失敗就改用原圖
+function aIconSrc(v){v=String(v||'').trim();return /^https?:\/\//i.test(v)?'https://wsrv.nl/?url='+encodeURIComponent(v)+'&w=128&h=128&fit=inside&n=-1&output=webp':v;}
+function aIconHTML(v){if(!aIsImg(v))return aEsc(v);v=String(v).trim();const s=aIconSrc(v);return '<img src="'+aEsc(s)+'"'+(s!==v?' data-orig="'+aEsc(v)+'" onerror="if(this.dataset.orig&&this.src!==this.dataset.orig){this.src=this.dataset.orig;}"':'')+' alt="" loading="lazy">';}
 function aCardsFromPage(){
   return [...document.querySelectorAll('#interests-grid .interest-card')].map(c=>({
     icon:(c.querySelector('.interest-icon img')||{}).getAttribute?c.querySelector('.interest-icon img').getAttribute('src'):((c.querySelector('.interest-icon')||{}).textContent||''),
