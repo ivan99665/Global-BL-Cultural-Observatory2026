@@ -3336,10 +3336,10 @@ function mpApply(){
     else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}
     else{mpMode='none';}
   }
-  document.getElementById('music-player').style.display='flex';
-  const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
-  document.body.style.paddingBottom='72px';
-  if(mpData.audioUrl&&mpUserInteracted)mpAutoPlay();
+  // 預設收合，訪客點膠囊才展開（同一分頁內記住選擇）
+  let mpOpen=false;try{mpOpen=sessionStorage.getItem('mp-open')==='1';}catch(e){}
+  if(mpOpen){mpShow();if(mpData.audioUrl&&mpUserInteracted)mpAutoPlay();}
+  else mpHide();
 }
 
 // ── Piped API fallback (auto-triggered when YT embedding fails) ──
@@ -3457,8 +3457,8 @@ function mpSeekClick(e){
   else if(mpMode==='audio'&&audio.duration)audio.currentTime=pct*audio.duration;
 }
 function mpVol(v){if(mpMode==='youtube'&&ytPlayer&&ytPlayer.setVolume)ytPlayer.setVolume(+v);else audio.volume=v/100;}
-function mpHide(){document.getElementById('music-player').style.display='none';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='flex';document.body.style.paddingBottom='0';}
-function mpShow(){document.getElementById('music-player').style.display='flex';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';document.body.style.paddingBottom='72px';}
+function mpHide(){try{sessionStorage.removeItem('mp-open');}catch(e){}document.getElementById('music-player').style.display='none';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='flex';document.body.style.paddingBottom='0';}
+function mpShow(){try{sessionStorage.setItem('mp-open','1');}catch(e){}document.getElementById('music-player').style.display='flex';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';document.body.style.paddingBottom='72px';}
 function mpFmt(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
 audio.addEventListener('timeupdate',()=>{if(mpMode!=='audio'||!audio.duration)return;const p=(audio.currentTime/audio.duration)*100;document.getElementById('mp-bar').style.width=p+'%';document.getElementById('mp-cur').textContent=mpFmt(audio.currentTime);});
 audio.addEventListener('loadedmetadata',()=>{if(mpMode==='audio')document.getElementById('mp-dur').textContent=mpFmt(audio.duration);});

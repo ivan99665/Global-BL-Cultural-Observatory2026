@@ -4463,7 +4463,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
           <div class="tl-center"><div class="tl-dot"></div></div>
           <div class="tl-right">
             <div class="tl-card">
-              <img class="tl-img" src="thaibl-main/index_photo/1659219246046.webp" alt="2007">
+              <img class="tl-img" src="thaibl-main/index_photo/love.jpg" alt="2007">
               <div class="tl-body">
                 <div class="tl-year">2007</div>
                 <div class="tl-title">《愛在暹羅》— 情感啟蒙</div>
@@ -4597,7 +4597,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
         <div class="tl-item">
           <div class="tl-left">
             <div class="tl-card">
-              <img class="tl-img" src="thaibl-main/index_photo/1024x768_226847334750.jpg" alt="2024">
+              <img class="tl-img" src="thaibl-main/index_photo/001.jpg" alt="2024">
               <div class="tl-body">
                 <div class="tl-year">2024</div>
                 <div class="tl-title">婚姻平權法案 — 文化里程碑</div>
@@ -6567,10 +6567,10 @@ function mpApply(){
     else if(mpData.audioUrl){mpMode='audio';if(audio.src!==mpData.audioUrl){audio.src=mpData.audioUrl;audio.volume=0.7;}}
     else{mpMode='none';}
   }
-  document.getElementById('music-player').style.display='flex';
-  const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';
-  document.body.style.paddingBottom='72px';
-  if(mpData.audioUrl&&mpUserInteracted)mpAutoPlay();
+  // 預設收合，訪客點膠囊才展開（同一分頁內記住選擇）
+  let mpOpen=false;try{mpOpen=sessionStorage.getItem('mp-open')==='1';}catch(e){}
+  if(mpOpen){mpShow();if(mpData.audioUrl&&mpUserInteracted)mpAutoPlay();}
+  else mpHide();
 }
 
 // ── Piped API fallback (auto-triggered when YT embedding fails) ──
@@ -6688,8 +6688,8 @@ function mpSeekClick(e){
   else if(mpMode==='audio'&&audio.duration)audio.currentTime=pct*audio.duration;
 }
 function mpVol(v){if(mpMode==='youtube'&&ytPlayer&&ytPlayer.setVolume)ytPlayer.setVolume(+v);else audio.volume=v/100;}
-function mpHide(){document.getElementById('music-player').style.display='none';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='flex';document.body.style.paddingBottom='0';}
-function mpShow(){document.getElementById('music-player').style.display='flex';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';document.body.style.paddingBottom='72px';}
+function mpHide(){try{sessionStorage.removeItem('mp-open');}catch(e){}document.getElementById('music-player').style.display='none';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='flex';document.body.style.paddingBottom='0';}
+function mpShow(){try{sessionStorage.setItem('mp-open','1');}catch(e){}document.getElementById('music-player').style.display='flex';const rb=document.getElementById('mp-restore-btn');if(rb)rb.style.display='none';document.body.style.paddingBottom='72px';}
 function mpFmt(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
 audio.addEventListener('timeupdate',()=>{if(mpMode!=='audio'||!audio.duration)return;const p=(audio.currentTime/audio.duration)*100;document.getElementById('mp-bar').style.width=p+'%';document.getElementById('mp-cur').textContent=mpFmt(audio.currentTime);});
 audio.addEventListener('loadedmetadata',()=>{if(mpMode==='audio')document.getElementById('mp-dur').textContent=mpFmt(audio.duration);});
@@ -7441,7 +7441,7 @@ const DEF_TL=[
   {year:'2016',title:'《一年生》— CP模式成形',text:'同年中國網劇《上癮》遭下架，部分觀眾轉而關注泰劇。《一年生》播出後，主演以CP形式持續合體宣傳，帶動周邊商品與見面會的發展。',img:''},
   {year:'2020',title:'《以你的心詮釋我的愛》— 藝術轉型',text:'Nadao Bangkok以電影化的影像打造五集BL劇。夕陽、海島與扶桑花的畫面風格廣受好評，提升了外界對BL劇美學的評價。',img:'thaibl-main/index_photo/I-told-sunset-about-you-14.jpg'},
   {year:'2022',title:'《KinnPorsche》— 製作升級',text:'黑幫題材的BL劇以高規格製作受到關注，於WeTV等平台引起廣泛討論，也顯示泰國BL劇在題材與製作規模上的擴展。',img:'thaibl-main/index_photo/7c5dc4c0-b4d0-11ec-ab4c-b7e658868dab_webp_original.jpg'},
-  {year:'2024',title:'婚姻平權法案 — 文化里程碑',text:'泰國國會通過婚姻平權法案（2025年1月正式生效），為性別多元議題寫下里程碑。據SCB EIC估計，泰國Y劇與性別多元內容市場2025年將逾49億泰銖（引自The Nation，2026）。',img:'thaibl-main/index_photo/1024x768_226847334750.jpg'},
+  {year:'2024',title:'婚姻平權法案 — 文化里程碑',text:'泰國國會通過婚姻平權法案（2025年1月正式生效），為性別多元議題寫下里程碑。據SCB EIC估計，泰國Y劇與性別多元內容市場2025年將逾49億泰銖（引自The Nation，2026）。',img:'thaibl-main/index_photo/001.jpg'},
 ];
 
 // ── RUNTIME STATE ──
