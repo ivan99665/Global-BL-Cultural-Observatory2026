@@ -861,5 +861,38 @@ document.addEventListener('keydown',e=>{
 </script>
 
 <script src="playlist-widget.js" defer></script>
+
+<!-- 手機版導覽列：Logo 不換行、只留中文名，整條變細 -->
+<style id="mnav-css">
+/* iPhone Safari：淡入前偏移的元素不要讓整頁可以左右晃 */
+html{overflow-x:hidden;}@supports(overflow:clip){html{overflow-x:clip;}}
+.nav-logo .nl-b{white-space:nowrap;}
+@media(max-width:600px){
+  nav{padding:.55rem .9rem !important;gap:.5rem;}
+  .nav-logo{font-size:.9rem !important;white-space:nowrap;flex-shrink:0;line-height:1.2;}
+  .nav-logo .nl-b{display:none;}
+  nav .nav-tab{padding:.42rem .5rem !important;font-size:.62rem !important;}
+  nav a[href="about.html"]{padding:.34rem .7rem !important;font-size:.64rem !important;letter-spacing:.04em !important;gap:.3rem !important;}
+}
+</style>
+<script id="mnav-js">
+(function(){
+  // 把「彩虹經緯 · Global BL」拆成兩段，手機只顯示前半；後台改了 Logo 文字也會自動重拆
+  function split(el){
+    if(!el||el.querySelector('.nl-a'))return;
+    var t=el.textContent,i=t.indexOf(' · ');if(i<0)return;
+    var a=document.createElement('span');a.className='nl-a';a.textContent=t.slice(0,i);
+    var b=document.createElement('span');b.className='nl-b';b.textContent=t.slice(i);
+    el.textContent='';el.appendChild(a);el.appendChild(b);
+  }
+  function run(){
+    document.querySelectorAll('.nav-logo').forEach(function(el){
+      split(el);
+      if(!el.__mnav){el.__mnav=1;new MutationObserver(function(){split(el);}).observe(el,{childList:true,characterData:true,subtree:true});}
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+})();
+</script>
 </body>
 </html>

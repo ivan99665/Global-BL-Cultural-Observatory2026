@@ -5340,6 +5340,8 @@ function ddlCmsUploadImg(i,input){const file=input.files[0];if(!file)return;cmsU
 // IMGBB + GITHUB PUBLISH
 // ═══════════════════════════════
 const K_IMGBB='tb-imgbb-key';
+// GitHub 錯誤訊息翻成看得懂的中文
+function ghErrZh(m){m=String(m||'');if(/Bad credentials|401/i.test(m))return 'GitHub Token 無效或已過期，請到「⚙️」貼上新的 Token';if(/Resource not accessible|403|Not Found|404/i.test(m))return '這組 Token 沒有寫入權限（需要此儲存庫的 Contents: Read and write）';if(/Failed to fetch|NetworkError/i.test(m))return '連不上 GitHub，請檢查網路';return m;}
 const K_GH_TOKEN='tb-gh-token';
 const K_GH_REPO='tb-gh-repo';
 const K_GH_PATH='tb-gh-path';
@@ -5442,7 +5444,7 @@ async function publishToGitHub(){
   try{
     // 取得現有檔案 SHA
     log.textContent='📡 連接 GitHub...';
-    const infoRes=await fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch,{
+    const infoRes=await fetch('https://api.github.com/repos/'+repo+'/contents/'+path+'?ref='+branch+'&t='+Date.now(),{cache:'no-store',
       headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}
     });
     if(!infoRes.ok){const e=await infoRes.json();throw new Error(e.message||infoRes.status);}
@@ -5471,7 +5473,7 @@ async function publishToGitHub(){
     setTimeout(()=>{btn.textContent='🚀 儲存並發布到 GitHub';btn.style.background='';btn.disabled=false;},4000);
   }catch(e){
     btn.textContent='🚀 儲存並發布到 GitHub';btn.disabled=false;
-    log.innerHTML='❌ 發布失敗：'+e.message;
+    log.innerHTML='❌ 發布失敗：'+ghErrZh(e.message);
     console.error(e);
   }
 }
@@ -5925,7 +5927,7 @@ async function plUpload(d){
   if(!token||!repo)throw new Error('請先在「🚀 發布」分頁填好 GitHub 設定');
   const api='https://api.github.com/repos/'+repo+'/contents/playlist.json';
   const h={Authorization:'Bearer '+token,Accept:'application/vnd.github+json'};
-  let sha='';const ri=await fetch(api+'?ref='+encodeURIComponent(branch),{headers:h});if(ri.ok)sha=(await ri.json()).sha;
+  let sha='';const ri=await fetch(api+'?ref='+encodeURIComponent(branch)+'&t='+Date.now(),{headers:h,cache:'no-store'});if(ri.ok)sha=(await ri.json()).sha;
   const content=btoa(unescape(encodeURIComponent(JSON.stringify(d,null,2))));
   const body={message:'Update playlist',content:content,branch:branch};if(sha)body.sha=sha;
   const r=await fetch(api,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},h),body:JSON.stringify(body)});
@@ -5962,7 +5964,7 @@ async function plCmsSave(btn){
   plCmsBuild();if(window.plwReload)plwReload();
   const o=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='⏳ 上傳到 GitHub…';}
   try{await plUpload(plData);if(btn)btn.textContent='✅ 已上傳，約 1 分鐘後所有頁面更新';}
-  catch(e){if(btn)btn.textContent='⚠️ 已存在這台電腦，但上傳失敗：'+e.message;}
+  catch(e){if(btn)btn.textContent='⚠️ 已存在這台電腦，但上傳失敗：'+ghErrZh(e.message);}
   if(btn)setTimeout(function(){btn.textContent=o;btn.disabled=false;},4000);
 }
 // ══ 作品推薦加值：在哪裡看／十三的私心小評（劇卡上）、新手入坑指南、CP 檔案 ══
@@ -6308,5 +6310,36 @@ showPage=function(id){
 </script>
 
 <script src="playlist-widget.js" defer></script>
+
+<!-- 手機版導覽列：Logo 不換行、只留中文名，整條變細 -->
+<style id="mnav-css">
+.nav-logo .nl-b{white-space:nowrap;}
+@media(max-width:600px){
+  nav{padding:.55rem .9rem !important;gap:.5rem;}
+  .nav-logo{font-size:.9rem !important;white-space:nowrap;flex-shrink:0;line-height:1.2;}
+  .nav-logo .nl-b{display:none;}
+  nav .nav-tab{padding:.42rem .5rem !important;font-size:.62rem !important;}
+  nav a[href="about.html"]{padding:.34rem .7rem !important;font-size:.64rem !important;letter-spacing:.04em !important;gap:.3rem !important;}
+}
+</style>
+<script id="mnav-js">
+(function(){
+  // 把「彩虹經緯 · Global BL」拆成兩段，手機只顯示前半；後台改了 Logo 文字也會自動重拆
+  function split(el){
+    if(!el||el.querySelector('.nl-a'))return;
+    var t=el.textContent,i=t.indexOf(' · ');if(i<0)return;
+    var a=document.createElement('span');a.className='nl-a';a.textContent=t.slice(0,i);
+    var b=document.createElement('span');b.className='nl-b';b.textContent=t.slice(i);
+    el.textContent='';el.appendChild(a);el.appendChild(b);
+  }
+  function run(){
+    document.querySelectorAll('.nav-logo').forEach(function(el){
+      split(el);
+      if(!el.__mnav){el.__mnav=1;new MutationObserver(function(){split(el);}).observe(el,{childList:true,characterData:true,subtree:true});}
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+})();
+</script>
 </body>
 </html>
