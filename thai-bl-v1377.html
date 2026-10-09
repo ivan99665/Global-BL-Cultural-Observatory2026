@@ -5505,37 +5505,43 @@ function featApplyTheme(th){
   document.body.classList.add('theme-feat');
 }
 // 從劇照取色：統計彩色像素的色相，主色＝最常見色相，輔色＝與主色差 60° 以上的次常見色相
+// 讀取一張圖的像素：本站圖片直接讀；其他網站先直接讀，被擋就經 wsrv.nl（公開圖片代理）讀；File 物件直接在本機讀
+function featLoadPixels(src,cb){
+  const read=function(im){try{const c=document.createElement('canvas');c.width=72;c.height=72;const x=c.getContext('2d');x.drawImage(im,0,0,72,72);return x.getImageData(0,0,72,72).data;}catch(e){return null;}};
+  const tryUrl=function(u,cors,next){
+    const im=new Image();if(cors)im.crossOrigin='anonymous';
+    let fin=false;const t=setTimeout(function(){if(!fin){fin=true;next();}},10000);
+    im.onload=function(){if(fin)return;fin=true;clearTimeout(t);const d=read(im);if(d)cb(d);else next();};
+    im.onerror=function(){if(fin)return;fin=true;clearTimeout(t);next();};
+    im.src=u;
+  };
+  const fail=function(){cb(null);};
+  if(typeof src!=='string'){const ou=URL.createObjectURL(src);tryUrl(ou,false,function(){URL.revokeObjectURL(ou);fail();});return;}
+  if(!/^https?:/i.test(src)){tryUrl(src,false,fail);return;}
+  tryUrl(src,true,function(){tryUrl('https://wsrv.nl/?url='+encodeURIComponent(src)+'&w=240&output=jpg',true,fail);});
+}
 function featPalette(urls,cb){
   const list=urls.slice(0,4);if(!list.length){cb(null,'請先在「頁首輪播大圖」放至少一張劇照。');return;}
   const bins=[];for(let i=0;i<36;i++)bins.push({w:0,x:0,y:0,s:0});
   let left=list.length,used=0,blocked=0;
   list.forEach(function(u){
-    const im=new Image();
-    if(/^https?:/i.test(u))im.crossOrigin='anonymous';
-    im.onload=function(){
-      try{
-        const c=document.createElement('canvas');c.width=72;c.height=72;
-        const x=c.getContext('2d');x.drawImage(im,0,0,72,72);
-        const d=x.getImageData(0,0,72,72).data;
-        for(let i=0;i<d.length;i+=4){
-          const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255;
-          const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,ch=mx-mn;
-          if(ch<.08||l<.08||l>.94)continue;
-          const sat=ch/(1-Math.abs(2*l-1));
-          let h=mx===r?((g-b)/ch)%6:mx===g?(b-r)/ch+2:(r-g)/ch+4;h=(h*60+360)%360;
-          const w=sat*(1-Math.abs(2*l-1)),bi=bins[Math.floor(h/10)%36];
-          bi.w+=w;bi.x+=Math.cos(h*Math.PI/180)*w;bi.y+=Math.sin(h*Math.PI/180)*w;bi.s+=sat*w;
-        }
-        used++;
-      }catch(e){blocked++;}
-      done();
-    };
-    im.onerror=function(){blocked++;done();};
-    im.src=u;
+    featLoadPixels(u,function(d){
+      if(!d){blocked++;done();return;}
+      for(let i=0;i<d.length;i+=4){
+        const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255;
+        const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,ch=mx-mn;
+        if(ch<.08||l<.08||l>.94)continue;
+        const sat=ch/(1-Math.abs(2*l-1));
+        let h=mx===r?((g-b)/ch)%6:mx===g?(b-r)/ch+2:(r-g)/ch+4;h=(h*60+360)%360;
+        const w=sat*(1-Math.abs(2*l-1)),bi=bins[Math.floor(h/10)%36];
+        bi.w+=w;bi.x+=Math.cos(h*Math.PI/180)*w;bi.y+=Math.sin(h*Math.PI/180)*w;bi.s+=sat*w;
+      }
+      used++;done();
+    });
   });
   function done(){
     if(--left>0)return;
-    if(!used){cb(null,blocked?'這些圖片放在其他網站，瀏覽器不允許讀取顏色。請改用網站資料夾裡的圖片，或手動選色。':'讀不到圖片。');return;}
+    if(!used){cb(null,'讀不到這些圖片（可能網址已失效，或該網站禁止外部讀取）。可以改按「用電腦裡的劇照取色」，或手動選色。');return;}
     const sm=bins.map(function(b,i){return {i:i,w:b.w+bins[(i+35)%36].w*.5+bins[(i+1)%36].w*.5};});
     sm.sort(function(a,b){return b.w-a.w;});
     if(!sm[0].w){cb(null,'這些劇照幾乎沒有彩色，請手動選色。');return;}
@@ -5641,12 +5647,14 @@ function featEdBuild(){
     +'<div class="fe-2">'+featFI('heroTitle','大標題','留空＝用專題標題')+featFI('heroEyebrow','大標題上方小字','深度專題 · Deep Dive')+'</div>'
     +featFI('heroSub','大標題下方副標','原文劇名 · 英文劇名 · 年份')
     +featFT('quote','引言金句（頁首下方的斜體文字，可換行）','',70)+'</div>';
+  if(D.theme&&D.theme.on&&!D.theme.bg)Object.assign(D.theme,{bg:'#0D1A24',text:'#F5EDD8',accent:'#E8863A',accent2:'#4BA8A0'});
   const th=D.theme||{};
   const sw=function(k,label){return '<div class="cf"><div class="cl">'+label+'</div><div class="fe-color"><input type="color" data-fp="theme.'+k+'" data-rebuild="1" value="'+featEsc(th[k]||'#000000')+'"><span>'+featEsc(th[k]||'—')+'</span></div></div>';};
   h+='<div class="fe-sec"><h3>🎨 專屬配色</h3>'
     +'<p class="fe-hint">勾選後，整個專題頁（背景、標題、分頁、重點框、對比表）會改用這組顏色。可以按「從劇照建議配色」讓網站分析頁首劇照，再用色票微調。</p>'
     +'<div class="fe-card-head"><label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;cursor:pointer;"><input type="checkbox" data-fp="theme.on" data-rebuild="1"'+(th.on?' checked':'')+'> 使用專屬配色</label>'
-    +'<span style="flex:1"></span><button class="fe-btn ghost" onclick="featEdSuggest()">🎨 從劇照建議配色</button></div>'
+    +'<span style="flex:1"></span><button class="fe-btn ghost" onclick="featEdSuggest()">🎨 從頁首劇照建議配色</button>'
+    +'<label class="fe-btn ghost" style="cursor:pointer;">🖼 用電腦裡的劇照取色<input type="file" accept="image/*" multiple style="display:none;" onchange="featEdSuggestFiles(this)"></label></div>'
     +'<div id="fe-theme-msg" class="fe-lbl"></div>'
     +(th.on?'<div class="fe-2">'+sw('bg','背景色')+sw('text','文字色')+sw('accent','主色（標題、分頁、重點）')+sw('accent2','輔色（標籤、對比表第二欄）')+'</div>'
       +'<div class="fe-theme-prev" style="background:'+featEsc(th.bg||'#0D1A24')+';color:'+featEsc(th.text||'#F5EDD8')+';">'
@@ -5762,10 +5770,15 @@ function featCmpColMove(i,j,dir){
   featEdBuild();
 }
 function featEdSuggest(){
-  const msg=document.getElementById('fe-theme-msg');if(msg)msg.textContent='分析劇照中…';
   const urls=featLines(featDraft.heroImgs).map(featUrl).filter(Boolean);
   const d=ddlData[featEdIdx];if(!urls.length&&d&&d.cover)urls.push(d.cover);
-  featPalette(urls,function(th,err){
+  featEdSuggestFrom(urls);
+}
+// 電腦裡的圖片只在本機分析顏色，不會上傳也不會存起來
+function featEdSuggestFiles(input){const files=Array.from(input.files||[]);input.value='';if(files.length)featEdSuggestFrom(files);}
+function featEdSuggestFrom(list){
+  const msg=document.getElementById('fe-theme-msg');if(msg)msg.textContent='分析劇照中…';
+  featPalette(list,function(th,err){
     if(!th){const m=document.getElementById('fe-theme-msg');if(m)m.textContent='⚠️ '+err;return;}
     featDraft.theme=th;featEdBuild();
     const m=document.getElementById('fe-theme-msg');if(m)m.textContent='✅ 已依劇照建議配色，可以再用色票微調，然後按「儲存並預覽」看效果。';
