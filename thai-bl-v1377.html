@@ -1435,71 +1435,7 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 
 </style>
 <style id="pl-css">
-/* ══ 本週推薦歌單：黑膠唱片行 ══ */
-.pl-sec{position:relative;padding:6rem 2rem;background:radial-gradient(ellipse 70% 60% at 20% 30%,rgba(232,134,58,.12),transparent 70%),linear-gradient(180deg,#0D1A24,#120E0B 55%,#0D1A24);overflow:hidden;}
-.pl-sec[hidden]{display:none;}
-.pl-sec::after{content:'';position:absolute;inset:-10%;pointer-events:none;opacity:.06;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-.pl-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;}
-.pl-week{display:inline-block;font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:.22em;color:#F2B07A;border:1px solid rgba(242,176,122,.3);border-radius:3px;padding:.28rem .7rem;margin:-.6rem 0 1rem;}
-.pl-week:empty{display:none;}
-.pl-intro{font-size:.9rem;line-height:1.85;color:rgba(245,237,216,.62);max-width:560px;margin-bottom:2.6rem;}
-.pl-grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:3rem;align-items:start;}
-/* 唱盤 */
-.pl-deck{position:sticky;top:90px;}
-.pl-tt{position:relative;aspect-ratio:1/0.86;background:linear-gradient(145deg,#2A1E16,#1A120D);border-radius:14px;box-shadow:0 24px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);padding:8%;}
-.pl-platter{position:relative;width:82%;aspect-ratio:1;border-radius:50%;background:#0B0B0B;box-shadow:0 0 0 6px #241912,0 8px 20px rgba(0,0,0,.6);}
-.pl-record{position:absolute;inset:3%;border-radius:50%;background:repeating-radial-gradient(circle,#141414 0 1.5px,#1E1E1E 1.5px 3px);animation:plSpin 2.4s linear infinite;animation-play-state:paused;}
-.pl-record::after{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 30deg,transparent 0 40deg,rgba(255,255,255,.08) 55deg,transparent 75deg 220deg,rgba(255,255,255,.06) 235deg,transparent 255deg);}
-.pl-label{position:absolute;inset:33%;border-radius:50%;background:#E8863A center/cover no-repeat;box-shadow:0 0 0 3px rgba(0,0,0,.4);}
-.pl-label::after{content:'';position:absolute;left:50%;top:50%;width:9%;height:9%;border-radius:50%;background:#0B0B0B;transform:translate(-50%,-50%);}
-.pl-arm{position:absolute;right:9%;top:9%;width:12px;height:56%;transform-origin:50% 8%;transform:rotate(-14deg);transition:transform .9s cubic-bezier(.22,1,.36,1);}
-.pl-arm::before{content:'';position:absolute;left:50%;top:0;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,#C9A46A 30%,#6B5232);transform:translate(-50%,-30%);}
-.pl-arm::after{content:'';position:absolute;left:50%;top:6%;width:4px;height:92%;background:linear-gradient(#D9C29A,#8C7350);border-radius:2px;transform:translateX(-50%);box-shadow:-6px 100% 0 2px #D9C29A;}
-.pl-led{position:absolute;left:7%;bottom:7%;width:8px;height:8px;border-radius:50%;background:#4A2A18;}
-.pl-deck.playing .pl-record{animation-play-state:running;}
-.pl-deck.playing .pl-arm{transform:rotate(24deg);}
-.pl-deck.playing .pl-led{background:#FF8A3D;box-shadow:0 0 10px #FF8A3D;}
-.pl-now{margin-top:1.3rem;}
-.pl-now-tag{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.28em;color:#E8863A;}
-.pl-now-title{font-family:'Noto Serif TC',serif;font-size:1.25rem;color:#FAD9B5;margin-top:.3rem;}
-.pl-now-sub{font-size:.8rem;color:rgba(245,237,216,.55);margin-top:.2rem;min-height:1.2em;}
-.pl-ctrl{display:flex;align-items:center;gap:.6rem;margin-top:1rem;flex-wrap:wrap;}
-.pl-ctrl button{width:40px;height:40px;border-radius:50%;border:1px solid rgba(245,237,216,.2);background:none;color:#F5EDD8;cursor:pointer;font-size:.85rem;transition:all .2s;}
-.pl-ctrl button:hover{border-color:#E8863A;color:#F2B07A;}
-.pl-ctrl .pl-play{width:50px;height:50px;background:#E8863A;border:none;color:#1A0F08;font-size:1rem;}
-.pl-ctrl .pl-play:hover{background:#F2B07A;color:#1A0F08;}
-.pl-ctrl a{margin-left:auto;font-size:.72rem;color:rgba(245,237,216,.5);text-decoration:none;}
-.pl-ctrl a:hover{color:#F2B07A;}
-.pl-msg{font-size:.72rem;color:#F2B07A;margin-top:.6rem;min-height:1em;}
-.pl-video{display:none;margin-top:1rem;border-radius:10px;overflow:hidden;aspect-ratio:16/9;background:#000;}
-.pl-video.on{display:block;}
-.pl-video iframe{width:100%;height:100%;display:block;border:0;}
-/* 唱片封套清單 */
-.pl-list{list-style:none;display:flex;flex-direction:column;gap:.9rem;padding:0;margin:0;}
-.pl-item{position:relative;display:flex;gap:1.1rem;align-items:center;padding:.8rem 1rem .8rem .8rem;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(232,134,58,.1);cursor:pointer;transition:background .25s,border-color .25s,transform .25s;}
-.pl-item:hover{background:rgba(232,134,58,.06);border-color:rgba(232,134,58,.28);transform:translateX(4px);}
-.pl-item.active{background:rgba(232,134,58,.1);border-color:rgba(232,134,58,.45);}
-.pl-sleeve{position:relative;width:84px;height:84px;flex-shrink:0;}
-.pl-disc{position:absolute;top:6%;left:6%;width:88%;height:88%;border-radius:50%;background:radial-gradient(circle,#E8863A 0 16%,#0B0B0B 17% 19%,transparent 20%),repeating-radial-gradient(circle,#151515 0 1.5px,#202020 1.5px 3px);transition:transform .45s cubic-bezier(.22,1,.36,1);}
-.pl-sleeve img,.pl-sleeve .pl-noimg{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;border-radius:4px;box-shadow:2px 4px 12px rgba(0,0,0,.5);display:block;background:#1E3347;}
-.pl-item:hover .pl-disc,.pl-item.active .pl-disc{transform:translateX(34%);}
-.pl-item.active.playing .pl-disc{animation:plSpinX 2.4s linear infinite;}
-@keyframes plSpinX{from{transform:translateX(34%) rotate(0)}to{transform:translateX(34%) rotate(360deg)}}
-.pl-meta{flex:1;min-width:0;padding-left:1.4rem;}
-.pl-no{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:rgba(232,134,58,.7);}
-.pl-t{font-size:.98rem;font-weight:500;color:#F5EDD8;margin-top:.15rem;}
-.pl-a{font-size:.76rem;color:rgba(245,237,216,.5);margin-top:.1rem;}
-.pl-note{font-size:.78rem;line-height:1.7;color:rgba(242,176,122,.85);margin-top:.35rem;}
-.pl-note:empty{display:none;}
-.pl-eq{display:none;align-items:flex-end;gap:3px;height:18px;}
-.pl-item.active.playing .pl-eq{display:flex;}
-.pl-eq i{width:3px;background:#E8863A;border-radius:1px;animation:plEq 1s ease-in-out infinite;}
-.pl-eq i:nth-child(2){animation-delay:-.4s}.pl-eq i:nth-child(3){animation-delay:-.7s}
-@keyframes plEq{0%,100%{height:4px}50%{height:18px}}
-@keyframes plSpin{to{transform:rotate(360deg)}}
-@media(max-width:860px){.pl-sec{padding:4.5rem 16px;}.pl-grid{grid-template-columns:1fr;gap:2rem;}.pl-deck{position:relative;top:0;max-width:340px;}.pl-sleeve{width:68px;height:68px;}.pl-meta{padding-left:1.1rem;}}
-@media(prefers-reduced-motion:reduce){.pl-record,.pl-item.active.playing .pl-disc,.pl-eq i{animation:none!important;}}
-/* 後台 */
+/* 後台「🎵 歌單」分頁 */
 #cs-pl .pl-cms-song{background:#1E3347;border:1px solid rgba(232,134,58,.13);border-radius:10px;padding:.8rem;margin-bottom:.6rem;}
 #cs-pl .pl-cms-head{display:flex;gap:.4rem;align-items:center;margin-bottom:.6rem;font-size:.72rem;color:#E8863A;}
 #cs-pl .pl-cms-2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
@@ -2396,38 +2332,6 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
       </div><!-- /timeline -->
     </div>
   </div>
-
-  <!-- 本週推薦歌單（黑膠唱片行）：沒有歌曲時整區隱藏 -->
-  <section class="pl-sec" id="playlist" hidden>
-    <div class="pl-inner">
-      <p class="section-eyebrow">本週推薦歌單 · Weekly Playlist</p>
-      <h2 class="section-title" id="pl-title">本週推薦歌單</h2>
-      <div class="pl-week" id="pl-week"></div>
-      <p class="pl-intro" id="pl-intro"></p>
-      <div class="pl-grid">
-        <div class="pl-deck">
-          <div class="pl-tt" aria-hidden="true">
-            <div class="pl-platter"><div class="pl-record"><div class="pl-label" id="pl-label"></div></div></div>
-            <div class="pl-arm"></div><div class="pl-led"></div>
-          </div>
-          <div class="pl-now">
-            <div class="pl-now-tag">NOW PLAYING</div>
-            <div class="pl-now-title" id="pl-now-title">選一張唱片開始聽</div>
-            <div class="pl-now-sub" id="pl-now-sub"></div>
-            <div class="pl-ctrl">
-              <button onclick="plStep(-1)" aria-label="上一首">⏮</button>
-              <button class="pl-play" id="pl-play" onclick="plToggle()" aria-label="播放">▶</button>
-              <button onclick="plStep(1)" aria-label="下一首">⏭</button>
-              <a id="pl-yt" href="#" target="_blank" rel="noopener" style="visibility:hidden;">在 YouTube 開啟 ↗</a>
-            </div>
-            <div class="pl-msg" id="pl-msg"></div>
-          </div>
-          <div class="pl-video" id="pl-video-wrap"><div id="pl-yt-player"></div></div>
-        </div>
-        <ol class="pl-list" id="pl-list"></ol>
-      </div>
-    </div>
-  </section>
 
   <!-- BUSINESS — carousel left -->
   <div class="biz-grid" id="business">
@@ -3513,7 +3417,7 @@ function moveIC(wrapId, state, dir) {
 
     <!-- ══ NAV ══ -->
     <div id="cs-pl" style="display:none;">
-      <div class="cloc">🎵 本週推薦歌單 — 泰劇站首頁「歷史脈絡」下方</div>
+      <div class="cloc">🎵 本週推薦歌單 — 顯示在每一頁右下角的浮動唱片（不需要按「🚀 發布」）</div>
       <div class="cf"><label class="cl">標題</label><input class="ci" id="pl-f-title" placeholder="本週推薦歌單"></div>
       <div class="cf"><label class="cl">週次（選填）</label><input class="ci" id="pl-f-week" placeholder="例：2026 · 10 月第 2 週"></div>
       <div class="cf"><label class="cl">介紹</label><textarea class="cta" id="pl-f-intro" style="min-height:55px;"></textarea></div>
@@ -3523,7 +3427,7 @@ function moveIC(wrapId, state, dir) {
       <div id="pl-cms-list"></div>
       <div style="display:flex;gap:.5rem;margin-top:.4rem;">
         <button class="cadd-btn" style="flex:1;" onclick="plCmsAdd()">＋ 新增歌曲</button>
-        <button class="cadd-btn" style="flex:1;background:linear-gradient(135deg,#C94B25,#E8863A);color:#fff;border:none;" onclick="plCmsSave(this)">💾 儲存歌單</button>
+        <button class="cadd-btn" style="flex:1;background:linear-gradient(135deg,#C94B25,#E8863A);color:#fff;border:none;" onclick="plCmsSave(this)">💾 儲存並上傳歌單</button>
       </div>
     </div>
 
@@ -4379,7 +4283,7 @@ function cmsTab(s){
   if(s==='imgs')buildFixedImgList();
   if(s==='music')mpCmsLoad();
   if(s==='ddl'){ddlCmsBuildList();}
-  if(s==='pl')plCmsBuild();
+  if(s==='pl')plCmsOpen();
   if(s==='publish')pubLoadSettings();
 }
 async function cmsChgPW(){const np=document.getElementById('f-npw').value.trim();if(np.length<8){alert('新密碼至少需要 8 碼');return;}await pwSet(np);document.getElementById('f-npw').value='';alert('✅ 密碼已更新');}
@@ -5156,18 +5060,18 @@ async function publishToGitHub(){
     imgs:JSON.parse(localStorage.getItem(K_IMGS)||'null'),
     ddl:JSON.parse(localStorage.getItem(K_DDL)||'null'),
     ddlhero:JSON.parse(localStorage.getItem(K_DDLHERO)||'null'),
-    playlist:JSON.parse(localStorage.getItem(K_PL)||'null'),
     music:JSON.parse(localStorage.getItem(K_MUSIC)||'null'),
   };
-  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",playlist:"'+K_PL+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
+  const bakedScript='<script id="cms-baked-data">(function(){var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("tb-bakedAt")||0);if(d.bakedAt<=prev)return;localStorage.setItem("tb-bakedAt",d.bakedAt);var map={txt:"'+K_TXT+'",recs:"'+K_RECS+'",tl:"'+K_TL+'",imgs:"'+K_IMGS+'",ddl:"'+K_DDL+'",ddlhero:"'+K_DDLHERO+'",music:"'+K_MUSIC+'"};Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});})();<\/script>';
 
   // 取得當前 HTML，注入資料，移除舊 baked script
   const featEdEl=document.getElementById('feat-ed');if(featEdEl)featEdEl.remove();
-  if(plPlayer){try{plPlayer.destroy();}catch(e){}plPlayer=null;plReady=false;}const plVw=document.getElementById('pl-video-wrap');if(plVw){plVw.innerHTML='<div id="pl-yt-player"></div>';plVw.classList.remove('on');}plSetPlaying(false);
+
   document.querySelectorAll('#page-deeplist .dh-x').forEach(function(e){e.remove();});const dhHero=document.querySelector('#page-deeplist .ddl-hero');const dhCls=dhHero?dhHero.className:'';if(dhHero)dhHero.className='ddl-hero';
   const featRootEl=document.getElementById('feat-root');const featRootHtml=featRootEl?featRootEl.innerHTML:'';
   if(featRootEl)featRootEl.innerHTML='';
   let html=document.documentElement.outerHTML;
+  if(window.plwStrip)html=plwStrip(html);
   if(featRootEl)featRootEl.innerHTML=featRootHtml;
   if(dhHero){dhHero.className=dhCls;ddlHeroApply();}
   html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
@@ -5643,82 +5547,31 @@ function featEdSave(preview){
   if(preview){document.getElementById('feat-ed').style.display='none';ddlOpen(d.target);}
   else{const s=document.getElementById('feat-ed-sub');if(s){const o=s.textContent;s.textContent='✅ 已儲存（記得到「🚀 發布」上傳到網站）';setTimeout(function(){s.textContent=o;},2500);}}
 }
-// ══ 本週推薦歌單（黑膠唱片行）：資料由後台「🎵 歌單」編輯，只播放 YouTube 官方影片 ══
+// ══ 本週推薦歌單：後台「🎵 歌單」編輯，存成 playlist.json；前台由 playlist-widget.js 在每頁右下角顯示 ══
 const K_PL='tb-playlist';
 const DEF_PL={title:'本週推薦歌單',week:'',intro:'十三這週單曲循環的歌，點一張唱片就能聽。',songs:[]};
 let plData=JSON.parse(JSON.stringify(DEF_PL));
-let plIdx=-1,plPlayer=null,plReady=false,plPlaying=false,plPending=null;
 function plEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function plYtId(u){u=String(u||'').trim();const m=u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(u)?u:'');}
-function plCover(s){const c=String(s.cover||'').trim();if(c&&!/^(javascript|data:(?!image\/))/i.test(c))return c;const id=plYtId(s.yt);return id?'https://i.ytimg.com/vi/'+id+'/hqdefault.jpg':'';}
 function plLoad(){try{const r=localStorage.getItem(K_PL);if(r){const p=JSON.parse(r);plData=Object.assign({},DEF_PL,p);if(!Array.isArray(plData.songs))plData.songs=[];}}catch(e){}}
-function plRender(){
-  const sec=document.getElementById('playlist');if(!sec)return;
-  const songs=plData.songs.filter(function(s){return s&&s.title;});
-  sec.hidden=!songs.length;
-  if(!songs.length)return;
-  document.getElementById('pl-title').textContent=plData.title||'本週推薦歌單';
-  document.getElementById('pl-week').textContent=plData.week||'';
-  document.getElementById('pl-intro').textContent=plData.intro||'';
-  document.getElementById('pl-list').innerHTML=songs.map(function(s,i){
-    const cv=plCover(s);
-    return '<li class="pl-item'+(i===plIdx?' active'+(plPlaying?' playing':''):'')+'" onclick="plPlay('+i+')">'
-      +'<div class="pl-sleeve"><span class="pl-disc"></span>'+(cv?'<img src="'+plEsc(cv)+'" alt="" loading="lazy">':'<div class="pl-noimg"></div>')+'</div>'
-      +'<div class="pl-meta"><div class="pl-no">'+(i<5?'A':'B')+((i%5)+1)+'</div><div class="pl-t">'+plEsc(s.title)+'</div>'
-      +'<div class="pl-a">'+plEsc(s.artist||'')+(s.drama?' · 《'+plEsc(s.drama)+'》':'')+'</div>'
-      +'<div class="pl-note">'+plEsc(s.note||'')+'</div></div>'
-      +'<div class="pl-eq"><i></i><i></i><i></i></div></li>';
-  }).join('');
-}
-function plSongs(){return plData.songs.filter(function(s){return s&&s.title;});}
-function plSetPlaying(on){
-  plPlaying=on;
-  const deck=document.querySelector('.pl-deck');if(deck)deck.classList.toggle('playing',on);
-  const b=document.getElementById('pl-play');if(b){b.textContent=on?'❚❚':'▶';b.setAttribute('aria-label',on?'暫停':'播放');}
-  document.querySelectorAll('#pl-list .pl-item').forEach(function(li,i){li.classList.toggle('active',i===plIdx);li.classList.toggle('playing',on&&i===plIdx);});
-}
-function plLoadYT(cb){
-  if(window.YT&&window.YT.Player){cb();return;}
-  const prev=window.onYouTubeIframeAPIReady;
-  window.onYouTubeIframeAPIReady=function(){if(typeof prev==='function')prev();cb();};
-  if(!document.getElementById('pl-yt-api')){const s=document.createElement('script');s.id='pl-yt-api';s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);}
-}
-function plPlay(i){
-  const songs=plSongs();const s=songs[i];if(!s)return;
-  plIdx=i;
-  const id=plYtId(s.yt);
-  document.getElementById('pl-now-title').textContent=s.title;
-  document.getElementById('pl-now-sub').textContent=(s.artist||'')+(s.drama?' · 《'+s.drama+'》':'');
-  const lbl=document.getElementById('pl-label');const cv=plCover(s);lbl.style.backgroundImage=cv?'url("'+cv.replace(/"/g,'%22')+'")':'';
-  const yt=document.getElementById('pl-yt');yt.href=id?'https://www.youtube.com/watch?v='+id:'#';yt.style.visibility=id?'visible':'hidden';
-  const msg=document.getElementById('pl-msg');msg.textContent=id?'':'這首歌還沒有 YouTube 連結。';
-  plSetPlaying(false);
-  if(!id){if(plPlayer&&plReady)plPlayer.pauseVideo();document.getElementById('pl-video-wrap').classList.remove('on');return;}
-  document.getElementById('pl-video-wrap').classList.add('on');
-  if(plPlayer&&plReady){plPlayer.loadVideoById(id);return;}
-  plPending=id;
-  if(plPlayer)return;
-  plLoadYT(function(){
-    plPlayer=new YT.Player('pl-yt-player',{videoId:plPending,playerVars:{autoplay:1,playsinline:1,rel:0,modestbranding:1},
-      events:{
-        onReady:function(e){plReady=true;e.target.loadVideoById(plPending);},
-        onStateChange:function(e){
-          if(e.data===YT.PlayerState.PLAYING){plSetPlaying(true);document.getElementById('pl-msg').textContent='';}
-          else if(e.data===YT.PlayerState.PAUSED)plSetPlaying(false);
-          else if(e.data===YT.PlayerState.ENDED){plSetPlaying(false);plStep(1);}
-        },
-        onError:function(){plSetPlaying(false);document.getElementById('pl-msg').textContent='這首歌的版權方不允許在其他網站播放，請點「在 YouTube 開啟」收聽。';}
-      }});
-  });
-}
-function plToggle(){
-  if(plIdx<0){plPlay(0);return;}
-  if(!plPlayer||!plReady)return;
-  if(plPlaying)plPlayer.pauseVideo();else plPlayer.playVideo();
-}
-function plStep(d){const n=plSongs().length;if(!n)return;plPlay(((plIdx<0?0:plIdx+d)%n+n)%n);}
-
 // ── 後台：🎵 歌單 ──
+function plCmsOpen(){
+  plLoad();
+  if(localStorage.getItem(K_PL)){plCmsBuild();return;}
+  fetch('playlist.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    .then(function(j){if(j&&Array.isArray(j.songs))plData=Object.assign({},DEF_PL,j);plCmsBuild();});
+}
+async function plUpload(d){
+  const token=localStorage.getItem(K_GH_TOKEN),repo=localStorage.getItem(K_GH_REPO),branch=localStorage.getItem(K_GH_BRANCH)||'main';
+  if(!token||!repo)throw new Error('請先在「🚀 發布」分頁填好 GitHub 設定');
+  const api='https://api.github.com/repos/'+repo+'/contents/playlist.json';
+  const h={Authorization:'Bearer '+token,Accept:'application/vnd.github+json'};
+  let sha='';const ri=await fetch(api+'?ref='+encodeURIComponent(branch),{headers:h});if(ri.ok)sha=(await ri.json()).sha;
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(d,null,2))));
+  const body={message:'Update playlist',content:content,branch:branch};if(sha)body.sha=sha;
+  const r=await fetch(api,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},h),body:JSON.stringify(body)});
+  if(!r.ok){let m=r.status;try{m=(await r.json()).message||m;}catch(e){}throw new Error(m);}
+}
 function plCmsBuild(){
   const g=function(id,v){const el=document.getElementById(id);if(el)el.value=v||'';};
   g('pl-f-title',plData.title);g('pl-f-week',plData.week);g('pl-f-intro',plData.intro);
@@ -5742,12 +5595,16 @@ function plCmsCollect(){
 function plCmsAdd(){plCmsCollect();plData.songs.push({title:'',artist:'',drama:'',yt:'',note:'',cover:''});plCmsBuild();}
 function plCmsDel(i){if(!confirm('確定刪除第 '+(i+1)+' 首？'))return;plCmsCollect();plData.songs.splice(i,1);plCmsBuild();}
 function plCmsMove(i,d){plCmsCollect();const n=i+d,a=plData.songs;if(n<0||n>=a.length)return;const t=a[i];a[i]=a[n];a[n]=t;plCmsBuild();}
-function plCmsSave(btn){
+async function plCmsSave(btn){
   plCmsCollect();
   plData.songs=plData.songs.filter(function(s){return s.title||s.yt;});
+  plData.savedAt=Date.now();
   if(!lsSet(K_PL,JSON.stringify(plData)))return;
-  plIdx=-1;plRender();plCmsBuild();
-  if(btn){const o=btn.textContent;btn.textContent='✅ 已儲存（記得到「🚀 發布」上傳）';setTimeout(function(){btn.textContent=o;},2600);}
+  plCmsBuild();if(window.plwReload)plwReload();
+  const o=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='⏳ 上傳到 GitHub…';}
+  try{await plUpload(plData);if(btn)btn.textContent='✅ 已上傳，約 1 分鐘後所有頁面更新';}
+  catch(e){if(btn)btn.textContent='⚠️ 已存在這台電腦，但上傳失敗：'+e.message;}
+  if(btn)setTimeout(function(){btn.textContent=o;btn.disabled=false;},4000);
 }
 function ddlCmsApplyImg(i){const v=document.getElementById('ddlimg-'+i)?.value;if(v){ddlData[i].cover=v;const p=document.getElementById('ddlprev-'+i);if(p)p.src=v;}}
 
@@ -5875,7 +5732,6 @@ showPage=function(id){
   const raw=localStorage.getItem(K_TXT);if(raw){try{applyTxt(JSON.parse(raw));}catch(e){}}
   renderMainCarousel(); renderGenreCarousel(); renderTimeline(); applyAllFixedImgs();
   ddlLoad(); ddlRenderAll();
-  plLoad(); plRender();
   // Default to global page on first visit; honour URL hash (e.g. #page-home)
   const hashPage=location.hash.replace('#page-','');
   const validPages=['global','style','audience','culture','home','deeplist','itsay','recs'];
@@ -5970,5 +5826,6 @@ showPage=function(id){
 })();
 </script>
 
+<script src="playlist-widget.js" defer></script>
 </body>
 </html>

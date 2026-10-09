@@ -6755,6 +6755,7 @@ async function publishToGitHub(){
   Object.keys(keyMap).forEach(k=>{allData[k]=JSON.parse(localStorage.getItem(keyMap[k])||'null');});
   const bakedScript='<script id="cms-baked-data">(function(){try{var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("globalBL-bakedAt")||0);if(d.bakedAt<=prev)return;var map='+JSON.stringify(keyMap)+';Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});localStorage.setItem("globalBL-bakedAt",d.bakedAt);}catch(e){}})();<\/script>';
   let html=document.documentElement.outerHTML;
+  if(window.plwStrip)html=plwStrip(html);
   html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
   html=html.replace('<head>','<head>\n'+bakedScript);
   btn.textContent='⏳ 取得檔案資訊...';btn.disabled=true;
@@ -7990,5 +7991,6 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 })();
 </script>
 
+<script src="playlist-widget.js" defer></script>
 </body>
 </html>
