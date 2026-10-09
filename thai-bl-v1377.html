@@ -1453,7 +1453,9 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 .rh-dots button.on{width:22px;background:var(--sunset-gold);}
 #genreCarousel{touch-action:pan-y;}
 /* 推薦片單像一條底片：上下齒孔跟著卡片一起往左走，左右兩端淡出 */
-#genreCarouselTrack{will-change:transform;width:max-content;padding:30px 0 !important;margin:0;background-color:#04090D;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%229%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%229%22%20rx%3D%222.2%22%20fill%3D%22%2318303F%22%20stroke%3D%22%23A8D8D4%22%20stroke-opacity%3D%22.28%22%2F%3E%3C%2Fsvg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%229%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%229%22%20rx%3D%222.2%22%20fill%3D%22%2318303F%22%20stroke%3D%22%23A8D8D4%22%20stroke-opacity%3D%22.28%22%2F%3E%3C%2Fsvg%3E"),linear-gradient(180deg,rgba(26,58,74,.22),rgba(4,9,13,0) 22%,rgba(4,9,13,0) 78%,rgba(26,58,74,.22));background-size:20px 9px,20px 9px,100% 100%;background-repeat:repeat-x,repeat-x,no-repeat;background-position:7px 10px,7px calc(100% - 10px),0 0;box-shadow:inset 0 1px 0 rgba(168,216,212,.12),inset 0 -1px 0 rgba(168,216,212,.12),0 10px 30px rgba(0,0,0,.45);}
+#genreCarouselTrack{will-change:transform;width:max-content;padding:30px 0 10px !important;margin:0;position:relative;}
+#genreCarouselTrack>.ic-slide{position:relative;z-index:1;}
+#genreCarouselTrack::before{content:'';position:absolute;left:0;right:0;top:0;height:210px;z-index:0;pointer-events:none;background-color:#04090D;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%229%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%229%22%20rx%3D%222.2%22%20fill%3D%22%2318303F%22%20stroke%3D%22%23A8D8D4%22%20stroke-opacity%3D%22.28%22%2F%3E%3C%2Fsvg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%229%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%229%22%20rx%3D%222.2%22%20fill%3D%22%2318303F%22%20stroke%3D%22%23A8D8D4%22%20stroke-opacity%3D%22.28%22%2F%3E%3C%2Fsvg%3E"),linear-gradient(180deg,rgba(26,58,74,.22),rgba(4,9,13,0) 22%,rgba(4,9,13,0) 78%,rgba(26,58,74,.22));background-size:20px 9px,20px 9px,100% 100%;background-repeat:repeat-x,repeat-x,no-repeat;background-position:7px 10px,7px calc(100% - 10px),0 0;box-shadow:inset 0 1px 0 rgba(168,216,212,.12),inset 0 -1px 0 rgba(168,216,212,.12),0 10px 30px rgba(0,0,0,.45);}
 #genreCarouselTrack .ic-slide:first-child{margin-left:10px;}
 #genreCarousel{-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);}
 .dr-mine{margin-top:.8rem;padding:.7rem .8rem;border-radius:8px;background:rgba(232,134,58,.06);border:1px dashed rgba(232,134,58,.25);}
@@ -1470,6 +1472,13 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 #recs-genre+.rx-sec{padding-top:1.6rem;}
 .rx-sec:last-of-type{padding-bottom:4rem;}
 #genreCarouselTrack{align-items:flex-start;}
+/* 推薦片單卡片：圖片是底片上的一格，資訊卡獨立放在底片下方 */
+#genreCarousel .drama-card{background:transparent;border:0;border-radius:0;overflow:visible;}
+#genreCarousel .drama-card:hover{transform:none;box-shadow:none;}
+#genreCarousel .drama-card-img-wrap{border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.55),0 0 0 2px rgba(168,216,212,.06);}
+#genreCarousel .drama-card-info{margin-top:42px;background:rgba(255,255,255,.04);border:1px solid rgba(232,134,58,.12);border-radius:12px;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+#genreCarouselBox>.ic-btn{top:115px;transform:translateY(-50%);}
+#genreCarousel .drama-card:hover .drama-card-info{border-color:rgba(232,134,58,.3);box-shadow:0 14px 30px rgba(0,0,0,.35);}
 .rx-sec[hidden]{display:none;}
 .rx-guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
 .rx-level{background:linear-gradient(160deg,rgba(232,134,58,.08),rgba(13,26,36,.4));border:1px solid rgba(232,134,58,.18);border-radius:14px;padding:1.4rem 1.3rem;}
@@ -3213,14 +3222,18 @@ function toggleCast(btn) {
   const panel = btn.nextElementSibling;
   const arrow = btn.querySelector('.cast-arrow');
   const isOpen = panel.classList.contains('open');
-  // Close all others in same row
-  btn.closest('.drama-row')?.querySelectorAll('.cast-panel.open').forEach(p => {
+  // 同一區（一排劇卡或推薦片單輪播）裡其他展開的先收起來；再按一次同一張＝收回
+  const scope = btn.closest('.drama-row') || btn.closest('#genreCarousel') || document;
+  scope.querySelectorAll('.cast-panel.open').forEach(p => {
     p.classList.remove('open');
-    p.previousElementSibling.querySelector('.cast-arrow').classList.remove('open');
+    const t = p.previousElementSibling;
+    if (t) { const a = t.querySelector('.cast-arrow'); if (a) a.classList.remove('open'); const l = t.querySelector('span'); if (l && l.dataset.label) l.textContent = l.dataset.label; }
   });
   if (!isOpen) {
     panel.classList.add('open');
-    arrow.classList.add('open');
+    if (arrow) arrow.classList.add('open');
+    const l = btn.querySelector('span');
+    if (l) { if (!l.dataset.label) l.dataset.label = l.textContent; l.textContent = '收起演員陣容'; }
   }
 }
 
@@ -3987,6 +4000,7 @@ function renderGenreCarousel(){
             <span class="drama-play-lbl">觀看預告</span>
           </button>
         </div>
+        <div class="drama-card-info">
         <div class="drama-card-body">
           <div class="drama-card-name">${d.name||''}</div>
           <div class="drama-card-en">${d.en||''}</div>
@@ -4012,6 +4026,7 @@ function renderGenreCarousel(){
             </div>`).join('')}
           </div>
         </div>`:''}
+        </div>
       </div>
     </div>
   `).join('');
