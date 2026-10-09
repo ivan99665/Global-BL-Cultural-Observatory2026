@@ -1454,6 +1454,39 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 #feat-ed .fe-card-head select.ci{flex:0 1 auto;}
 #feat-ed .fe-2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
 #feat-ed .cl{display:flex;}
+#feat-ed .fe-sub{border:1px dashed rgba(232,134,58,.2);border-radius:8px;padding:.7rem;margin-bottom:.6rem;}
+#feat-ed .fe-lbl{font-size:.68rem;color:rgba(245,237,216,.55);margin:.2rem 0 .5rem;line-height:1.6;}
+@media(min-width:601px){#feat-root .season-compare-header{grid-template-columns:var(--cmp-cols,1fr auto 1fr);}}
+#feat-ed .fe-color{display:flex;align-items:center;gap:.6rem;}
+#feat-ed .fe-color input{width:46px;height:32px;border:1px solid rgba(232,134,58,.25);border-radius:6px;background:none;padding:2px;cursor:pointer;}
+#feat-ed .fe-color span{font-size:.72rem;color:rgba(245,237,216,.6);font-family:monospace;}
+#feat-ed .fe-theme-prev{margin-top:.4rem;border-radius:8px;padding:.9rem 1rem;font-size:.82rem;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;}
+#feat-ed .fe-theme-prev span{border-radius:20px;padding:2px 10px;font-size:.7rem;}
+#page-feature{--ft-bg-rgb:13 26 36;}
+#page-feature.feat-themed{background:var(--night-ink);color:var(--phuket-sand);}
+#page-feature.feat-themed .panel-hl{background:linear-gradient(135deg,rgb(var(--ft-acc-rgb)/.16),rgb(var(--ft-acc-rgb)/.05));border-color:rgb(var(--ft-acc-rgb)/.28);}
+#page-feature.feat-themed .ep-num{color:rgb(var(--ft-acc-rgb)/.5);}
+#page-feature.feat-themed .ep-item{border-bottom-color:rgb(var(--ft-acc-rgb)/.12);}
+#page-feature.feat-themed .ep-desc,#page-feature.feat-themed .detail-value,#page-feature.feat-themed .panel-text{color:rgb(var(--ft-text-rgb)/.78);}
+#page-feature.feat-themed .sym-tag{background:rgb(var(--ft-acc2-rgb)/.14);border-color:rgb(var(--ft-acc2-rgb)/.32);}
+#page-feature.feat-themed .tabs{border-bottom-color:rgb(var(--ft-acc-rgb)/.2);}
+#page-feature.feat-themed .tab{color:rgb(var(--ft-text-rgb)/.45);}
+#page-feature.feat-themed .tab:hover{color:rgb(var(--ft-text-rgb)/.8);}
+#page-feature.feat-themed .tab.active{color:var(--sunset-gold);}
+#page-feature.feat-themed .itsay-quote{border-color:rgb(var(--ft-acc-rgb)/.2);}
+#page-feature.feat-themed .s1-badge{background:linear-gradient(135deg,rgb(var(--ft-acc-rgb)/.16),rgb(var(--ft-acc-rgb)/.06));border-color:rgb(var(--ft-acc-rgb)/.35);}
+#page-feature.feat-themed .s2-badge{background:linear-gradient(135deg,rgb(var(--ft-acc2-rgb)/.18),rgb(var(--ft-acc2-rgb)/.06));border-color:rgb(var(--ft-acc2-rgb)/.35);}
+#page-feature.feat-themed .vs-circle{border-color:rgb(var(--ft-acc-rgb)/.4);color:var(--sunset-gold);background:rgb(var(--ft-bg-rgb));}
+#page-feature.feat-themed .compare-table th,#page-feature.feat-themed .compare-table td{border-color:rgb(var(--ft-acc-rgb)/.12);}
+#page-feature.feat-themed .compare-table thead th{background:rgb(var(--ft-acc-rgb)/.08);}
+#page-feature.feat-themed .col-dim{color:var(--sunset-gold);}
+#page-feature.feat-themed .col-s1{color:rgb(var(--ft-text-rgb)/.8);}
+#page-feature.feat-themed .col-s2{color:var(--ocean-light);}
+#page-feature.feat-themed .actor-section{background:linear-gradient(180deg,var(--night-ink),var(--ft-bg2));}
+#page-feature.feat-themed .actor-card{background:rgb(var(--ft-text-rgb)/.03);}
+#page-feature.feat-themed .actor-card.billkin{border-color:rgb(var(--ft-acc-rgb)/.28);}
+#page-feature.feat-themed .actor-card.pp-card{border-color:rgb(var(--ft-acc2-rgb)/.28);}
+#page-feature.feat-themed footer{background:var(--ft-bg2);}
 #feat-ed .fe-upl{margin-left:auto;cursor:pointer;text-transform:none;letter-spacing:0;}
 @media(max-width:640px){#feat-ed .fe-2{grid-template-columns:1fr;}#feat-ed .fe-top{padding:.8rem 16px;}}
 </style>
@@ -5378,17 +5411,31 @@ function featSide(t){
   else body='<ul class="ep-list">'+lines.map(function(l,i){const c=featCols(l,2);return '<li class="ep-item"><span class="ep-num">'+String(i+1).padStart(2,'0')+'</span><div><div class="ep-title">'+featEsc(c[0])+'</div><p class="ep-desc">'+featEsc(c[1])+'</p></div></li>';}).join('')+'</ul>';
   return '<div class="panel-hl">'+(t.sideTitle?'<h4>'+featEsc(t.sideTitle)+'</h4>':'')+body+'</div>';
 }
+function featCmp(t){
+  if(Array.isArray(t.cols))return {cols:t.cols,rows:Array.isArray(t.rowsArr)?t.rowsArr:[]};
+  return {
+    cols:[{title:t.aTitle||'',text:t.aText||'',col:t.aCol||''},{title:t.bTitle||'',text:t.bText||'',col:t.bCol||''}],
+    rows:featLines(t.rows).map(function(l){const c=featCols(l,3);return {dim:c[0],cells:[c[1],c[2]]};})
+  };
+}
 function featTab(t){
   if(t.layout==='compare'){
-    const rows=featLines(t.rows).map(function(l){return featCols(l,3);});
-    return '<div class="season-compare-header">'
-      +'<div class="season-badge s1-badge"><h3>'+featEsc(t.aTitle)+'</h3><p>'+featInline(t.aText)+'</p></div>'
-      +'<div class="vs-circle">VS</div>'
-      +'<div class="season-badge s2-badge"><h3>'+featEsc(t.bTitle)+'</h3><p>'+featInline(t.bText)+'</p></div></div>'
-      +(rows.length?'<table class="compare-table"><thead><tr><th class="col-dim">比較維度</th><th style="color:var(--sunset-peach);">'+featEsc(t.aCol||t.aTitle)+'</th><th style="color:var(--ocean-light);">'+featEsc(t.bCol||t.bTitle)+'</th></tr></thead><tbody>'
-        +rows.map(function(r){return '<tr><td class="col-dim">'+featEsc(r[0])+'</td><td class="col-s1">'+featEsc(r[1])+'</td><td class="col-s2">'+featEsc(r[2])+'</td></tr>';}).join('')+'</tbody></table>':'')
-      +(t.text?'<div class="panel-text">'+featParas(t.text)+'</div>':'')
-      +featCarousel(t.imgs,300,t.cap);
+    const cm=featCmp(t),cols=cm.cols;
+    const side=function(j){return j%2?'s2':'s1';};
+    let out='';
+    if(cols.some(function(c){return c.title||c.text;})){
+      out+='<div class="season-compare-header" style="--cmp-cols:'+cols.map(function(){return '1fr';}).join(' auto ')+';">'
+        +cols.map(function(c,j){return (j?'<div class="vs-circle">VS</div>':'')+'<div class="season-badge '+side(j)+'-badge"><h3>'+featEsc(c.title)+'</h3><p>'+featInline(c.text)+'</p></div>';}).join('')+'</div>';
+    }
+    const rows=cm.rows.filter(function(r){return r&&(r.dim||(r.cells||[]).some(Boolean));});
+    if(rows.length&&cols.length){
+      out+='<div style="overflow-x:auto;"><table class="compare-table"><thead><tr><th class="col-dim">比較維度</th>'
+        +cols.map(function(c,j){return '<th style="color:var('+(j%2?'--ocean-light':'--sunset-peach')+');">'+featEsc(c.col||c.title)+'</th>';}).join('')
+        +'</tr></thead><tbody>'
+        +rows.map(function(r){return '<tr><td class="col-dim">'+featEsc(r.dim)+'</td>'+cols.map(function(c,j){return '<td class="col-'+side(j)+'">'+featInline((r.cells||[])[j]||'')+'</td>';}).join('')+'</tr>';}).join('')
+        +'</tbody></table></div>';
+    }
+    return out+(t.text?'<div class="panel-text">'+featParas(t.text)+'</div>':'')+featCarousel(t.imgs,300,t.cap);
   }
   if(t.layout==='info'){
     return '<div class="panel-grid">'+[[t.p1Title,t.p1],[t.p2Title,t.p2]]
@@ -5419,6 +5466,81 @@ function featCast(p){
         +'</div></div>';
     }).join('')+'</div></div></div>';
 }
+// ── 專屬配色 ──
+const FEAT_VARS=['--night-ink','--phuket-sand','--sunset-gold','--sunset-mid','--sunset-peach','--sunset-glow','--ocean-teal','--ocean-light','--ft-bg-rgb','--ft-bg2','--ft-acc-rgb','--ft-acc2-rgb','--ft-text-rgb'];
+function featHexRgb(h){h=String(h||'').replace('#','');if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');const n=parseInt(h,16);return isNaN(n)||h.length!==6?null:[n>>16&255,n>>8&255,n&255];}
+function featMix(rgb,to,t){return rgb.map(function(v,i){return Math.round(v+(to[i]-v)*t);});}
+function featRgbStr(c){return c.join(' ');}
+function featRgbHex(c){return '#'+c.map(function(v){return ('0'+Math.max(0,Math.min(255,Math.round(v))).toString(16)).slice(-2);}).join('');}
+function featApplyTheme(th){
+  const pg=document.getElementById('page-feature');if(!pg)return;
+  FEAT_VARS.forEach(function(v){pg.style.removeProperty(v);});
+  pg.classList.remove('feat-themed');
+  if(!th||!th.on)return;
+  const bg=featHexRgb(th.bg),ac=featHexRgb(th.accent),ac2=featHexRgb(th.accent2),tx=featHexRgb(th.text);
+  if(!bg||!ac||!ac2||!tx)return;
+  const W=[255,255,255],K=[0,0,0];
+  const set=function(k,v){pg.style.setProperty(k,v);};
+  set('--night-ink',th.bg);set('--phuket-sand',th.text);
+  set('--sunset-gold',th.accent);set('--sunset-mid',featRgbHex(featMix(ac,K,.18)));
+  set('--sunset-peach',featRgbHex(featMix(ac,W,.35)));set('--sunset-glow',featRgbHex(featMix(ac,W,.68)));
+  set('--ocean-teal',th.accent2);set('--ocean-light',featRgbHex(featMix(ac2,W,.45)));
+  set('--ft-bg-rgb',featRgbStr(bg));set('--ft-bg2',featRgbHex(featMix(bg,K,.35)));
+  set('--ft-acc-rgb',featRgbStr(ac));set('--ft-acc2-rgb',featRgbStr(ac2));set('--ft-text-rgb',featRgbStr(tx));
+  pg.classList.add('feat-themed');
+}
+// 從劇照取色：統計彩色像素的色相，主色＝最常見色相，輔色＝與主色差 60° 以上的次常見色相
+function featPalette(urls,cb){
+  const list=urls.slice(0,4);if(!list.length){cb(null,'請先在「頁首輪播大圖」放至少一張劇照。');return;}
+  const bins=[];for(let i=0;i<36;i++)bins.push({w:0,x:0,y:0,s:0});
+  let left=list.length,used=0,blocked=0;
+  list.forEach(function(u){
+    const im=new Image();
+    if(/^https?:/i.test(u))im.crossOrigin='anonymous';
+    im.onload=function(){
+      try{
+        const c=document.createElement('canvas');c.width=72;c.height=72;
+        const x=c.getContext('2d');x.drawImage(im,0,0,72,72);
+        const d=x.getImageData(0,0,72,72).data;
+        for(let i=0;i<d.length;i+=4){
+          const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255;
+          const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,ch=mx-mn;
+          if(ch<.08||l<.08||l>.94)continue;
+          const sat=ch/(1-Math.abs(2*l-1));
+          let h=mx===r?((g-b)/ch)%6:mx===g?(b-r)/ch+2:(r-g)/ch+4;h=(h*60+360)%360;
+          const w=sat*(1-Math.abs(2*l-1)),bi=bins[Math.floor(h/10)%36];
+          bi.w+=w;bi.x+=Math.cos(h*Math.PI/180)*w;bi.y+=Math.sin(h*Math.PI/180)*w;bi.s+=sat*w;
+        }
+        used++;
+      }catch(e){blocked++;}
+      done();
+    };
+    im.onerror=function(){blocked++;done();};
+    im.src=u;
+  });
+  function done(){
+    if(--left>0)return;
+    if(!used){cb(null,blocked?'這些圖片放在其他網站，瀏覽器不允許讀取顏色。請改用網站資料夾裡的圖片，或手動選色。':'讀不到圖片。');return;}
+    const sm=bins.map(function(b,i){return {i:i,w:b.w+bins[(i+35)%36].w*.5+bins[(i+1)%36].w*.5};});
+    sm.sort(function(a,b){return b.w-a.w;});
+    if(!sm[0].w){cb(null,'這些劇照幾乎沒有彩色，請手動選色。');return;}
+    const hueOf=function(i){const b=bins[i];return b.w?(Math.atan2(b.y,b.x)*180/Math.PI+360)%360:i*10+5;};
+    const satOf=function(i){const b=bins[i];return b.w?b.s/b.w:.5;};
+    const h1=hueOf(sm[0].i),s1=satOf(sm[0].i);
+    const far=sm.find(function(b){const dh=Math.abs(hueOf(b.i)-h1);return b.w>0&&Math.min(dh,360-dh)>=60;});
+    const h2=far?hueOf(far.i):(h1+160)%360;
+    cb({on:true,
+      bg:featHsl(h1,Math.min(.38,s1*.6),.085),
+      accent:featHsl(h1,Math.max(.55,Math.min(.85,s1*1.1)),.6),
+      accent2:featHsl(h2,.42,.6),
+      text:featHsl(h1,.28,.92)});
+  }
+}
+function featHsl(h,s,l){
+  const a=s*Math.min(l,1-l);
+  const f=function(n){const k=(n+h/30)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1));};
+  return featRgbHex([f(0)*255,f(8)*255,f(4)*255]);
+}
 function featRender(d){
   const root=document.getElementById('feat-root');if(!root)return;
   const p=d.page||{};
@@ -5431,7 +5553,7 @@ function featRender(d){
     +'</div><div class="itsay-hc-dots" id="featHcDots">'
     +(hero.length>1?hero.map(function(u,i){return '<div class="itsay-hc-dot'+(i?'':' active')+'" onclick="featHcGo('+i+')"></div>';}).join(''):'')
     +'</div></div>'
-    +'<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(13,26,36,.9) 80%,#0D1A24 100%);pointer-events:none;height:100%;z-index:2;"></div>'
+    +'<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgb(var(--ft-bg-rgb)/.9) 80%,rgb(var(--ft-bg-rgb)) 100%);pointer-events:none;height:100%;z-index:2;"></div>'
     +'<div class="itsay-hero-text" style="z-index:3;"><p class="section-eyebrow" style="margin-bottom:.7rem;">'+featEsc(p.heroEyebrow||'深度專題 · Deep Dive')+'</p>'
     +'<h2>'+featEsc(p.heroTitle||d.title)+'</h2><p>'+featEsc(p.heroSub||d.sub||'')+'</p></div></div>';
   h+='<div class="section-wrap">'+(p.quote?'<div class="itsay-quote">'+featInline(p.quote)+'</div>':'');
@@ -5446,6 +5568,7 @@ function featRender(d){
     +(p.footSub?'<div class="footer-sub">'+featEsc(p.footSub)+'</div>':'')
     +'<div class="footer-div"></div><p class="footer-note">'+featEsc(p.footNote||'深度專題分析 · 學術評論目的 · 劇集版權歸原製作公司所有')+'</p></footer>';
   root.innerHTML=h;
+  featApplyTheme(p.theme);
   featHcIdx=0;featHcTotal=hero.length;
   const cg=document.getElementById('dd-catalog-grid'),fg=document.getElementById('feat-catalog-grid');
   if(cg&&fg)fg.innerHTML=cg.innerHTML;
@@ -5459,7 +5582,7 @@ function featTemplate(){
       {name:'故事架構',layout:'std',sideTitle:'集數情感弧線',sideType:'list'},
       {name:'情感敘事',layout:'std',sideTitle:'情感符號系統',sideType:'tags'},
       {name:'鏡頭語言',layout:'std',sideTitle:'鏡頭與色彩',sideType:'details'},
-      {name:'兩季對比',layout:'compare',aTitle:'第一季',bTitle:'第二季'},
+      {name:'兩季對比',layout:'compare',cols:[{title:'第一季'},{title:'第二季'}],rowsArr:[{dim:'',cells:[]}]},
       {name:'文化背景',layout:'std',sideTitle:'文化符號解讀',sideType:'details'},
       {name:'基本資料',layout:'info',p1Title:'製作資訊',p2Title:'獎項與影響力'}],
     castTitle:'',castIntro:'',cast:[{},{}],footTitle:'',footSub:'',footNote:''};
@@ -5481,8 +5604,8 @@ function featEdEnsure(){
     +'<button class="fe-btn" onclick="featEdSave(false)">💾 儲存</button><button class="fe-btn" onclick="featEdSave(true)">👁 儲存並預覽</button></div></div>'
     +'<div id="feat-ed-body"></div>';
   document.body.appendChild(w);
-  w.addEventListener('input',function(e){const p=e.target.dataset&&e.target.dataset.fp;if(p)featSet(p,e.target.value);});
-  w.addEventListener('change',function(e){const p=e.target.dataset&&e.target.dataset.fp;if(p){featSet(p,e.target.value);if(e.target.dataset.rebuild)featEdBuild();}});
+  w.addEventListener('input',function(e){const p=e.target.dataset&&e.target.dataset.fp;if(p&&e.target.type!=='checkbox')featSet(p,e.target.value);});
+  w.addEventListener('change',function(e){const p=e.target.dataset&&e.target.dataset.fp;if(p){featSet(p,e.target.type==='checkbox'?e.target.checked:e.target.value);if(e.target.dataset.rebuild)featEdBuild();}});
 }
 function featEdOpen(i){
   ddlCmsCollect();
@@ -5503,6 +5626,17 @@ function featEdBuild(){
     +'<div class="fe-2">'+featFI('heroTitle','大標題','留空＝用專題標題')+featFI('heroEyebrow','大標題上方小字','深度專題 · Deep Dive')+'</div>'
     +featFI('heroSub','大標題下方副標','原文劇名 · 英文劇名 · 年份')
     +featFT('quote','引言金句（頁首下方的斜體文字，可換行）','',70)+'</div>';
+  const th=D.theme||{};
+  const sw=function(k,label){return '<div class="cf"><div class="cl">'+label+'</div><div class="fe-color"><input type="color" data-fp="theme.'+k+'" data-rebuild="1" value="'+featEsc(th[k]||'#000000')+'"><span>'+featEsc(th[k]||'—')+'</span></div></div>';};
+  h+='<div class="fe-sec"><h3>🎨 專屬配色</h3>'
+    +'<p class="fe-hint">勾選後，整個專題頁（背景、標題、分頁、重點框、對比表）會改用這組顏色。可以按「從劇照建議配色」讓網站分析頁首劇照，再用色票微調。</p>'
+    +'<div class="fe-card-head"><label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;cursor:pointer;"><input type="checkbox" data-fp="theme.on" data-rebuild="1"'+(th.on?' checked':'')+'> 使用專屬配色</label>'
+    +'<span style="flex:1"></span><button class="fe-btn ghost" onclick="featEdSuggest()">🎨 從劇照建議配色</button></div>'
+    +'<div id="fe-theme-msg" class="fe-lbl"></div>'
+    +(th.on?'<div class="fe-2">'+sw('bg','背景色')+sw('text','文字色')+sw('accent','主色（標題、分頁、重點）')+sw('accent2','輔色（標籤、對比表第二欄）')+'</div>'
+      +'<div class="fe-theme-prev" style="background:'+featEsc(th.bg||'#0D1A24')+';color:'+featEsc(th.text||'#F5EDD8')+';">'
+      +'<b style="color:'+featEsc(th.accent||'#E8863A')+';">標題與重點</b> 內文文字的樣子 <span style="border:1px solid '+featEsc(th.accent2||'#4BA8A0')+';color:'+featEsc(th.accent2||'#4BA8A0')+';">標籤</span></div>':'')
+    +'</div>';
   h+='<div class="fe-sec"><h3>② 分頁內容</h3><p class="fe-hint">每個分頁可選三種版型：<b>文字＋圖片＋右側重點</b>（像「故事架構」）、<b>對比表</b>（像「兩季對比」）、<b>資料卡</b>（像「基本資料」）。<br>內文空一行＝分段；用 **兩個星號** 包住的文字會變成橘色粗體；清單一行一項，欄位用「｜」分隔。名稱留空的分頁不會顯示。</p>';
   (D.tabs||[]).forEach(function(t,i){
     const P='tabs.'+i+'.',L=t.layout||'std';
@@ -5512,10 +5646,29 @@ function featEdBuild(){
       +'<button class="dyn-order-btn" onclick="featEdMove(\'tabs\','+i+',-1)">↑</button><button class="dyn-order-btn" onclick="featEdMove(\'tabs\','+i+',1)">↓</button>'
       +'<button class="dyn-del-btn" onclick="featEdDel(\'tabs\','+i+')">刪除</button></div>';
     if(L==='compare'){
-      h+='<div class="fe-2">'+featFI(P+'aTitle','左側標題','第一季')+featFI(P+'bTitle','右側標題','第二季')+'</div>'
-        +'<div class="fe-2">'+featFT(P+'aText','左側說明（可換行）','英文劇名\n2020 · 普吉島 · 5集\n導演：…',70)+featFT(P+'bText','右側說明（可換行）','',70)+'</div>'
-        +'<div class="fe-2">'+featFI(P+'aCol','表格左欄名稱','第一季 · 普吉島的夏天')+featFI(P+'bCol','表格右欄名稱','第二季 · 曼谷的現實')+'</div>'
-        +featFT(P+'rows','比較表（一行一列：維度｜左欄｜右欄）','場景設定｜普吉島老城區、海灘…｜曼谷大學校園、公寓…',120)
+      if(!Array.isArray(t.cols)){const cm=featCmp(t);t.cols=cm.cols;t.rowsArr=cm.rows;['aTitle','bTitle','aText','bText','aCol','bCol','rows'].forEach(function(k){delete t[k];});}
+      if(!Array.isArray(t.rowsArr))t.rowsArr=[];
+      h+='<div class="fe-lbl">比較對象（最多 4 個，例：第一季、第二季；標題和說明都留空就不顯示上方的對比卡）</div>';
+      t.cols.forEach(function(c,j){
+        const C=P+'cols.'+j+'.';
+        h+='<div class="fe-sub"><div class="fe-card-head"><b>對象 '+(j+1)+'</b><span style="flex:1"></span>'
+          +'<button class="dyn-order-btn" onclick="featCmpColMove('+i+','+j+',-1)">↑</button><button class="dyn-order-btn" onclick="featCmpColMove('+i+','+j+',1)">↓</button>'
+          +'<button class="dyn-del-btn" onclick="featCmpColDel('+i+','+j+')">刪除</button></div>'
+          +'<div class="fe-2">'+featFI(C+'title','標題','第一季')+featFI(C+'col','表格欄名（留空＝同標題）','第一季 · 普吉島的夏天')+'</div>'
+          +featFT(C+'text','說明（可換行）','英文劇名\n2020 · 普吉島 · 5集\n導演：…',60)+'</div>';
+      });
+      if(t.cols.length<4)h+='<button class="cadd-btn" onclick="featCmpColAdd('+i+')">＋ 新增比較對象</button>';
+      h+='<div class="fe-lbl" style="margin-top:1rem;">比較表（一列＝一個比較維度；沒有任何列就不顯示表格）</div>';
+      t.rowsArr.forEach(function(r,k){
+        const R=P+'rowsArr.'+k+'.';
+        if(!Array.isArray(r.cells))r.cells=[];
+        h+='<div class="fe-sub"><div class="fe-card-head"><b>第 '+(k+1)+' 列</b>'
+          +'<input class="ci" data-fp="'+R+'dim" value="'+featEsc(r.dim||'')+'" placeholder="比較維度，例：場景設定">'
+          +'<button class="dyn-order-btn" onclick="featEdMove(\''+P+'rowsArr\','+k+',-1)">↑</button><button class="dyn-order-btn" onclick="featEdMove(\''+P+'rowsArr\','+k+',1)">↓</button>'
+          +'<button class="dyn-del-btn" onclick="featEdDel(\''+P+'rowsArr\','+k+')">刪除</button></div>'
+          +'<div class="fe-2">'+t.cols.map(function(c,j){return featFT(R+'cells.'+j,c.title||('對象 '+(j+1)),'',50);}).join('')+'</div></div>';
+      });
+      h+='<button class="cadd-btn" onclick="featEdAdd(\''+P+'rowsArr\')">＋ 新增一列</button>'
         +featFT(P+'text','表格下方補充文字（選填）','',60)
         +featFT(P+'imgs','表格下方輪播圖（選填，一行一個網址）','',50,1)+featFI(P+'cap','圖片說明','');
     }else if(L==='info'){
@@ -5568,9 +5721,41 @@ function featEdUpload(p,input){
     });
   });
 }
-function featEdAdd(k){featDraft[k]=featDraft[k]||[];featDraft[k].push(k==='tabs'?{name:'新分頁',layout:'std',sideType:'list'}:{});featEdBuild();}
-function featEdDel(k,i){if(!confirm('確定刪除這個'+(k==='tabs'?'分頁':'演員')+'？'))return;featDraft[k].splice(i,1);featEdBuild();}
-function featEdMove(k,i,dir){const a=featDraft[k],n=i+dir;if(n<0||n>=a.length)return;const tmp=a[i];a[i]=a[n];a[n]=tmp;featEdBuild();}
+function featArr(p){let a=featGet(p);if(!Array.isArray(a)){a=[];featSet(p,a);}return a;}
+function featEdAdd(p){
+  const k=p.split('.').pop();
+  featArr(p).push(k==='tabs'?{name:'新分頁',layout:'std',sideType:'list'}:k==='rowsArr'?{dim:'',cells:[]}:{});
+  featEdBuild();
+}
+function featEdDel(p,i){
+  const k=p.split('.').pop();
+  if(!confirm('確定刪除這個'+({tabs:'分頁',cast:'演員',rowsArr:'比較列'}[k]||'項目')+'？'))return;
+  featArr(p).splice(i,1);featEdBuild();
+}
+function featEdMove(p,i,dir){const a=featArr(p),n=i+dir;if(n<0||n>=a.length)return;const tmp=a[i];a[i]=a[n];a[n]=tmp;featEdBuild();}
+function featCmpColAdd(i){const t=featDraft.tabs[i];if(t.cols.length>=4)return;t.cols.push({title:'',text:'',col:''});featEdBuild();}
+function featCmpColDel(i,j){
+  if(!confirm('刪除這個比較對象？表格裡這一欄的內容也會一起刪除。'))return;
+  const t=featDraft.tabs[i];t.cols.splice(j,1);
+  (t.rowsArr||[]).forEach(function(r){(r.cells=r.cells||[]).splice(j,1);});
+  featEdBuild();
+}
+function featCmpColMove(i,j,dir){
+  const t=featDraft.tabs[i],n=j+dir;if(n<0||n>=t.cols.length)return;
+  const sw=function(a){const x=a[j];a[j]=a[n];a[n]=x;};
+  sw(t.cols);(t.rowsArr||[]).forEach(function(r){r.cells=r.cells||[];sw(r.cells);});
+  featEdBuild();
+}
+function featEdSuggest(){
+  const msg=document.getElementById('fe-theme-msg');if(msg)msg.textContent='分析劇照中…';
+  const urls=featLines(featDraft.heroImgs).map(featUrl).filter(Boolean);
+  const d=ddlData[featEdIdx];if(!urls.length&&d&&d.cover)urls.push(d.cover);
+  featPalette(urls,function(th,err){
+    if(!th){const m=document.getElementById('fe-theme-msg');if(m)m.textContent='⚠️ '+err;return;}
+    featDraft.theme=th;featEdBuild();
+    const m=document.getElementById('fe-theme-msg');if(m)m.textContent='✅ 已依劇照建議配色，可以再用色票微調，然後按「儲存並預覽」看效果。';
+  });
+}
 function featEdTemplate(){if(!confirm('重設會清空這篇專題目前填的內容，確定嗎？'))return;featDraft=featTemplate();featEdBuild();}
 function featEdClose(){if(confirm('關閉編輯器？還沒按「儲存」的修改會遺失。'))document.getElementById('feat-ed').style.display='none';}
 function featEdSave(preview){
