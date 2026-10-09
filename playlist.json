@@ -1,7 +1,48 @@
 {
   "title": "本週推薦歌單",
   "week": "",
-  "intro": "十三這週單曲循環的歌，點一首就能聽。",
-  "songs": [],
-  "savedAt": 0
+  "intro": "十三這週單曲循環的歌，點一張唱片就能聽。",
+  "songs": [
+    {
+      "title": "มนตรา",
+      "artist": "KENG HARIT",
+      "drama": "ขมจิราต้องรอด Khemjira",
+      "yt": "https://youtu.be/F5yXpItDZVo?si=uwLpb7Bwbes2LYE_",
+      "note": "",
+      "cover": ""
+    },
+    {
+      "title": "ถ้าสวรรค์ไม่มีเธอฉันก็ไม่อยากไป (Heavenly)",
+      "artist": "GEMINI, FOURTH",
+      "drama": "Ticket to Heaven เด็กชายไม่ไปสวรรค์",
+      "yt": "https://www.youtube.com/watch?v=6DB7wFVaebs&list=RDF5yXpItDZVo&index=3",
+      "note": "",
+      "cover": ""
+    },
+    {
+      "title": "กีดกัน (Skyline)",
+      "artist": "Billkin",
+      "drama": "แปลรักฉันด้วยใจเธอ 以你的心詮釋我的愛",
+      "yt": "https://www.youtube.com/watch?v=hJeEOzEZstU&list=RDF5yXpItDZVo&index=9",
+      "note": "",
+      "cover": ""
+    },
+    {
+      "title": "ดาวหางฮัลเลย์ (Halley's Comet)",
+      "artist": "fellow fellow",
+      "drama": "",
+      "yt": "https://www.youtube.com/watch?v=CWFWxNvNAPE",
+      "note": "",
+      "cover": ""
+    },
+    {
+      "title": "ไม่เป็นรอง",
+      "artist": "COCKTAIL",
+      "drama": "",
+      "yt": "https://youtu.be/5I6E5w9aQDg?si=gIRTuv5USJMERTww",
+      "note": "",
+      "cover": ""
+    }
+  ],
+  "savedAt": 1791573672121
 }
