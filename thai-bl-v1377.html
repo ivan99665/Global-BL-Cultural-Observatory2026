@@ -1452,6 +1452,10 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 .rh-dots button{width:8px;height:8px;padding:0;border:0;border-radius:4px;background:rgba(245,237,216,.2);cursor:pointer;transition:width .3s,background .3s;}
 .rh-dots button.on{width:22px;background:var(--sunset-gold);}
 #genreCarousel{touch-action:pan-y;}
+/* 推薦片單像一條底片：上下齒孔跟著卡片一起往左走，左右兩端淡出 */
+#genreCarouselTrack{will-change:transform;width:max-content;padding:30px 0 !important;margin:0;background-color:#04090D;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%229%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%229%22%20rx%3D%222.2%22%20fill%3D%22%2318303F%22%20stroke%3D%22%23A8D8D4%22%20stroke-opacity%3D%22.28%22%2F%3E%3C%2Fsvg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%229%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%229%22%20rx%3D%222.2%22%20fill%3D%22%2318303F%22%20stroke%3D%22%23A8D8D4%22%20stroke-opacity%3D%22.28%22%2F%3E%3C%2Fsvg%3E"),linear-gradient(180deg,rgba(26,58,74,.22),rgba(4,9,13,0) 22%,rgba(4,9,13,0) 78%,rgba(26,58,74,.22));background-size:20px 9px,20px 9px,100% 100%;background-repeat:repeat-x,repeat-x,no-repeat;background-position:7px 10px,7px calc(100% - 10px),0 0;box-shadow:inset 0 1px 0 rgba(168,216,212,.12),inset 0 -1px 0 rgba(168,216,212,.12),0 10px 30px rgba(0,0,0,.45);}
+#genreCarouselTrack .ic-slide:first-child{margin-left:10px;}
+#genreCarousel{-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);}
 .dr-mine{margin-top:.8rem;padding:.7rem .8rem;border-radius:8px;background:rgba(232,134,58,.06);border:1px dashed rgba(232,134,58,.25);}
 .dr-mine-h{font-size:.6rem;letter-spacing:.14em;color:rgba(242,176,122,.75);margin-bottom:.35rem;}
 .dr-rate{display:flex;align-items:center;gap:.6rem;font-size:.7rem;color:rgba(245,237,216,.6);line-height:1.6;}
@@ -1460,7 +1464,12 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 .dr-stars i{font-style:normal;color:rgba(245,237,216,.15);}
 .dr-take{font-size:.74rem;line-height:1.6;color:var(--sunset-peach);margin-top:.35rem;font-style:italic;}
 /* 新手入坑指南、CP 檔案 */
-.rx-sec{max-width:1100px;margin:0 auto;padding:4.5rem 2rem;}
+.rx-sec{max-width:1100px;margin:0 auto;padding:2.6rem 2rem;}
+/* 推薦頁各區塊間距收緊，讀起來是同一頁的連續內容 */
+#recs-genre{padding-bottom:1.6rem;}
+#recs-genre+.rx-sec{padding-top:1.6rem;}
+.rx-sec:last-of-type{padding-bottom:4rem;}
+#genreCarouselTrack{align-items:flex-start;}
 .rx-sec[hidden]{display:none;}
 .rx-guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
 .rx-level{background:linear-gradient(160deg,rgba(232,134,58,.08),rgba(13,26,36,.4));border:1px solid rgba(232,134,58,.18);border-radius:14px;padding:1.4rem 1.3rem;}
@@ -1493,7 +1502,7 @@ body.theme-global .nav-tab.active::after{background:var(--vin-amber);}
 .rx-cp-link{display:inline-block;margin-top:.6rem;font-size:.74rem;color:var(--sunset-peach);border:1px solid rgba(232,134,58,.4);border-radius:14px;padding:.25rem .8rem;text-decoration:none;font-style:normal;}
 .rx-cp-link:hover{background:var(--sunset-gold);color:#1A0F08;}
 .rx-cp-moment{margin-top:.8rem;padding:.7rem .8rem;border-left:2px solid var(--sunset-gold);background:rgba(232,134,58,.06);font-size:.78rem;line-height:1.7;color:var(--sunset-peach);border-radius:0 6px 6px 0;}
-@media(max-width:860px){.rx-guide-grid{grid-template-columns:1fr;}.rx-sec{padding:3.5rem 16px;}}
+@media(max-width:860px){.rx-guide-grid{grid-template-columns:1fr;}.rx-sec{padding:2rem 16px;}}
 /* 後台 */
 #cs-rx .rx-cms-box{background:#1E3347;border:1px solid rgba(232,134,58,.13);border-radius:10px;padding:.8rem;margin-bottom:.7rem;}
 #cs-rx .rx-cms-row{display:grid;grid-template-columns:1fr 1.3fr auto;gap:.4rem;margin-bottom:.4rem;align-items:center;}
@@ -3166,7 +3175,7 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
     <button class="ic-btn ic-prev" onclick="moveIC('genreCarousel', genreState, -1)" style="left: -15px;">&#8592;</button>
     <button class="ic-btn ic-next" onclick="moveIC('genreCarousel', genreState, 1)" style="right: -15px;">&#8594;</button>
   </div>
-  <div class="rh-dots" id="genreDots"></div>
+  
 </div>
 
 <!-- 新手入坑指南（後台「🧭 指南/CP」編輯，沒內容時隱藏） -->
@@ -3340,6 +3349,7 @@ setInterval(() => moveIC('bpic', bpicState, 1), 2000);
 function moveIC(wrapId, state, dir) {
   const track = document.getElementById(wrapId + 'Track');
 
+  if (wrapId === 'genreCarousel' && typeof genreStep === 'function') { genreStep(dir); return; }
   if (wrapId === 'genreCarousel') {
     const cardWidth = 300 + 20;
     const container = document.getElementById(wrapId);
@@ -3488,7 +3498,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cf"><label class="cl">小標（英文那行）</label><input class="ci" id="rh-f-genreEb"></div>
         <div class="cf"><label class="cl">大標題</label><textarea class="cta" id="rh-f-genreT" style="min-height:52px;"></textarea></div>
         <div class="cf"><label class="cl">一句說明（告訴觀眾卡片上有什麼）</label><textarea class="cta" id="rh-f-genreIn" style="min-height:52px;"></textarea></div>
-        <div class="cf"><label class="cl">自動輪播間隔（秒，0＝不自動播放）</label><input class="ci" id="rh-f-auto" type="number" min="0" max="30"></div>
+        <div class="cf"><label class="cl">輪播速度：每移動一張卡片花幾秒（數字越大越慢，0＝不自動播放）</label><input class="ci" id="rh-f-auto" type="number" min="0" max="30"></div>
         <div style="font-size:.7rem;color:#F2B07A;margin:.8rem 0 .4rem;">🧭 新手入坑指南</div>
         <div class="cf"><label class="cl">小標</label><input class="ci" id="rh-f-guideEb"></div>
         <div class="cf"><label class="cl">大標題</label><textarea class="cta" id="rh-f-guideT" style="min-height:52px;"></textarea></div>
@@ -3868,7 +3878,7 @@ const DEF_RECSHEAD={
   genreEb:'推薦片單 · Watch List',genreT:'十三的推薦片單',genreIn:'每張卡片都能點圖片看預告，下面標著在哪裡看，還有十三的私心小評（純屬個人口味）。',
   guideEb:'新手入坑指南 · Starter Guide',guideT:'不知道從哪部開始？',guideIn:'依照入坑程度分成三層，從最好入口的開始看就對了。',
   cpEb:'CP 檔案 · CP Files',cpT:'十三的 CP 觀察筆記',cpIn:'十三關注的 CP、他們合作過的作品，還有最愛的發糖名場面。',
-  auto:5};
+  auto:6};
 function recsHeadGet(){try{return Object.assign({},DEF_RECSHEAD,JSON.parse(localStorage.getItem(K_RECSHEAD)||'{}'));}catch(e){return Object.assign({},DEF_RECSHEAD);}}
 function recsHeadApply(){
   const h=recsHeadGet();
@@ -3886,19 +3896,24 @@ function recsNavBuild(){
     .filter(([id])=>{const el=document.getElementById(id);return el&&!el.hidden;});
   nav.innerHTML=list.length>1?list.map(([id,t])=>'<a href="javascript:void(0)" onclick="document.getElementById(\''+id+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">'+t.replace(/[&<>"]/g,'')+'</a>').join(''):'';
 }
-// 題材輪播：可見時才自動播放；滑鼠停留、鍵盤聚焦、展開演員、看預告時暫停
-let genreTimer=null,genreHold=false;
-function genreMaxIdx(){
-  const c=document.getElementById('genreCarousel');if(!c)return 0;
-  const cw=320,max=Math.max(0,genreState.total*cw-20-c.clientWidth);return Math.ceil(max/cw);
+// 推薦片單：由右往左緩緩連續輪播（無縫循環）
+// 滑鼠停留、鍵盤聚焦、展開演員、看預告、捲出畫面或分頁在背景時暫停；左右鍵＝平滑移動一張；手機可用手指拖曳
+const GENRE_CARD=320;   // 卡片寬 300 + 間距 20
+let gOff=0,gLoop=0,gLast=0,gRaf=0,gAnim=null,genreHold=false,genreTimer=null;
+function genreSetup(){
+  const track=document.getElementById('genreCarouselTrack'),wrap=document.getElementById('genreCarousel');if(!track||!wrap)return;
+  track.querySelectorAll('.ic-slide[data-clone]').forEach(n=>n.remove());
+  const orig=[...track.querySelectorAll('.ic-slide')];
+  track.style.transition='none';
+  gLoop=orig.length*GENRE_CARD;
+  if(!orig.length)return;
+  // 複製足夠的卡片，捲到第一輪結尾時畫面不會出現空白
+  const need=Math.max(1,Math.ceil((wrap.clientWidth||1200)/gLoop));
+  for(let k=0;k<need;k++)orig.forEach(n=>{const c=n.cloneNode(true);c.dataset.clone='1';c.setAttribute('aria-hidden','true');c.querySelectorAll('a,button,[tabindex]').forEach(x=>x.setAttribute('tabindex','-1'));track.appendChild(c);});
+  gOff=((gOff%gLoop)+gLoop)%gLoop;genreDraw();
 }
-function genreDotsBuild(){
-  const d=document.getElementById('genreDots');if(!d)return;
-  if(!document.getElementById('genreCarousel').clientWidth)return;
-  const n=genreMaxIdx()+1;
-  d.innerHTML=n>1?Array.from({length:n},(_,i)=>'<button type="button" aria-label="第 '+(i+1)+' 組" class="'+(i===Math.min(genreState.idx,n-1)?'on':'')+'" onclick="genreGo('+i+')"></button>').join(''):'';
-}
-function genreGo(i){genreState.idx=i-1;moveIC('genreCarousel',genreState,1);genreAutoStart();}
+function genreDraw(){const t=document.getElementById('genreCarouselTrack');if(t)t.style.transform='translate3d(-'+gOff.toFixed(2)+'px,0,0)';}
+function genreWrapOff(){if(gLoop>0)gOff=((gOff%gLoop)+gLoop)%gLoop;}
 function genrePaused(){
   const box=document.getElementById('genreCarouselBox'),pg=document.getElementById('page-recs');
   if(!box||!pg||!pg.classList.contains('active'))return true;
@@ -3908,23 +3923,43 @@ function genrePaused(){
   const tm=document.getElementById('trailer-modal');if(tm&&tm.classList.contains('open'))return true;
   const r=box.getBoundingClientRect();return r.bottom<0||r.top>innerHeight;
 }
-function genreAutoStart(){
-  clearInterval(genreTimer);genreTimer=null;
-  const sec=+recsHeadGet().auto||0;
-  if(sec>0&&!matchMedia('(prefers-reduced-motion: reduce)').matches)
-    genreTimer=setInterval(()=>{if(!genrePaused())moveIC('genreCarousel',genreState,1);else genreDotsBuild();},sec*1000);
+function genreSpeed(){const sec=+recsHeadGet().auto||0;return sec>0?GENRE_CARD/sec:0;}   // 每秒移動幾 px
+function genreTick(now){
+  gRaf=requestAnimationFrame(genreTick);
+  const dt=gLast?Math.min(250,now-gLast):16;gLast=now;
+  if(!gLoop)return;
+  if(gAnim){
+    const p=Math.min(1,(now-gAnim.t0)/gAnim.dur),e=1-Math.pow(1-p,3);
+    gOff=gAnim.from+(gAnim.to-gAnim.from)*e;if(p>=1){gAnim=null;genreWrapOff();}
+    genreDraw();return;
+  }
+  const v=genreSpeed();
+  if(v&&!genrePaused()&&!matchMedia('(prefers-reduced-motion: reduce)').matches){gOff+=v*dt/1000;genreWrapOff();genreDraw();}
 }
+function genreAutoStart(){if(!gRaf)gRaf=requestAnimationFrame(genreTick);}
+// 左右鍵：平滑移到上一張／下一張卡片的位置
+function genreStep(dir){
+  if(!gLoop)return;
+  if(gAnim){gOff=gAnim.to;gAnim=null;genreWrapOff();}
+  let from=gOff,to=(dir>0?Math.floor(gOff/GENRE_CARD+1e-3)+1:Math.ceil(gOff/GENRE_CARD-1e-3)-1)*GENRE_CARD;
+  if(to<0){from+=gLoop;to+=gLoop;}
+  gAnim={from,to,t0:performance.now(),dur:600};
+}
+function genreDotsBuild(){}
 (function genreSwipe(){
-  let x0=null,y0=0;
-  document.addEventListener('touchstart',e=>{const c=e.target.closest&&e.target.closest('#genreCarousel');if(!c)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY;genreHold=true;},{passive:true});
-  document.addEventListener('touchend',e=>{
-    if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
-    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))moveIC('genreCarousel',genreState,dx<0?1:-1);
-    setTimeout(()=>{genreHold=false;},4000);
+  let x0=null,y0=0,o0=0,drag=false,rel=null;
+  document.addEventListener('touchstart',e=>{const c=e.target.closest&&e.target.closest('#genreCarousel');if(!c)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY;o0=gOff;drag=false;gAnim=null;genreHold=true;clearTimeout(rel);},{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(x0===null)return;const dx=e.touches[0].clientX-x0,dy=e.touches[0].clientY-y0;
+    if(!drag&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))drag=true;
+    if(drag){gOff=o0-dx;genreWrapOff();genreDraw();}
   },{passive:true});
-  window.addEventListener('resize',()=>{if(typeof genreState!=='undefined'){genreState.idx=Math.min(genreState.idx,genreMaxIdx());genreDotsBuild();}});
+  document.addEventListener('touchend',()=>{if(x0===null)return;x0=null;rel=setTimeout(()=>{genreHold=false;},3000);},{passive:true});
+  let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(genreSetup,200);});
 })();
 // 後台
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('[onclick*="recs"]');if(a)setTimeout(genreSetup,450);},true);
+window.addEventListener('hashchange',()=>{if(location.hash.indexOf('recs')>=0)setTimeout(genreSetup,450);});
 function recsHeadFill(){
   const h=recsHeadGet();
   Object.keys(DEF_RECSHEAD).forEach(k=>{const el=document.getElementById('rh-f-'+k);if(el)el.value=h[k];});
@@ -3981,14 +4016,18 @@ function renderGenreCarousel(){
     </div>
   `).join('');
   if(typeof genreState!=='undefined'){genreState.idx=0;genreState.total=recsDramas.length;}
-  const tr=document.getElementById('genreCarouselTrack');if(tr)tr.style.transform='translateX(0)';
+  gOff=0;gAnim=null;
   if(typeof rxRender==='function')rxRender();
-  recsHeadApply();genreDotsBuild();
+  recsHeadApply();genreSetup();
+  // 推薦頁一開始可能是隱藏的（寬度為 0），等切換到推薦頁、版面算得出寬度後再補複製卡片
+  requestAnimationFrame(()=>setTimeout(genreSetup,400));
 }
 
 // ═══ 預告片彈窗 ═══
 // 有填 YouTube 網址 → 彈窗內嵌播放；沒填 → 開新分頁搜尋該劇官方預告
 let trailerResumeMusic=false;
+// 從 YouTube 網址取出影片 ID（watch?v=、youtu.be、shorts、embed、live、m.youtube 都可以）
+function ytId(url){if(!url)return null;const m=String(url).match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/i);return m?m[1]:(/^[\w-]{11}$/.test(String(url).trim())?String(url).trim():null);}
 function openTrailer(i){
   const d=recsDramas[i];if(!d)return;
   const id=ytId(d.trailer||'');
@@ -4155,6 +4194,7 @@ function castRowHTML(di,ci,c){
       <input type="file" id="cavupl-${di}-${ci}" accept="image/*" style="display:none;" onchange="handleCastImg(${di},${ci},this)">
     </div>
     <div>
+      <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cimg-${di}-${ci}" value="${String(c.img||'').startsWith('data:')?'(已上傳的照片)':rxEsc(c.img||'')}" placeholder="🖼 照片網址（直接貼上，或按左邊 📁 上傳）" style="font-size:.72rem;" oninput="castImgUrl(${di},${ci},this.value)"></div>
       <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cname-${di}-${ci}" value="${c.name||''}" placeholder="演員名字（英文）" style="font-size:.76rem;"></div>
       <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cnameT-${di}-${ci}" value="${c.nameT||''}" placeholder="泰文名" style="font-size:.76rem;"></div>
       <div class="cf" style="margin-bottom:.5rem;"><input class="ci" id="cnote-${di}-${ci}" value="${c.note||''}" placeholder="飾演角色、說明..." style="font-size:.76rem;"></div>
@@ -4403,8 +4443,15 @@ function handleCastImg(di,ci,input){
   const file=input.files[0];if(!file)return;
   cmsUploadImg(file,200,200,.85,url=>{
     recsDramas[di].cast[ci].img=url;
-    const p=document.getElementById('cavprev-'+di+'-'+ci);if(p)p.src=url;
+    const p=document.getElementById('cavprev-'+di+'-'+ci);if(p){p.src=url;p.style.opacity='';}
+    const t=document.getElementById('cimg-'+di+'-'+ci);if(t)t.value=url.startsWith('data:')?'(已上傳的照片)':url;
   });
+}
+function castImgUrl(di,ci,v){
+  v=String(v||'').trim();if(v==='(已上傳的照片)')return;
+  if(/^(javascript|vbscript|data:(?!image\/))/i.test(v))return;
+  if(recsDramas[di]&&recsDramas[di].cast[ci])recsDramas[di].cast[ci].img=v;
+  const p=document.getElementById('cavprev-'+di+'-'+ci);if(p){p.src=v;p.style.opacity=v?'':'.3';}
 }
 
 // ═══════════════════════════════
