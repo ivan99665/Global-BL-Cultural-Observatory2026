@@ -268,7 +268,7 @@ footer a{color:var(--fa-amber-soft);text-decoration:none;}
       <h2 class="fa-title">我在關注<em>什麼</em></h2>
       <div class="fa-sub">Interests · 關注領域</div>
     </div>
-    <div class="interests-grid">
+    <div class="interests-grid" id="interests-grid">
       <div class="interest-card reveal d1"><div class="fa-glow"></div><span class="fa-fno">13A</span><div class="interest-icon">🐘</div><div class="interest-title">泰劇中毒史</div><div class="interest-desc">從《一年生》一路掉坑到現在。泰國 BL 到底為什麼這麼好嗑？我想慢慢找答案。</div></div>
       <div class="interest-card reveal d2"><div class="fa-glow"></div><span class="fa-fno">13B</span><div class="interest-icon">🌏</div><div class="interest-title">世界 BL 散步</div><div class="interest-desc">台灣、日本、韓國、泰國的 BL 各有自己的風景，每個人也都有自己的口味。不分高下，我只想帶你到處逛逛。</div></div>
       <div class="interest-card reveal d3"><div class="fa-glow"></div><span class="fa-fno">13C</span><div class="interest-icon">🎧</div><div class="interest-title">OST 單曲循環</div><div class="interest-desc">好劇一定配好歌！一聽到前奏就回到那個場景。我也會分享讓我單曲循環、停不下來的劇中歌曲。</div></div>
@@ -461,6 +461,37 @@ async function aUploadImgBB(file){
   throw new Error('ImgBB 上傳失敗');
 }
 
+// ── 我在關注什麼（字卡）──
+let aCards=[];
+function aEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function aCardsFromPage(){
+  return [...document.querySelectorAll('#interests-grid .interest-card')].map(c=>({
+    icon:(c.querySelector('.interest-icon')||{}).textContent||'',
+    title:(c.querySelector('.interest-title')||{}).textContent||'',
+    desc:(c.querySelector('.interest-desc')||{}).textContent||''}));
+}
+function aRenderCards(list){
+  const g=document.getElementById('interests-grid');if(!g||!Array.isArray(list)||!list.length)return;
+  g.innerHTML=list.map((it,i)=>'<div class="interest-card reveal visible d'+((i%6)+1)+'"><div class="fa-glow"></div><span class="fa-fno">13'+String.fromCharCode(65+i%26)+'</span>'
+    +'<div class="interest-icon">'+aEsc(it.icon)+'</div><div class="interest-title">'+aEsc(it.title)+'</div><div class="interest-desc">'+aEsc(it.desc)+'</div></div>').join('');
+}
+function aCardsBuild(){
+  const box=document.getElementById('a-cards-list');if(!box)return;
+  box.innerHTML=aCards.map((c,i)=>'<div style="border:1px solid rgba(232,134,58,.2);border-radius:10px;padding:.9rem;margin-bottom:.8rem;background:rgba(232,134,58,.04);">'
+    +'<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.6rem;"><b style="font-size:.74rem;color:var(--spring-river);">字卡 '+(i+1)+'</b><span style="flex:1"></span>'
+    +'<button onclick="aCardMove('+i+',-1)" style="background:none;border:1px solid rgba(232,134,58,.3);color:var(--text-dark);border-radius:6px;padding:2px 9px;cursor:pointer;">↑</button>'
+    +'<button onclick="aCardMove('+i+',1)" style="background:none;border:1px solid rgba(232,134,58,.3);color:var(--text-dark);border-radius:6px;padding:2px 9px;cursor:pointer;">↓</button>'
+    +'<button onclick="aCardDel('+i+')" style="background:none;border:1px solid rgba(255,154,122,.4);color:#FF9A7A;border-radius:6px;padding:2px 9px;cursor:pointer;font-size:.72rem;">刪除</button></div>'
+    +'<div style="display:grid;grid-template-columns:80px 1fr;gap:.6rem;">'
+    +'<div class="af" style="margin:0;"><label class="al">圖示</label><input class="ai" value="'+aEsc(c.icon)+'" oninput="aCards['+i+'].icon=this.value" style="text-align:center;font-size:1.1rem;"></div>'
+    +'<div class="af" style="margin:0;"><label class="al">標題</label><input class="ai" value="'+aEsc(c.title)+'" oninput="aCards['+i+'].title=this.value"></div></div>'
+    +'<div class="af" style="margin:.6rem 0 0;"><label class="al">內文</label><textarea class="ata" oninput="aCards['+i+'].desc=this.value" style="min-height:70px;">'+aEsc(c.desc)+'</textarea></div>'
+    +'</div>').join('');
+}
+function aCardAdd(){aCards.push({icon:'✨',title:'',desc:''});aCardsBuild();}
+function aCardDel(i){if(!confirm('確定刪除字卡 '+(i+1)+'？'))return;aCards.splice(i,1);aCardsBuild();}
+function aCardMove(i,d){const n=i+d;if(n<0||n>=aCards.length)return;const t=aCards[i];aCards[i]=aCards[n];aCards[n]=t;aCardsBuild();}
+
 function aApply(d){
   if(!d) d = aLoad();
   if(d.name) document.querySelector('.hero-name').innerHTML = d.name;
@@ -480,6 +511,7 @@ function aApply(d){
   if(d.stat4l) document.getElementById('stat4l').textContent = d.stat4l;
   if(d.email){ const el=document.getElementById('contact-email'); if(el){ el.href='mailto:'+d.email; el.querySelector('.contact-link-value').textContent=d.email; } }
   if(d.ig){ const el=document.getElementById('contact-ig'); if(el){ el.href='https://www.instagram.com/'+d.ig.replace('@',''); el.querySelector('.contact-link-value').textContent='@'+d.ig.replace('@',''); } }
+  if(Array.isArray(d.interests)&&d.interests.length)aRenderCards(d.interests);
   if(d.avatar){ const img=document.getElementById('avatar-img'); if(img) img.src=d.avatar; document.querySelector('.photo-frame-inner').innerHTML='<img id="avatar-img" src="'+d.avatar+'" alt="十三" style="width:100%;height:100%;object-fit:cover;">'; }
 }
 
@@ -529,6 +561,8 @@ async function aFillForm(){
   document.getElementById('f-email').value = d.email||'ivan06171005@gmail.com';
   document.getElementById('f-ig').value = d.ig||'lotus_13ss';
   document.getElementById('f-avatar').value = d.avatar||'';
+  aCards=(Array.isArray(d.interests)&&d.interests.length?d.interests:aCardsFromPage()).map(c=>({icon:c.icon||'',title:c.title||'',desc:c.desc||''}));
+  aCardsBuild();
   aSetAvatarPreview(d.avatar||'');
   document.getElementById('f-ghtoken').value = aGetToken();
   document.getElementById('f-imgbb').value = localStorage.getItem(IMGBB_KEY_LS)||'';
@@ -554,6 +588,7 @@ async function aSaveAll(){
     email: document.getElementById('f-email').value,
     ig: document.getElementById('f-ig').value,
     avatar: document.getElementById('f-avatar').value,
+    interests: aCards.map(c=>({icon:(c.icon||'').trim(),title:(c.title||'').trim(),desc:(c.desc||'').trim()})).filter(c=>c.title||c.desc),
   };
   const btn=document.getElementById('a-save-btn');
   btn.textContent='⏳ 同步中...';
@@ -657,6 +692,7 @@ document.addEventListener('keydown',e=>{
     <button class="atab active" onclick="aTab('hero')" data-s="hero">🏠 簡介</button>
     <button class="atab" onclick="aTab('about')" data-s="about">📝 關於我</button>
     <button class="atab" onclick="aTab('stats')" data-s="stats">📊 數據</button>
+    <button class="atab" onclick="aTab('cards')" data-s="cards">🎞 關注卡片</button>
     <button class="atab" onclick="aTab('contact')" data-s="contact">📬 聯絡</button>
     <button class="atab" onclick="aTab('pw')" data-s="pw">⚙️ 密碼</button>
   </div>
@@ -730,6 +766,13 @@ document.addEventListener('keydown',e=>{
     </div>
 
     <!-- 聯絡 -->
+    <div id="as-cards" class="a-section" style="display:none;">
+      <div class="asec">🎞 我在關注什麼（字卡）</div>
+      <div style="font-size:.72rem;color:var(--text-soft);line-height:1.8;margin-bottom:1rem;">每張字卡有圖示（貼一個 emoji）、標題和內文。可以新增、刪除、調整順序，改完按右上角「💾 儲存套用」。</div>
+      <div id="a-cards-list"></div>
+      <button onclick="aCardAdd()" style="width:100%;padding:.75rem;background:none;border:1px dashed rgba(232,134,58,.45);border-radius:10px;color:var(--spring-river);font-family:'Noto Sans TC',sans-serif;font-size:.82rem;cursor:pointer;">＋ 新增字卡</button>
+    </div>
+
     <div id="as-contact" class="a-section" style="display:none;">
       <div class="asec">📬 聯絡資訊</div>
       <div class="af"><label class="al">Email</label><input class="ai" id="f-email" value="ivan06171005@gmail.com"></div>
