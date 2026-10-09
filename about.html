@@ -413,7 +413,8 @@ const GH_REPO = 'Global-BL-Cultural-Observatory2026';
 const GH_FILE = 'about-data.json';
 const GH_RAW = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
 const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
-const IMGBB_KEY = '1f8d50dc921cf0e59ee9467807a74b03';
+// ImgBB 金鑰只存在本機瀏覽器（和泰劇站後台共用同一個設定），原始碼中不含任何金鑰
+const IMGBB_KEY_LS = 'tb-imgbb-key';
 
 // 密碼只以「加鹽 SHA-256 雜湊」存在本機瀏覽器，原始碼中不含任何預設密碼
 const ABOUT_PW_HASH='aboutCMS_pw_hash';
@@ -449,7 +450,9 @@ async function aSaveGitHub(d){
 async function aUploadImgBB(file){
   const fd = new FormData();
   fd.append('image', file);
-  const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method:'POST', body:fd });
+  const key = (localStorage.getItem(IMGBB_KEY_LS)||'').trim();
+  if(!key) throw new Error('nokey');
+  const r = await fetch('https://api.imgbb.com/1/upload?key='+encodeURIComponent(key), { method:'POST', body:fd });
   const data = await r.json();
   if(data.success) return data.data.url;
   throw new Error('ImgBB 上傳失敗');
@@ -525,6 +528,7 @@ async function aFillForm(){
   document.getElementById('f-avatar').value = d.avatar||'';
   aSetAvatarPreview(d.avatar||'');
   document.getElementById('f-ghtoken').value = aGetToken();
+  document.getElementById('f-imgbb').value = localStorage.getItem(IMGBB_KEY_LS)||'';
 }
 
 async function aSaveAll(){
@@ -576,9 +580,9 @@ async function aUploadImg(input){
     aSetAvatarPreview(url);
     label.querySelector('div div:first-child').textContent='✅ 上傳成功';
   }catch(e){
-    label.querySelector('div div:first-child').textContent='❌ 上傳失敗';
+    label.querySelector('div div:first-child').textContent=e.message==='nokey'?'❌ 請先到「⚙️」分頁填 ImgBB Key':'❌ 上傳失敗';
   }
-  setTimeout(()=>label.querySelector('div div:first-child').textContent=orig, 2000);
+  setTimeout(()=>label.querySelector('div div:first-child').textContent=orig, 3500);
 }
 
 function aPreviewUrl(){
@@ -736,6 +740,12 @@ document.addEventListener('keydown',e=>{
         <label class="al">Personal Access Token（只存在本機，不上傳）</label>
         <input class="ai" id="f-ghtoken" type="password" placeholder="github_pat_..." oninput="localStorage.setItem('aboutCMS_ghtoken',this.value)">
         <div style="font-size:.68rem;color:var(--text-soft);margin-top:.35rem;">⚠️ 需要 repo 讀寫權限 · 只會存在你的瀏覽器 localStorage</div>
+      </div>
+      <div class="asec" style="margin-top:1.2rem;">🖼 ImgBB API Key（上傳頭像用）</div>
+      <div class="af">
+        <label class="al">API Key（只存在本機，不上傳；和泰劇站後台共用）</label>
+        <input class="ai" id="f-imgbb" type="password" placeholder="貼上在 api.imgbb.com 取得的 Key" oninput="localStorage.setItem('tb-imgbb-key',this.value.trim())">
+        <div style="font-size:.68rem;color:var(--text-soft);margin-top:.35rem;">沒有 Key 也可以直接在頭像欄位貼圖片網址</div>
       </div>
       <div class="asec" style="margin-top:1.2rem;">⚙️ 更改後台密碼</div>
       <div class="af"><label class="al">新密碼</label><input class="ai" id="f-npw" type="password" placeholder="輸入新密碼..."></div>
