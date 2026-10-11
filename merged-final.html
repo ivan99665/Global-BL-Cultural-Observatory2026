@@ -78,6 +78,18 @@ html:not(.hero-anim-pending) #hscr{opacity:1!important;animation:none!important;
 
 /* 國家面板：標題在縮圖列上方、國碼徽章、快速比較 */
 .cpl .cpl-hdr{bottom:92px !important;}
+/* 閱讀排版：左側關鍵詞、右欄小導覽、核心觀察重點詞、段落間距 */
+.cpl-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.75rem;}
+.cpl-tags span{font-family:var(--mono),monospace;font-size:.68rem;letter-spacing:.06em;padding:.16rem .5rem;border:1px solid rgba(255,255,255,.3);border-radius:2px;color:rgba(255,255,255,.88);background:rgba(0,0,0,.38);}
+.cpnav{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:.4rem;margin:-1.5rem -1.8rem .4rem;padding:.75rem 1.8rem;background:var(--cp-bg-r,#1d1712);border-bottom:1px solid var(--cp-border);}
+.cpnav a{font-family:var(--mono),monospace;font-size:.74rem;letter-spacing:.14em;padding:.28rem .8rem;border:1px solid var(--cp-border);border-radius:14px;color:rgba(228,214,197,.75);text-decoration:none;transition:color .2s,border-color .2s;}
+.cpnav a:hover,.cpnav a:focus-visible{color:var(--cp-accent);border-color:var(--cp-accent);}
+.cpr .cpst{margin:2.4rem 0 1rem;}
+.cpr .cpnav + .cpst{margin-top:1.2rem;}
+.cpr .cpfacts{gap:1.05rem;}
+.cpr .cpfacts li{line-height:1.75;}
+.cpf-lead{color:var(--cp-accent);font-weight:600;margin-right:.5em;}
+@media(max-width:760px){.cpnav{margin:-1rem -1.1rem .4rem;padding:.6rem 1.1rem;}}
 /* 面板打開時，右上角的「泰BL專區／關於我」按鈕先藏起來，才不會蓋住 ✕ 關閉鈕 */
 body:has(#cpanel.open) #thai-btn-wrap{opacity:0 !important;visibility:hidden !important;pointer-events:none !important;}
 .cp-flag.cp-code{display:inline-block;font-family:var(--mono),monospace;font-size:.78rem !important;line-height:1;letter-spacing:.22em;padding:.35rem .6rem .35rem .75rem;border:1px solid var(--cp-accent,rgba(242,176,122,.6));color:var(--cp-accent,#F2B07A);border-radius:2px;width:auto !important;height:auto !important;margin-bottom:.5rem;background:rgba(0,0,0,.35);}
@@ -634,7 +646,9 @@ body.cursor-active{cursor:none;}
 .mmap{position:relative;width:100%;aspect-ratio:1000/378;}
 #mfilm,#mfilm svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .mflabel{position:absolute;z-index:3;font-family:var(--mono),monospace;font-size:.62rem;letter-spacing:.16em;color:rgba(242,176,122,.5);pointer-events:none;}
-.mflow{fill:none;stroke-width:1.3;stroke-dasharray:4 7;animation:mflow 1.8s linear infinite;}
+.mflow{fill:none;stroke-width:1.1;stroke-dasharray:4 7;opacity:.5;animation:mflow 2s linear infinite;transition:opacity .3s,stroke-width .3s;}
+#mfilm svg.mhot .mflow{opacity:.1;}
+#mfilm svg.mhot .mflow.on{opacity:.95;stroke-width:1.8;}
 @keyframes mflow{to{stroke-dashoffset:-22}}
 @media (prefers-reduced-motion:reduce){.mflow{animation:none;}}
 .mhint-touch{display:none;}
@@ -3498,7 +3512,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
     <div class="th-leak-in" aria-hidden="true"></div><div class="th-grain-in" aria-hidden="true"></div>
     <div class="th-edge t" aria-hidden="true"><span>KODAK 400</span><span>▸ 12A</span></div>
     <div class="th-rule"></div>
-    <p class="th-q">BL 從來不只是單純的戀愛故事，<br>它是各國社會文化與性別體制的一面<strong>鏡子</strong>，<br>精準反射出當地消費者的<strong>集體心理與精神匱乏</strong>。</p>
+    <p class="th-q">BL 從來不只是單純的戀愛故事，<br>它是各國社會文化與性別體制的一面<strong>鏡子</strong>，<br>折射出當地觀眾的<strong>集體心理與精神匱乏</strong>。</p>
     <p class="th-attr">Global BL Cultural Observatory · Core Thesis</p>
     <div class="th-edge b" aria-hidden="true"><span>BL · CORE THESIS</span><span>13 ▸</span></div>
   </div>
@@ -3556,7 +3570,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <div class="fa-content">
         <p class="fa-ctry">🇹🇭 泰國 · Thailand</p>
         <h3 class="fa-h">沉浸式<em>狂歡</em></h3>
-        <p class="fa-p">佛教文化的表面包容催生了獨特的「Koo-jin（真人CP）營業」文化。粉絲作為「投資人」，透過展現購買力決定CP的商業壽命，打破第四面牆的沉浸體驗是其核心驅動力。</p>
+        <p class="fa-p">有觀點將泰國的「Koo-jin（真人CP）營業」文化與佛教社會的包容氛圍連結。粉絲常被形容為「投資人」，以購買力支持 CP 的商業壽命，打破第四面牆的沉浸體驗是其核心驅動力。</p>
         <div class="fa-kws">
           <span class="fa-kw">真人CP營業</span><span class="fa-kw">打破第四面牆</span><span class="fa-kw">粉絲即投資人</span><span class="fa-kw">佛教包容文化</span>
         </div>
@@ -3599,7 +3613,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <div class="fa-content">
         <p class="fa-ctry">🇯🇵 日本 · Japan</p>
         <h3 class="fa-h">期間限定<em>幻境</em></h3>
-        <p class="fa-p">嚴格的「攻受體制」源於女性逃離現實父權壓迫、追求去性別化烏托邦的嘗試。粉絲定位為「旁觀者」，追求純粹的精神性愛，極力避免演員與角色的現實過度綁定。</p>
+        <p class="fa-p">有研究者認為，「攻受體制」與女性讀者想暫時離開現實父權框架、想像去性別化烏托邦的需求有關。粉絲多以「旁觀者」自居，重視角色之間的情感，較少把演員與角色在現實中綁定。</p>
         <div class="fa-kws">
           <span class="fa-kw">攻受體制</span><span class="fa-kw">旁觀者視角</span><span class="fa-kw">虛構保護圈</span><span class="fa-kw">建前/本音</span>
         </div>
@@ -3650,7 +3664,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <div class="fb-content">
         <p class="fb-ctry">🇺🇸🇪🇺 歐美 · West</p>
         <h3 class="fb-h">反叛的<em>斜線</em></h3>
-        <p class="fb-p">起源於《星際爭霸戰》的 Slash 文化，強調交織性、身分認同與絕對的權力對等。粉絲將消費視為政治表態，反抗異性戀霸權，對「賣腐（Queerbaiting）」與刻板印象極度零容忍。</p>
+        <p class="fb-p">起源於《星際爭霸戰》的 Slash 文化，較重視交織性、身分認同與角色之間的權力對等。不少粉絲把消費視為一種表態，也常公開批評「賣腐（Queerbaiting）」與刻板印象。</p>
         <div class="fb-kws">
           <span class="fb-kw">政治表態消費</span><span class="fb-kw">交織性</span><span class="fb-kw">反 Queerbaiting</span><span class="fb-kw">身分流動</span>
         </div>
@@ -3693,7 +3707,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <div class="fb-content">
         <p class="fb-ctry">🇯🇵🇨🇳🇰🇷🇹🇭 亞洲 · Asia</p>
         <h3 class="fb-h">避難的<em>烏托邦</em></h3>
-        <p class="fb-p">亞洲傳統 BL 建立在「攻受二元」的權力美學上，為女性讀者提供逃離現實性別束縛的精神空間。各國因地制宜：日本的隱忍、泰國的解放、中國的隱喻、韓國的視覺奇觀。</p>
+        <p class="fb-p">許多亞洲 BL 作品以「攻受二元」的權力美學為基礎，為女性讀者提供逃離現實性別束縛的精神空間。各國因地制宜：日本的隱忍、泰國的解放、中國的隱喻、韓國的視覺奇觀。</p>
         <div class="fb-kws">
           <span class="fb-kw">攻受二元美學</span><span class="fb-kw">精神逃避空間</span><span class="fb-kw">在地化改造</span><span class="fb-kw">女性凝視</span>
         </div>
@@ -3708,7 +3722,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
 
 <!-- FLIP CARDS -->
 <section class="flip-sec">
-  <div class="si"><p class="eye">// 七國文化解碼 · Seven Nations Decoded</p><h2 class="tit">翻轉，看見<em>背後的故事</em></h2><p class="sub">Hover 翻轉卡片 · 解碼各國性別體制與消費心理</p></div>
+  <div class="si"><p class="eye">// 七國文化解碼 · Seven Nations Decoded</p><h2 class="tit">翻轉，看見<em>背後的故事</em></h2><p class="sub">點擊或滑過翻轉卡片 · 解碼各國性別體制與消費心理</p></div>
   <div class="flip-grid" id="fg"></div>
 </section>
 
@@ -3773,7 +3787,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
         <div class="cdc-nation"><span class="cdc-flag">🇪🇺</span><span class="cdc-code">EU</span><span class="cdc-name">歐洲</span></div>
         <div class="cdc-cell cdc-c1"><span class="cdc-pill">串流</span><span class="cdc-pill">獨立電影</span></div>
         <div class="cdc-cell cdc-c2"><span class="cdc-pill">個人主義</span></div>
-        <div class="cdc-cell cdc-c3"><span class="cdc-pill">模糊 BL/LGBTQ+</span></div>
+        <div class="cdc-cell cdc-c3"><span class="cdc-pill">LGBTQ+ 寫實</span></div>
         <div class="cdc-cell cdc-c4"><span class="cdc-tag">心靈共鳴、去標籤化</span></div>
       </div>
     </div>
@@ -3790,8 +3804,8 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
     <p class="epi-lbl">// 結語 · 台灣文化座標</p>
     <h2 class="epi-h">尋找台灣的<br><em>文化座標</em></h2>
     <div class="epi-blocks">
-      <div class="epi-blk"><span class="epi-n">01</span><p class="epi-tag">缺憾的投射</p><h3 class="epi-bh">各國 BL 體制，皆是在地心理匱乏的折射</h3><p class="epi-bp">日本的逃避、歐美的反叛、泰國的沉浸、中國的隱喻——每一種 BL 消費型態，都精準指向那個社會的性別傷口與集體渴望。</p></div>
-      <div class="epi-blk"><span class="epi-n">02</span><p class="epi-tag">歷史底蘊與絕對自由</p><h3 class="epi-bh">從白先勇《孽子》到婚姻平權，台灣擁有免於審查恐懼的創作環境</h3><p class="epi-bp">亞洲首個同婚合法國家的身分，讓台灣 BL 創作者能夠直視傷痕、書寫禁忌。</p></div>
+      <div class="epi-blk"><span class="epi-n">01</span><p class="epi-tag">缺憾的投射</p><h3 class="epi-bh">各國 BL 體制，或許都是在地心理匱乏的折射</h3><p class="epi-bp">日本的逃避、歐美的反叛、泰國的沉浸、中國的隱喻——每一種 BL 消費型態，都可以看見那個社會的性別傷口與集體渴望。</p></div>
+      <div class="epi-blk"><span class="epi-n">02</span><p class="epi-tag">歷史底蘊與創作自由</p><h3 class="epi-bh">從戒嚴時期出版的《孽子》，到解嚴後逐步開放的言論與出版自由，台灣累積了深厚的同志書寫傳統</h3><p class="epi-bp">2019 年成為亞洲第一個同婚合法化的地方，則讓台灣 BL 能更貼近真實生活，直視傷痕、書寫禁忌。</p></div>
       <div class="epi-blk"><span class="epi-n">03</span><p class="epi-tag">直視傷痕與尺度綻放</p><h3 class="epi-bh">將大時代悲劇與個人極致愛戀交織，是台灣獨有的敘事能量</h3><p class="epi-bp">《刻在你心底的名字》捕捉了解嚴初期「體制已開、心靈未解」的社會壓抑，將時代裂縫中的無奈，化為跨越三十年的刻骨深情。</p></div>
       <div class="epi-blk"><span class="epi-n">04</span><p class="epi-tag">動漫復興與專屬語彙</p><h3 class="epi-bh">文策院推動下，台灣正建立跨媒材 IP 產業鏈</h3><p class="epi-bp">宮廟文化、冥婚民俗、本土地景——台灣的在地文化符號正被具象化為專屬視覺語彙。</p></div>
     </div>
@@ -3810,7 +3824,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
   <div class="si"><p class="eye">// 三條研究軸線 · Three Research Axes</p><h2 class="tit">深入探索<em>三條研究軸線</em></h2><p class="sub">美學 · 受眾 · 文化</p></div>
   <div class="axes">
     <div class="axis"><div class="ax-img"><img id="ax1" src="Three Research Axes/00.jpg" alt="風格經緯"></div><div class="ax-body"><span class="ax-num">01</span><p class="ax-tag">美學 × 商業分析</p><h3 class="ax-h">風格<em>經緯</em></h3><p class="ax-p">解構 BL 劇的視覺語言——燈光、構圖、色調如何建構慾望的美學語法。從泰國的熱帶暖色到日本的清冷線條，風格即意識形態。</p></div></div>
-    <div class="axis"><div class="ax-img"><img id="ax2" src="Three Research Axes/01.jpg" alt="受眾解構"></div><div class="ax-body"><span class="ax-num">02</span><p class="ax-tag">女性凝視 × 心理機制</p><h3 class="ax-h">受眾<em>解構</em></h3><p class="ax-p">誰在看？她們為何著迷？BL 的跨國受眾心理折射出全球女性對情感表達自由的深層渴望。</p></div></div>
+    <div class="axis"><div class="ax-img"><img id="ax2" src="Three Research Axes/01.jpg" alt="受眾解構"></div><div class="ax-body"><span class="ax-num">02</span><p class="ax-tag">女性凝視 × 心理機制</p><h3 class="ax-h">受眾<em>解構</em></h3><p class="ax-p">誰在看？她們為何著迷？從 BL 的跨國受眾心理，可以看見許多女性對情感表達自由的渴望。</p></div></div>
     <div class="axis" onclick="snTab(document.querySelector('.sn[onclick*=culture]'),'culture')" style="cursor:pointer" title="前往 文化錯位"><div class="ax-img"><img id="ax3" src="Three Research Axes/02.jpg" alt="文化錯位"></div><div class="ax-body"><span class="ax-num">03</span><p class="ax-tag">現實困境 × 幻想投射</p><h3 class="ax-h">文化<em>錯位</em></h3><p class="ax-p">文化錯位揭示 BL 如何在跨越邊界時，同時翻譯與重構性別想像。</p></div></div>
   </div>
 </section>
@@ -3840,7 +3854,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
             <span class="bud-card-tag">耽美帝國</span>
           </div>
           <div class="bud-card-theme">「禁忌反而放大欲望」</div>
-          <p class="bud-card-body">廣電總局明令禁止同性戀題材，所有影視改編必須「去同性化」包裝為兄弟情。然而矛盾的是，中國擁有全球最大的耽美原創小說市場。即使在去同性化的包裝下，《陳情令》仍引發廣大迴響，並帶動拍攝地旅遊、周邊商品與見面會等延伸商機。</p>
+          <p class="bud-card-body">廣電總局明令禁止同性戀題材，影視改編作品多以「兄弟情」的方式呈現。然而矛盾的是，中國的耽美原創小說市場規模龐大。即使在去同性化的包裝下，《陳情令》仍引發廣大迴響，並帶動拍攝地旅遊、周邊商品與見面會等延伸商機。</p>
           <div style="margin-top:.8rem;padding:.6rem;background:rgba(196,29,58,.04);border:1px solid rgba(196,29,58,.1);border-radius:3px;font-size:.72rem;color:rgba(27,68,54,.6);line-height:1.65;">
             <strong style="color:var(--bud-wine);">漫動影生態：</strong>耽美小說 → 影視改編（去同性化）→ 粉絲自行「還原」→ 龐大同人二創<br>
             <strong style="color:var(--bud-wine);">動畫代表：</strong>《天官賜福》《魔道祖師》
@@ -3870,7 +3884,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
             <span class="bud-card-tag">深夜烏托邦</span>
           </div>
           <div class="bud-card-theme">「隱忍與疏離的純粹美學」</div>
-          <p class="bud-card-body">BL 的精神發源地，擁有最完整的「漫→動畫→廣播劇→真人影視」IP 產業鏈。深夜劇場格式主要鎖定核心觀眾，演員較少在作品之外延續 CP 經營。日本 BL 常以隱忍、克制與眼神交流，表現未說出口的情感。</p>
+          <p class="bud-card-body">BL 類型的重要發源地，擁有相當完整的「漫→動畫→廣播劇→真人影視」IP 產業鏈。深夜劇場格式主要鎖定核心觀眾，演員較少在作品之外延續 CP 經營。日本 BL 常以隱忍、克制與眼神交流，表現未說出口的情感。</p>
           <div style="margin-top:.8rem;padding:.6rem;background:rgba(188,0,45,.04);border:1px solid rgba(188,0,45,.1);border-radius:3px;font-size:.72rem;color:rgba(27,68,54,.6);line-height:1.65;">
             <strong style="color:var(--bud-wine);">代表漫畫：</strong>中村明日美子《同級生》・寶井理人《10 count》<br>
             <strong style="color:var(--bud-wine);">代表動畫：</strong>《GIVEN 被贈與的未來》
@@ -3903,7 +3917,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
           <p class="bud-card-body">韓國 BL 的特色之一是與 Webtoon（數位條漫）的緊密連結，許多作品改編自條漫。作品多以偶像式的光影與妝造呈現，較少觸及現實社會議題，為觀眾提供一個視覺上的逃逸空間。</p>
           <div style="margin-top:.8rem;padding:.6rem;background:rgba(0,52,120,.04);border:1px solid rgba(0,52,120,.1);border-radius:3px;font-size:.72rem;color:rgba(27,68,54,.6);line-height:1.65;">
             <strong style="color:var(--bud-wine);">Webtoon 代表：</strong>《JINX》・《夜畫帳》<br>
-            <strong style="color:var(--bud-wine);">市場策略：</strong>條漫 → Lezhin/Tappytoon 全球連載 → K-Pop 偶像練習生引流 → OTT 短劇
+            <strong style="color:var(--bud-wine);">市場策略：</strong>條漫 → Lezhin/Tappytoon 全球連載 → 改編為網路短劇，部分由偶像出身的演員主演
           </div>
           <div class="bud-card-works"><strong>代表劇集：</strong>《語意錯誤》《第八感》</div>
       <div class="sm-poster-section">
@@ -3929,11 +3943,11 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
             <div><div class="bud-card-name">泰國</div><div style="font-size:.62rem;color:var(--bud-purple);">THAILAND</div></div>
             <span class="bud-card-tag">粉紅軟實力</span>
           </div>
-          <div class="bud-card-theme">「CP 真人營業的發明地」</div>
-          <p class="bud-card-body">泰國確立了「戲裡戀愛、戲外 CP」的獨特行銷模式，開創雙人商業代言、國際巡迴見面會的龐大周邊產值。近年泰國文化部也將 BL 與 GL 內容列為推動創意經濟與軟實力的產業之一，並規劃結合取景地與觀光路線（Khaosod English, 2026）。美學上兼具海島浪漫（ITSAY）與黑幫寫實（KinnPorsche）等不同風格。</p>
+          <div class="bud-card-theme">「CP 真人營業的代表」</div>
+          <p class="bud-card-body">泰國確立了「戲裡戀愛、戲外 CP」的獨特行銷模式，延伸出雙人商業代言、國際巡迴見面會等周邊商機。近年泰國文化部也將 BL 與 GL 內容列為推動創意經濟與軟實力的產業之一，並規劃結合取景地與觀光路線（Khaosod English, 2026）。美學上兼具海島浪漫（ITSAY）與黑幫寫實（KinnPorsche）等不同風格。</p>
           <div style="margin-top:.8rem;padding:.6rem;background:rgba(165,25,49,.04);border:1px solid rgba(165,25,49,.1);border-radius:3px;font-size:.72rem;color:rgba(27,68,54,.6);line-height:1.65;">
             <strong style="color:var(--bud-wine);">市場鏈：</strong>網路小說（Y 小說）→ 影視爆發 → 雙人 CP 真人營業<br>
-            <strong style="color:var(--bud-wine);">代表公司：</strong>GMMTV・Nadao Bangkok・WeTV
+            <strong style="color:var(--bud-wine);">代表公司：</strong>GMMTV・Nadao Bangkok・Be On Cloud・Domundi
           </div>
           <div class="bud-card-works"><strong>代表作品：</strong>《以你的心詮釋我的愛》《KinnPorsche》《清醒點，泰爾先生》</div>
       <div class="sm-poster-section">
@@ -3960,10 +3974,10 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
             <span class="bud-card-tag">自由實驗場</span>
           </div>
           <div class="bud-card-theme">「同婚合法地的在地寫實共鳴」</div>
-          <p class="bud-card-body">亞洲第一個同婚合法的地方，創作題材相對多元，部分作品觸及同婚後的法律現實、職場與家庭議題。台灣原創漫畫在 CCC 創作集、LINE WEBTOON 等平台蓬勃發展，HOM（鴻）《大城小事》等作品細膩描繪都市男同志的真實生活困境。</p>
+          <p class="bud-card-body">亞洲第一個同婚合法的地方，創作題材相對多元，部分作品觸及同婚後的法律現實、職場與家庭議題。台灣原創 BL 漫畫在 CCC 創作集、LINE WEBTOON 等平台快速成長，如每日青菜《Day Off》以辦公室戀情為主軸，已售出多國語言版權。</p>
           <div style="margin-top:.8rem;padding:.6rem;background:rgba(254,0,0,.04);border:1px solid rgba(254,0,0,.1);border-radius:3px;font-size:.72rem;color:rgba(27,68,54,.6);line-height:1.65;">
-            <strong style="color:var(--bud-wine);">代表漫畫：</strong>每日青菜《Day Off》・HOM（鴻）《大城小事》・MAE《記憶的怪物》<br>
-            <strong style="color:var(--bud-wine);">市場策略：</strong>跨國合製（日本樂天 TV・GagaOOLala）切入海外小眾市場
+            <strong style="color:var(--bud-wine);">代表漫畫：</strong>每日青菜《Day Off》<br>
+            <strong style="color:var(--bud-wine);">市場策略：</strong>跨國合製與平台合作（如 GagaOOLala）切入海外市場
           </div>
           <div class="bud-card-works"><strong>代表劇集：</strong>《HIStory》系列《向流星許願的我們》</div>
       <div class="sm-poster-section">
@@ -3990,7 +4004,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
             <span class="bud-card-tag">酷兒主流化</span>
           </div>
           <div class="bud-card-theme">「同人反哺主流的童話療癒」</div>
-          <p class="bud-card-body">從早期網路同人次文化（Slash Fiction）出發，近年有圖像小說被 Netflix、Amazon Prime 等平台改編為影視作品並全球播出。演員較少進行真人 CP 式的劇外經營。《戀愛修課》Heartstopper 以溫柔的筆調描寫酷兒少年的成長，被不少觀眾視為一種青春療癒。</p>
+          <p class="bud-card-body">從同人次文化（Slash Fiction，早期以同人誌流傳）出發，近年有圖像小說被 Netflix、Amazon Prime 等平台改編為影視作品並全球播出。演員較少進行真人 CP 式的劇外經營。《戀愛修課》Heartstopper 以溫柔的筆調描寫酷兒少年的成長，被不少觀眾視為一種青春療癒。</p>
           <div style="margin-top:.8rem;padding:.6rem;background:rgba(0,51,153,.04);border:1px solid rgba(0,51,153,.1);border-radius:3px;font-size:.72rem;color:rgba(27,68,54,.6);line-height:1.65;">
             <strong style="color:var(--bud-wine);">圖像小說代表：</strong>艾莉絲·歐斯曼《戀愛修課》（原為網路條漫）<br>
             <strong style="color:var(--bud-wine);">特色：</strong>強調多元族群共融（不同膚色・跨性別角色）
@@ -4059,7 +4073,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
         </div>
         <div class="aud-imgtext-text">
           <h4>「她」為什麼愛 BL？<br><em style="font-size:.88rem;color:var(--vin-sepia);">Female Gaze 與安全投射的理論基礎</em></h4>
-          <p>電影理論學者 Laura Mulvey 的「Male Gaze」（男性凝視）理論指出，傳統影視往往以男性視角物化女性。BL 的不同之處在於：女性讀者得以跳脫「被凝視的客體」身份，化身為「凝視的主體」——欣賞一場與自身性別無關的情感故事，暫時跳脫傳統性別框架。</p>
+          <p>電影理論學者 Laura Mulvey 的「Male Gaze」（男性凝視）理論指出，傳統影視往往以男性視角物化女性。有學者認為，BL 的不同之處在於：女性讀者得以跳脫「被凝視的客體」身份，化身為「凝視的主體」——欣賞一場與自身性別無關的情感故事，暫時跳脫傳統性別框架。</p>
           <p style="margin-top:.6rem;">也有觀點認為，BL 提供的不只是視覺快感：兩位男主角相對平等的地位，讓女性受眾得以在虛構世界中想像「不受性別壓迫的愛情」。</p>
         </div>
       </div>
@@ -4093,8 +4107,8 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
           <div class="bud-sub">從亞洲純愛到歐美寫實的接受度差異</div>
           <ul>
             <li><strong>亞洲 BL 的距離感：</strong>部分同志社群認為亞洲 BL 過於美化，與同志的真實處境有距離；也有人肯定其傳遞的平等戀愛想像。</li>
-            <li><strong>歐美酷兒影視的打回：</strong>歐美作品較著重社會寫實，較常引起 LGBTQ+ 社群的共鳴。</li>
-            <li><strong>跨性別接受光譜：</strong>亞洲 BL 著重情感烏托邦，歐美著重現實處境——形成全球受眾接受度的東西方分野。</li>
+            <li><strong>歐美酷兒影視的共鳴：</strong>歐美作品較著重社會寫實，較常引起 LGBTQ+ 社群的共鳴。</li>
+            <li><strong>跨文化的接受差異：</strong>亞洲 BL 著重情感烏托邦，歐美著重現實處境——形成全球受眾接受度的東西方分野。</li>
           </ul>
         </div>
       </div>
@@ -4162,7 +4176,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <div class="aud-eco-body">
         <p style="font-family:var(--serif);font-size:.82rem;font-weight:700;color:#3A2010;margin:0 0 .8rem;">「擬真陪伴」的高黏著消費模型</p>
         <ul class="aud-eco-chain">
-          <li>選秀節目建立 CP 粉絲基礎</li>
+          <li>經紀公司配對並長期經營 CP 組合</li>
           <li>Y 劇播出強化角色情感</li>
           <li>社交媒體甜蜜互動（Fanservice）維繫日常黏著</li>
           <li>雙人商業代言、品牌活動變現</li>
@@ -4199,8 +4213,8 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
         <p style="font-family:var(--serif);font-size:.82rem;font-weight:700;color:#3A2010;margin:0 0 .8rem;">數據驅動的精準影視轉化流水線</p>
         <ul class="aud-eco-chain">
           <li>Webtoon / BL 小說訂閱制付費閱讀</li>
-          <li>演算法篩選高評分作品進行影視開發</li>
-          <li>Netflix / TVING 版權授權國際放映</li>
+          <li>從人氣作品中挑選進行影視開發</li>
+          <li>Watcha、Viki 等平台播出與海外授權</li>
           <li>K-Pop 偶像跨界主演，粉絲雙重消費</li>
           <li>OST 授權、品牌置入廣告二次變現</li>
         </ul>
@@ -4216,7 +4230,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       <div class="aud-eco-body">
         <p style="font-family:var(--serif);font-size:.82rem;font-weight:700;color:#3A2010;margin:0 0 .8rem;">限制之下發展出的另類流通</p>
         <ul class="aud-eco-chain">
-          <li>「兄弟情」題材繞過審查進入主流院線</li>
+          <li>以「兄弟情」改編進入主流串流平台</li>
           <li>同人圈（AO3/飯圈）私下流通原耽作品</li>
           <li>透過海外平台播出觸及海外觀眾</li>
           <li>實體周邊（設定集/亞克力板）彌補數位限制</li>
@@ -4238,7 +4252,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
         <div class="bud-eyebrow">Cultural Dislocation · 文化錯位</div>
         <h1 class="bud-h1" style="font-size:clamp(1.8rem,4vw,3rem);margin:.6rem 0;">現實越窒息<br>幻想越美麗</h1>
         <div class="bud-rule"><span class="bud-rule-inner">◆ &nbsp; 翻轉卡片 &nbsp; ◆</span></div>
-        <p class="bud-body" style="max-width:600px;margin:.8rem auto 0;">探討各國的現實性別困境與體制壓迫，如何影響粉絲對 BL 作品中「粉紅烏托邦」的情感投射。<span style="color:var(--bud-purple);"> ← 懸停翻轉卡片</span></p>
+        <p class="bud-body" style="max-width:600px;margin:.8rem auto 0;">探討各國的現實性別困境與體制壓迫，如何影響粉絲對 BL 作品中「粉紅烏托邦」的情感投射。<span style="color:var(--bud-purple);"> ← 點擊或滑過卡片即可翻面</span></p>
       </div>
 
       <div class="bud-flip-grid">
@@ -4310,7 +4324,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
               <div>
                 <div class="bud-flip-utopia">「階級與性別雙重完美的烏托邦」</div>
                 <div style="font-size:.62rem;letter-spacing:.1em;color:var(--bud-purple);text-transform:uppercase;margin-bottom:.5rem;">粉絲投射機制</div>
-                <p class="bud-flip-text">劇中主角通常是非富即貴、有社會地位的菁英（黑幫少爺、醫師、工程師），且他們的父母與同儕往往「無條件支持」他們的同性戀情。有觀點認為，這反映了觀眾對階級流動與平權社會的想像。</p>
+                <p class="bud-flip-text">許多作品的主角是非富即貴、有社會地位的菁英（黑幫少爺、醫師、工程師），且他們的父母與同儕往往「無條件支持」他們的同性戀情。有觀點認為，這反映了觀眾對階級流動與平權社會的想像。</p>
               </div>
               <div class="bud-flip-label">Fantasy Layer ✦</div>
             </div>
@@ -4521,7 +4535,7 @@ const HP_WM_DATA = {
       {title:'清醒點，泰爾先生',en:'Me and Thee',year:'2025',desc:'黑幫少爺 Thee 不擅與人相處，偶遇攝影師 Peach 後聘為生活教練。朝夕相處間，Thee 對 Peach 暗生情愫，在他身上感受到前所未有的溫暖與愛。',img:'map/Me and Thee01.jpg',imgs:['map/Me and Thee01.jpg','map/Me and Thee02.jpg','map/Me and Thee03.jpg'],yt:'https://www.youtube.com/watch?v=PXqpISTPse8'},
       {title:'通往天堂的門票',en:'Ticket to Heaven',year:'2026',desc:'1996 年泰國天主教男校，虔誠資優生 Tanrak 與叛逆轉學生 Barth 在朝夕相處中滋長禁忌情愫。信仰與愛情的拉鋸，讓這張通往天堂的門票充滿掙扎與抉擇。',img:'map/Ticket to Heaven01.jpg',imgs:['map/Ticket to Heaven01.jpg','map/Ticket to Heaven02.jpg','map/Ticket to Heaven03.jpg'],yt:'https://www.youtube.com/watch?v=9rPBmHoxQX4'},
     ],
-    monetize:{model:'擬真陪伴 · Parasocial CP Economy',steps:['選秀節目建立 CP 粉絲基礎（如 GMMTV 旗下藝人）','Y 劇播出強化角色情感，確立「戲裡戀愛」印象','社交媒體甜蜜互動（Fanservice）維繫日常黏著度','雙人商業代言與品牌活動','國際巡迴見面會與周邊商品'],desc:'泰國模式常被稱為「擬真陪伴」：業者透過 CP 在劇外的持續互動經營粉絲關係，並延伸至代言、見面會與周邊等消費（Prasannam, 2019）。'}
+    monetize:{model:'擬真陪伴 · Parasocial CP Economy',steps:['經紀公司配對並長期經營 CP 組合（如 GMMTV 旗下藝人）','Y 劇播出強化角色情感，確立「戲裡戀愛」印象','社交媒體甜蜜互動（Fanservice）維繫日常黏著度','雙人商業代言與品牌活動','國際巡迴見面會與周邊商品'],desc:'泰國模式常被稱為「擬真陪伴」：業者透過 CP 在劇外的持續互動經營粉絲關係，並延伸至代言、見面會與周邊等消費（Prasannam, 2019）。'}
   },
   tw:{
     flag:'🇹🇼', name:'台灣', en:'TAIWAN · 自由實驗場',
@@ -5004,23 +5018,30 @@ function buildMap(){
   ];
   var POS={"us":[22.78,28.68],"eu":[52.78,21.32],"cn":[79.44,33.09],"kr":[85.5,30.51],"jp":[88.47,30.51],"tw":[83.61,39.93],"th":[78.06,45.96]};
   PINS.forEach(function(p){p.x=POS[p.key][0];p.y=POS[p.key][1];});
-  // 從泰國流向其他地區的發光虛線
-  var th=POS.th, tx=th[0]/100*W, ty=th[1]/100*H, arcs='';
-  PINS.forEach(function(p){
-    if(p.key==='th')return;
-    var x=p.x/100*W, y=p.y/100*H, mx=(tx+x)/2, my=Math.min(ty,y)-Math.abs(tx-x)*.28-12;
-    arcs+='<path class="mflow" d="M'+tx.toFixed(1)+','+ty.toFixed(1)+' Q'+mx.toFixed(1)+','+my.toFixed(1)+' '+x.toFixed(1)+','+y.toFixed(1)+'" stroke="'+p.c+'" opacity=".6"/>';
-  });
+  // 各地區互相連結的網狀虛線：每兩個地區一條弧線，顏色從一端漸變到另一端
+  var arcs='', grads='';
+  for(var i=0;i<PINS.length;i++)for(var j=i+1;j<PINS.length;j++){
+    var a=PINS[i], b=PINS[j];
+    var ax=a.x/100*W, ay=a.y/100*H, bx=b.x/100*W, by=b.y/100*H;
+    var dist=Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
+    var mx=(ax+bx)/2, my=Math.max(16,Math.min(ay,by)-dist*.16-6);
+    var gid='mg-'+a.key+'-'+b.key;
+    grads+='<linearGradient id="'+gid+'" gradientUnits="userSpaceOnUse" x1="'+ax.toFixed(1)+'" y1="'+ay.toFixed(1)+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'"><stop offset="0" stop-color="'+a.c+'"/><stop offset="1" stop-color="'+b.c+'"/></linearGradient>';
+    arcs+='<path class="mflow" data-a="'+a.key+'" data-b="'+b.key+'" style="animation-delay:-'+((i*7+j*3)%10/5).toFixed(1)+'s" d="M'+ax.toFixed(1)+','+ay.toFixed(1)+' Q'+mx.toFixed(1)+','+my.toFixed(1)+' '+bx.toFixed(1)+','+by.toFixed(1)+'" stroke="url(#'+gid+')"/>';
+  }
   host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'
     +'<defs><filter id="mglow" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +'<pattern id="mscan" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="rgba(168,216,212,.035)"/></pattern>'
-    +'<radialGradient id="mlb" cx="50%" cy="45%" r="70%"><stop offset="0%" stop-color="#12222A"/><stop offset="100%" stop-color="#05090C"/></radialGradient></defs>'
+    +grads+'<radialGradient id="mlb" cx="50%" cy="45%" r="70%"><stop offset="0%" stop-color="#12222A"/><stop offset="100%" stop-color="#05090C"/></radialGradient></defs>'
     +'<rect width="100%" height="100%" fill="url(#mlb)"/>'
     +'<line x1="0" y1="'+(78/136*H).toFixed(1)+'" x2="'+W+'" y2="'+(78/136*H).toFixed(1)+'" stroke="rgba(242,176,122,.12)" stroke-dasharray="4 8"/>'
     +'<path d="'+LAND+'" fill="rgba(242,176,122,.06)" stroke="#F2B07A" stroke-width=".9" stroke-linejoin="round" vector-effect="non-scaling-stroke" filter="url(#mglow)" opacity=".9"/>'
     +arcs+'<rect width="100%" height="100%" fill="url(#mscan)"/></svg>'
     +'<div class="mflabel" style="top:.7rem;left:1rem;">KODAK 400 · 13A</div><div class="mflabel" style="bottom:.7rem;left:1rem;">▸ BL ATLAS · 35MM</div>';
-  pinsEl.innerHTML=PINS.map(function(p){return '<div class="mpin" style="left:'+p.x+'%;top:'+p.y+'%;" onclick="openPanel(\''+p.key+'\')">'+'<div class="mpin-pulse" style="width:32px;height:32px;background:'+p.c+'18;border:1.5px dashed '+p.c+'66;left:50%;top:50%;"></div>'+'<div class="mpin-dot" style="background:'+p.c+';box-shadow:0 0 14px '+p.c+'aa;"></div>'+'<div class="mpin-label">'+p.name+'</div></div>';}).join('');
+  pinsEl.innerHTML=PINS.map(function(p){return '<div class="mpin" data-key="'+p.key+'" style="left:'+p.x+'%;top:'+p.y+'%;" onclick="openPanel(\''+p.key+'\')">'+'<div class="mpin-pulse" style="width:32px;height:32px;background:'+p.c+'18;border:1.5px dashed '+p.c+'66;left:50%;top:50%;"></div>'+'<div class="mpin-dot" style="background:'+p.c+';box-shadow:0 0 14px '+p.c+'aa;"></div>'+'<div class="mpin-label">'+p.name+'</div></div>';}).join('');
+  var svgEl=host.querySelector('svg');
+  function hot(key){ if(!svgEl)return; svgEl.classList.toggle('mhot',!!key); svgEl.querySelectorAll('.mflow').forEach(function(l){ l.classList.toggle('on', !!key && (l.dataset.a===key||l.dataset.b===key)); }); }
+  pinsEl.querySelectorAll('.mpin').forEach(function(el){ el.addEventListener('mouseenter',function(){hot(el.dataset.key);}); el.addEventListener('mouseleave',function(){hot(null);}); });
   // 手機：地圖比畫面寬時，一開始先捲到亞洲（大部分標記在這裡）
   function focusAsia(){ if(stage&&stage.scrollWidth>stage.clientWidth+4){ stage.scrollLeft=Math.max(0,stage.scrollWidth*.80-stage.clientWidth*.6); } }
   setTimeout(focusAsia,60); window.addEventListener('resize',function(){setTimeout(focusAsia,150);});
@@ -5028,13 +5049,13 @@ function buildMap(){
 
 // ══ FLIP CARDS ══
 var FLIP=[
-  {key:'th',flag:'🇹🇭',name:'泰國',tag:'Thailand',src:'Seven Nations Decoded/th.jpg',img:1,h:'沉浸式<em>狂歡</em>',p:'Koo-jin 真人CP文化，粉絲作為投資人，透過購買力決定CP商業壽命。佛教包容文化催生打破第四面牆的沉浸體驗。',kw:['真人CP','Koo-jin','投資人文化','佛教包容']},
-  {key:'jp',flag:'🇯🇵',name:'日本',tag:'Japan',src:'Seven Nations Decoded/jp.jpeg',img:2,h:'期間限定<em>幻境</em>',p:'嚴格攻受體制源自女性逃離父權壓迫的精神需求。「旁觀者」視角，虛構保護圈，避免角色現實綁定。',kw:['攻受體制','旁觀者','虛構保護圈','精神救贖']},
-  {key:'kr',flag:'🇰🇷',name:'韓國',tag:'Korea',src:'Seven Nations Decoded/kr.jpg',img:3,h:'視覺工業的<em>移植</em>',p:'K-Pop 視覺美學移植 BL 場域，Webtoon 重塑凝視節奏。體格差設定與強弱翻轉是核心情慾語法。',kw:['K-Pop美學','體格差','Webtoon','感官衝擊']},
+  {key:'th',flag:'🇹🇭',name:'泰國',tag:'Thailand',src:'Seven Nations Decoded/th.jpg',img:1,h:'沉浸式<em>狂歡</em>',p:'Koo-jin 真人CP文化，粉絲常被形容為投資人，以購買力支持 CP 的商業壽命。佛教包容文化催生打破第四面牆的沉浸體驗。',kw:['真人CP','Koo-jin','投資人文化','佛教包容']},
+  {key:'jp',flag:'🇯🇵',name:'日本',tag:'Japan',src:'Seven Nations Decoded/jp.jpeg',img:2,h:'期間限定<em>幻境</em>',p:'有研究者認為，攻受體制與女性想暫時離開父權框架的精神需求有關。「旁觀者」視角，虛構保護圈，避免角色現實綁定。',kw:['攻受體制','旁觀者','虛構保護圈','精神救贖']},
+  {key:'kr',flag:'🇰🇷',name:'韓國',tag:'Korea',src:'Seven Nations Decoded/kr.jpg',img:3,h:'視覺工業的<em>移植</em>',p:'K-Pop 視覺美學移植 BL 場域，Webtoon 重塑凝視節奏。體格差與強弱翻轉是常見的情慾設定。',kw:['K-Pop美學','體格差','Webtoon','感官衝擊']},
   {key:'cn',flag:'🇨🇳',name:'中國',tag:'China',src:'Seven Nations Decoded/cn.jpg',img:4,h:'禁忌放大<em>慾望</em>',p:'審查催生「社會主義兄弟情」隱喻語言，反使粉絲強化文本解碼與二次創作能量，禁忌成為慾望放大器。',kw:['兄弟情隱喻','文本解碼','集體主義','禁忌效應']},
-  {key:'tw',flag:'🇹🇼',name:'台灣',tag:'Taiwan',src:'Seven Nations Decoded/tw.jpg',img:5,h:'日常共鳴的<em>在地化</em>',p:'同婚合法後的現實投射，攻受界線模糊，融入宮廟冥婚等在地信仰。消費行為伴隨平權認同。',kw:['同婚合法','平等多元','在地信仰','平權消費']},
-  {key:'us',flag:'🇺🇸',name:'美國',tag:'USA',src:'Seven Nations Decoded/us.png',img:1,h:'反叛的<em>斜線</em>',p:'星際爭霸戰 Slash 起源，強調交織性與絕對權力對等。消費即政治表態，對 Queerbaiting 零容忍。',kw:['Slash文化','政治消費','交織性','反Queerbaiting']},
-  {key:'eu',flag:'🇪🇺',name:'歐洲',tag:'Europe',src:'Seven Nations Decoded/eu.webp',img:2,h:'心靈共鳴的<em>童話</em>',p:'模糊 BL 與 LGBTQ+ 界線，聚焦青少年自我探索與心理健康。去標籤化，重視社會教育意義。',kw:['青春寫實','心理健康','去標籤化','社會教育']},
+  {key:'tw',flag:'🇹🇼',name:'台灣',tag:'Taiwan',src:'Seven Nations Decoded/tw.jpg',img:5,h:'日常共鳴的<em>在地化</em>',p:'同婚合法後的現實投射，攻受界線模糊，部分作品融入宮廟、冥婚等在地信仰。消費行為伴隨平權認同。',kw:['同婚合法','平等多元','在地信仰','平權消費']},
+  {key:'us',flag:'🇺🇸',name:'美國',tag:'USA',src:'Seven Nations Decoded/us.png',img:1,h:'反叛的<em>斜線</em>',p:'星際爭霸戰 Slash 起源，強調交織性與絕對權力對等。消費常帶有表態意味，對 Queerbaiting 相當敏感。',kw:['Slash文化','政治消費','交織性','反Queerbaiting']},
+  {key:'eu',flag:'🇪🇺',name:'歐洲',tag:'Europe',src:'Seven Nations Decoded/eu.webp',img:2,h:'心靈共鳴的<em>童話</em>',p:'較少使用 BL 標籤，多以 LGBTQ+ 寫實作品呈現，聚焦青少年自我探索與心理健康。去標籤化，重視社會教育意義。',kw:['青春寫實','心理健康','去標籤化','社會教育']},
 ];
 function buildFlipCards(){
   var fg=document.getElementById('fg'); if(!fg) return;
@@ -5043,7 +5064,7 @@ function buildFlipCards(){
       +'<div class="fcard-inner">'
       +'<div class="fface">'
         +'<div class="ff-bg"><img src="'+(d.src||I[d.img])+'" alt=""></div>'
-        +'<span class="ff-hint">hover ↻</span>'
+        +'<span class="ff-hint">翻面 ↻</span>'
         +'<div class="ff-body"><div class="ff-flag">'+d.flag+'</div><div class="ff-name">'+d.name+'</div><div class="ff-tag">'+d.tag+'</div></div>'
       +'</div>'
       +'<div class="fback">'
@@ -5156,6 +5177,30 @@ var CP_GLANCE={
   eu:[['類型定位','LGBTQ+ 青春／寫實作品，較少以 BL 為類型'],['劇外 CP 經營','較少'],['主要播出','Netflix、BBC 等']],
   us:[['類型定位','LGBTQ+ 影集與小說改編'],['劇外 CP 經營','較少'],['主要播出','Hulu、Netflix、Amazon Prime 等']]
 };
+var CP_LEAD={
+  cn:['原創小說','審查限制','解碼文化','延伸商機'],
+  jp:['IP 產業鏈','劇外 CP 少','安全的疏離感'],
+  kr:['Webtoon 改編','偶像式美學','浪漫化想像','OTT 播出'],
+  th:['CP 營業模式','政府推動','產量規模','婚姻平權'],
+  tw:['同婚合法','寫實議題','原創漫畫','跨國合作'],
+  eu:['條漫改編','影展肯定','社會寫實','劇外 CP 少','類型脈絡'],
+  us:['Slash 同人','','多元議題','劇外 CP 少']
+};
+function cpFactHTML(key,f,i){
+  var m=String(f).match(/^([^：]{2,14})：([\s\S]*)$/);
+  if(m)return '<li><b class="cpf-lead">'+m[1]+'</b>'+m[2]+'</li>';
+  var lead=(CP_LEAD[key]||[])[i];
+  return '<li>'+(lead?'<b class="cpf-lead">'+lead+'</b>':'')+f+'</li>';
+}
+function cpJump(id){
+  var el=document.getElementById(id),nav=document.querySelector('.cpnav');if(!el)return;
+  // 找到真正在捲動的容器（電腦版是右欄，手機版可能是整個面板）
+  var box=el.parentElement;
+  while(box&&box!==document.body&&!(box.scrollHeight>box.clientHeight+2&&/(auto|scroll)/.test(getComputedStyle(box).overflowY)))box=box.parentElement;
+  if(!box||box===document.body)return el.scrollIntoView({behavior:'smooth'});
+  var top=box.scrollTop+el.getBoundingClientRect().top-box.getBoundingClientRect().top-(nav?nav.offsetHeight:0)-10;
+  box.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+}
 function openPanel(key){
   var d=HP_WM_DATA[key]; if(!d) return;
   document.getElementById('cpanel').setAttribute('data-country', key);
@@ -5165,14 +5210,20 @@ function openPanel(key){
   document.getElementById('cpnm').textContent=d.name;
   document.getElementById('cpth').textContent=d.theme;
   cpBuildSlides(d.works||[], IMGKEYS);
-  var tags=(TAGS[key]||[]).map(function(t){return '<span class="cptag hl">'+t+'</span>';}).join('');
+  // 文化關鍵詞移到左側大圖的標題下方
+  var hdr=document.querySelector('.cpl-hdr'),lt=document.getElementById('cpltags');
+  if(hdr&&!lt){lt=document.createElement('div');lt.id='cpltags';lt.className='cpl-tags';hdr.appendChild(lt);}
+  if(lt)lt.innerHTML=(TAGS[key]||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
+  var hasG=(CP_GLANCE[key]||[]).length, hasM=!!d.monetize;
+  var navItems=[hasG?['cps-glance','比較']:null,['cps-facts','觀察'],['cps-works','作品'],hasM?['cps-money','模式']:null].filter(Boolean);
   document.getElementById('cpbody').innerHTML=
-    ((CP_GLANCE[key]||[]).length?'<p class="cpst">// 快速比較</p><dl class="cpglance">'+CP_GLANCE[key].map(function(r){return '<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>';}).join('')+'</dl>':'')
-    +'<p class="cpst">// 文化關鍵詞</p><div class="cptags">'+tags+'</div>'
-    +'<p class="cpst">// 核心觀察</p><ul class="cpfacts">'+(d.facts||[]).map(function(f){return '<li>'+f+'</li>';}).join('')+'</ul>'
-    +'<p class="cpst">// 代表作品 <small style="font-size:.62rem;color:var(--faded);font-family:var(--mono);">— 點選作品切換大圖</small></p>'
+    '<div class="cpnav">'+navItems.map(function(n){return '<a href="javascript:void(0)" onclick="cpJump(\''+n[0]+'\')">'+n[1]+'</a>';}).join('')+'</div>'
+    +(hasG?'<p class="cpst" id="cps-glance">// 快速比較</p><dl class="cpglance">'+CP_GLANCE[key].map(function(r){return '<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>';}).join('')+'</dl>':'')
+    +'<p class="cpst" id="cps-facts">// 核心觀察</p><ul class="cpfacts">'+(d.facts||[]).map(function(f,i){return cpFactHTML(key,f,i);}).join('')+'</ul>'
+    +'<p class="cpst" id="cps-works">// 代表作品 <small style="font-size:.62rem;color:var(--faded);font-family:var(--mono);">— 點選作品切換大圖</small></p>'
     +'<div class="cpworks">'+(d.works||[]).map(function(w,i){var platHtml=(w.platforms||[]).map(function(p){return '<span class="wk-platform '+p.cls+'">'+p.label+'</span>';}).join('');var noteHtml=w.note?'<p class="wk-note">'+w.note+'</p>':'';var ytBtn=w.yt?'<a class="wm-yt-btn" href="'+w.yt+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ 官方預告片</a>':'';return '<div class="wk"'+(i===0?' on':'')+' onmouseenter="cpShowWork('+i+')" onclick="cpShowWork('+i+')">'+'<p class="wk-yr">'+w.year+'</p><h3 class="wk-tit">'+w.title+'</h3><p class="wk-en">'+w.en+'</p><p class="wk-desc">'+w.desc+'</p>'+platHtml+noteHtml+'<p class="wk-hint">▶ 滑入查看 3 張劇照</p>'+ytBtn+'</div>';}).join('')+'</div>'
-  +(d.monetize?'<p class="cpst">// 變現模式</p><div class="cp-monetize"><p style="font-family:var(--mono);font-size:.83rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(184,107,48,.9);margin-bottom:.6rem;">'+d.monetize.model+'</p><ul class="cp-monetize-steps">'+d.monetize.steps.map(function(s){return '<li class="cp-monetize-step">'+s+'</li>';}).join('')+'</ul><p class="cp-monetize-desc">'+d.monetize.desc+'</p></div>':'');
+  +(d.monetize?'<p class="cpst" id="cps-money">// 變現模式</p><div class="cp-monetize"><p style="font-family:var(--mono);font-size:.83rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(184,107,48,.9);margin-bottom:.6rem;">'+d.monetize.model+'</p><ul class="cp-monetize-steps">'+d.monetize.steps.map(function(s){return '<li class="cp-monetize-step">'+s+'</li>';}).join('')+'</ul><p class="cp-monetize-desc">'+d.monetize.desc+'</p></div>':'');
+  var cpr=document.querySelector('.cpr');if(cpr)cpr.scrollTop=0;
   document.getElementById('cpanel').classList.add('open');
   document.getElementById('cover').classList.add('on');
   document.body.style.overflow='hidden';
@@ -5554,7 +5605,7 @@ function moveIC(wrapId, state, dir) {
 
       <div class="ccard" style="margin-bottom:.7rem;">
         <div class="cct">💬 核心論點引言</div>
-        <div class="cf"><label class="cl">引言內文 <span class="cbadge">支援 HTML</span></label><textarea class="cta" id="f-th-q" style="min-height:70px;">BL 從來不只是單純的戀愛故事，<br>它是各國社會文化與性別體制的一面<strong>鏡子</strong>，<br>精準反射出當地消費者的<strong>集體心理與精神匱乏</strong>。</textarea></div>
+        <div class="cf"><label class="cl">引言內文 <span class="cbadge">支援 HTML</span></label><textarea class="cta" id="f-th-q" style="min-height:70px;">BL 從來不只是單純的戀愛故事，<br>它是各國社會文化與性別體制的一面<strong>鏡子</strong>，<br>折射出當地觀眾的<strong>集體心理與精神匱乏</strong>。</textarea></div>
         <div class="cf"><label class="cl">署名</label><input class="ci" id="f-th-attr" value="Global BL Cultural Observatory · Core Thesis"></div>
       </div>
 
@@ -5576,7 +5627,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cct">🇹🇭 深度A · 泰國卡片</div>
         <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fa1-ctry" value="🇹🇭 泰國 · Thailand"></div>
         <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fa1-h" value="沉浸式&lt;em&gt;狂歡&lt;/em&gt;"></div>
-        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fa1-p" style="min-height:65px;">佛教文化的表面包容催生了獨特的「Koo-jin（真人CP）營業」文化。粉絲作為「投資人」，透過展現購買力決定CP的商業壽命，打破第四面牆的沉浸體驗是其核心驅動力。</textarea></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fa1-p" style="min-height:65px;">有觀點將泰國的「Koo-jin（真人CP）營業」文化與佛教社會的包容氛圍連結。粉絲常被形容為「投資人」，以購買力支持 CP 的商業壽命，打破第四面牆的沉浸體驗是其核心驅動力。</textarea></div>
         <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fa1-kw" style="min-height:55px;">真人CP營業
 打破第四面牆
 粉絲即投資人
@@ -5587,7 +5638,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cct">🇯🇵 深度A · 日本卡片</div>
         <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fa2-ctry" value="🇯🇵 日本 · Japan"></div>
         <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fa2-h" value="期間限定&lt;em&gt;幻境&lt;/em&gt;"></div>
-        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fa2-p" style="min-height:65px;">嚴格的「攻受體制」源於女性逃離現實父權壓迫、追求去性別化烏托邦的嘗試。粉絲定位為「旁觀者」，追求純粹的精神性愛，極力避免演員與角色的現實過度綁定。</textarea></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fa2-p" style="min-height:65px;">有研究者認為，「攻受體制」與女性讀者想暫時離開現實父權框架、想像去性別化烏托邦的需求有關。粉絲多以「旁觀者」自居，重視角色之間的情感，較少把演員與角色在現實中綁定。</textarea></div>
         <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fa2-kw" style="min-height:55px;">攻受體制
 旁觀者視角
 虛構保護圈
@@ -5605,7 +5656,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cct">🇺🇸🇪🇺 深度B · 歐美卡片</div>
         <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fb1-ctry" value="🇺🇸🇪🇺 歐美 · West"></div>
         <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fb1-h" value="反叛的&lt;em&gt;斜線&lt;/em&gt;"></div>
-        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fb1-p" style="min-height:65px;">起源於《星際爭霸戰》的 Slash 文化，強調交織性、身分認同與絕對的權力對等。粉絲將消費視為政治表態，反抗異性戀霸權，對「賣腐（Queerbaiting）」與刻板印象極度零容忍。</textarea></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fb1-p" style="min-height:65px;">起源於《星際爭霸戰》的 Slash 文化，較重視交織性、身分認同與角色之間的權力對等。不少粉絲把消費視為一種表態，也常公開批評「賣腐（Queerbaiting）」與刻板印象。</textarea></div>
         <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fb1-kw" style="min-height:55px;">政治表態消費
 交織性
 反 Queerbaiting
@@ -5616,7 +5667,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cct">🇯🇵🇨🇳🇰🇷🇹🇭 深度B · 亞洲卡片</div>
         <div class="cf"><label class="cl">國家標籤</label><input class="ci" id="f-fb2-ctry" value="🇯🇵🇨🇳🇰🇷🇹🇭 亞洲 · Asia"></div>
         <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-fb2-h" value="避難的&lt;em&gt;烏托邦&lt;/em&gt;"></div>
-        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fb2-p" style="min-height:65px;">亞洲傳統 BL 建立在「攻受二元」的權力美學上，為女性讀者提供逃離現實性別束縛的精神空間。各國因地制宜：日本的隱忍、泰國的解放、中國的隱喻、韓國的視覺奇觀。</textarea></div>
+        <div class="cf"><label class="cl">描述段落</label><textarea class="cta" id="f-fb2-p" style="min-height:65px;">許多亞洲 BL 作品以「攻受二元」的權力美學為基礎，為女性讀者提供逃離現實性別束縛的精神空間。各國因地制宜：日本的隱忍、泰國的解放、中國的隱喻、韓國的視覺奇觀。</textarea></div>
         <div class="cf"><label class="cl">關鍵詞（每行一個）</label><textarea class="cta" id="f-fb2-kw" style="min-height:55px;">攻受二元美學
 精神逃避空間
 在地化改造
@@ -5627,7 +5678,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cct">🃏 七國文化解碼 — 標題</div>
         <div class="cf"><label class="cl">小標</label><input class="ci" id="f-snd-eye" value="// 七國文化解碼 · Seven Nations Decoded"></div>
         <div class="cf"><label class="cl">主標題 <span class="cbadge">支援 &lt;em&gt;</span></label><input class="ci" id="f-snd-tit" value="翻轉，看見&lt;em&gt;背後的故事&lt;/em&gt;"></div>
-        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-snd-sub" value="Hover 翻轉卡片 · 解碼各國性別體制與消費心理"></div>
+        <div class="cf"><label class="cl">副標題</label><input class="ci" id="f-snd-sub" value="點擊或滑過翻轉卡片 · 解碼各國性別體制與消費心理"></div>
       </div>
 
       <div class="ccard" style="margin-bottom:.7rem;">
@@ -5645,7 +5696,7 @@ function moveIC(wrapId, state, dir) {
           ['TW','影視\n文學','同婚合法\n民主','攻受解構','平權認同與日常共鳴'],
           ['TH','商業電視劇','佛教包容','青春公式','真人 CP 沉浸追星'],
           ['US','同人\n串流','個人主義\n平權','身分流動','社群反叛與政治實踐'],
-          ['EU','串流\n獨立電影','個人主義','模糊 BL/LGBTQ+','心靈共鳴、去標籤化']];
+          ['EU','串流\n獨立電影','個人主義','LGBTQ+ 寫實','心靈共鳴、去標籤化']];
           return '';}).join('')}
         <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.35rem;align-items:start;">
           <div style="font-size:.62rem;color:#F2B07A;padding-top:.5rem;font-weight:500;">🇯🇵 JP</div>
@@ -5706,7 +5757,7 @@ function moveIC(wrapId, state, dir) {
           <textarea class="cta" id="f-cdc-EU-c1" style="min-height:48px;font-size:.72rem;">串流
 獨立電影</textarea>
           <textarea class="cta" id="f-cdc-EU-c2" style="min-height:48px;font-size:.72rem;">個人主義</textarea>
-          <textarea class="cta" id="f-cdc-EU-c3" style="min-height:48px;font-size:.72rem;">模糊 BL/LGBTQ+</textarea>
+          <textarea class="cta" id="f-cdc-EU-c3" style="min-height:48px;font-size:.72rem;">LGBTQ+ 寫實</textarea>
           <input class="ci" id="f-cdc-EU-c4" value="心靈共鳴、去標籤化" style="font-size:.72rem;">
         </div>
       </div>
@@ -5719,14 +5770,14 @@ function moveIC(wrapId, state, dir) {
           <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 01</div>
             <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi1-n" value="01"></div>
             <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi1-tag" value="缺憾的投射"></div>
-            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi1-bh" style="min-height:50px;">各國 BL 體制，皆是在地心理匱乏的折射</textarea></div>
-            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi1-bp" style="min-height:60px;">日本的逃避、歐美的反叛、泰國的沉浸、中國的隱喻——每一種 BL 消費型態，都精準指向那個社會的性別傷口與集體渴望。</textarea></div>
+            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi1-bh" style="min-height:50px;">各國 BL 體制，或許都是在地心理匱乏的折射</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi1-bp" style="min-height:60px;">日本的逃避、歐美的反叛、泰國的沉浸、中國的隱喻——每一種 BL 消費型態，都可以看見那個社會的性別傷口與集體渴望。</textarea></div>
           </div>
           <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 02</div>
             <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi2-n" value="02"></div>
-            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi2-tag" value="歷史底蘊與絕對自由"></div>
-            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi2-bh" style="min-height:50px;">從白先勇《孽子》到婚姻平權，台灣擁有免於審查恐懼的創作環境</textarea></div>
-            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi2-bp" style="min-height:60px;">亞洲首個同婚合法國家的身分，讓台灣 BL 創作者能夠直視傷痕、書寫禁忌。</textarea></div>
+            <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-epi2-tag" value="歷史底蘊與創作自由"></div>
+            <div class="cf"><label class="cl">標題</label><textarea class="cta" id="f-epi2-bh" style="min-height:50px;">從戒嚴時期出版的《孽子》，到解嚴後逐步開放的言論與出版自由，台灣累積了深厚的同志書寫傳統</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-epi2-bp" style="min-height:60px;">2019 年成為亞洲第一個同婚合法化的地方，則讓台灣 BL 能更貼近真實生活，直視傷痕、書寫禁忌。</textarea></div>
           </div>
           <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">區塊 03</div>
             <div class="cf"><label class="cl">編號</label><input class="ci" id="f-epi3-n" value="03"></div>
@@ -5759,7 +5810,7 @@ function moveIC(wrapId, state, dir) {
           <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">軸線 02</div>
             <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-ax2-tag" value="女性凝視 × 心理機制"></div>
             <div class="cf"><label class="cl">標題 <span class="cbadge">&lt;em&gt;</span></label><input class="ci" id="f-ax2-h" value="受眾&lt;em&gt;解構&lt;/em&gt;"></div>
-            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-ax2-p" style="min-height:70px;">誰在看？她們為何著迷？BL 的跨國受眾心理折射出全球女性對情感表達自由的深層渴望。</textarea></div>
+            <div class="cf"><label class="cl">說明</label><textarea class="cta" id="f-ax2-p" style="min-height:70px;">誰在看？她們為何著迷？從 BL 的跨國受眾心理，可以看見許多女性對情感表達自由的渴望。</textarea></div>
           </div>
           <div><div style="font-size:.62rem;color:#F2B07A;margin-bottom:.3rem;">軸線 03</div>
             <div class="cf"><label class="cl">標籤</label><input class="ci" id="f-ax3-tag" value="現實困境 × 幻想投射"></div>
@@ -5784,7 +5835,7 @@ function moveIC(wrapId, state, dir) {
       <div class="ccard" style="margin-bottom:.7rem;">
         <div class="cct">🖼️ 圖文段落 1 — Female Gaze</div>
         <div class="cf"><label class="cl">標題 <span class="cbadge">支援 &lt;br&gt; &lt;em&gt;</span></label><textarea class="cta" id="f-it1-h" style="min-height:45px;">「她」為什麼愛 BL？&lt;br&gt;&lt;em style="font-size:.88rem;color:var(--vin-sepia);"&gt;Female Gaze 與安全投射的理論基礎&lt;/em&gt;</textarea></div>
-        <div class="cf"><label class="cl">段落 1</label><textarea class="cta" id="f-it1-p1" style="min-height:70px;">電影理論學者 Laura Mulvey 的「Male Gaze」（男性凝視）理論指出，傳統影視往往以男性視角物化女性。BL 的不同之處在於：女性讀者得以跳脫「被凝視的客體」身份，化身為「凝視的主體」——欣賞一場與自身性別無關的情感故事，暫時跳脫傳統性別框架。</textarea></div>
+        <div class="cf"><label class="cl">段落 1</label><textarea class="cta" id="f-it1-p1" style="min-height:70px;">電影理論學者 Laura Mulvey 的「Male Gaze」（男性凝視）理論指出，傳統影視往往以男性視角物化女性。有學者認為，BL 的不同之處在於：女性讀者得以跳脫「被凝視的客體」身份，化身為「凝視的主體」——欣賞一場與自身性別無關的情感故事，暫時跳脫傳統性別框架。</textarea></div>
         <div class="cf"><label class="cl">段落 2</label><textarea class="cta" id="f-it1-p2" style="min-height:55px;">也有觀點認為，BL 提供的不只是視覺快感：兩位男主角相對平等的地位，讓女性受眾得以在虛構世界中想像「不受性別壓迫的愛情」。</textarea></div>
       </div>
 
@@ -5859,7 +5910,7 @@ function moveIC(wrapId, state, dir) {
         <div class="cct">🇹🇭 泰國 翻轉卡片</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
           <div class="cf"><label class="cl">現實面</label><textarea class="cta" id="f-th-reality" style="min-height:80px;">社會對性別多元相對包容，但有研究者指出，制度與職場上的不平等仍然存在，貧富與階級差距也相當明顯。</textarea></div>
-          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-th-fantasy" style="min-height:80px;">劇中主角通常是非富即貴、有社會地位的菁英（黑幫少爺、醫師、工程師），且他們的父母與同儕往往「無條件支持」他們的同性戀情。有觀點認為，這反映了觀眾對階級流動與平權社會的想像。</textarea></div>
+          <div class="cf"><label class="cl">幻想面</label><textarea class="cta" id="f-th-fantasy" style="min-height:80px;">許多作品的主角是非富即貴、有社會地位的菁英（黑幫少爺、醫師、工程師），且他們的父母與同儕往往「無條件支持」他們的同性戀情。有觀點認為，這反映了觀眾對階級流動與平權社會的想像。</textarea></div>
         </div>
       </div>
 
@@ -7035,7 +7086,7 @@ const WM_DATA = {
       {title:'清醒點，泰爾先生',en:'Me and Thee',year:'2025',desc:'黑幫少爺 Thee 不擅與人相處，偶遇攝影師 Peach 後聘為生活教練。朝夕相處間，Thee 對 Peach 暗生情愫，在他身上感受到前所未有的溫暖與愛。',img:'map/Me and Thee01.jpg',imgs:['map/Me and Thee01.jpg','map/Me and Thee02.jpg','map/Me and Thee03.jpg'],yt:'https://www.youtube.com/watch?v=PXqpISTPse8'},
       {title:'通往天堂的門票',en:'Ticket to Heaven',year:'2026',desc:'1996 年泰國天主教男校，虔誠資優生 Tanrak 與叛逆轉學生 Barth 在朝夕相處中滋長禁忌情愫。信仰與愛情的拉鋸，讓這張通往天堂的門票充滿掙扎與抉擇。',img:'map/Ticket to Heaven01.jpg',imgs:['map/Ticket to Heaven01.jpg','map/Ticket to Heaven02.jpg','map/Ticket to Heaven03.jpg'],yt:'https://www.youtube.com/watch?v=9rPBmHoxQX4'},
     ],
-    monetize:{model:'擬真陪伴 · Parasocial CP Economy',steps:['選秀節目建立 CP 粉絲基礎（如 GMMTV 旗下藝人）','Y 劇播出強化角色情感，確立「戲裡戀愛」印象','社交媒體甜蜜互動（Fanservice）維繫日常黏著度','雙人商業代言與品牌活動','國際巡迴見面會與周邊商品'],desc:'泰國模式常被稱為「擬真陪伴」：業者透過 CP 在劇外的持續互動經營粉絲關係，並延伸至代言、見面會與周邊等消費（Prasannam, 2019）。'}
+    monetize:{model:'擬真陪伴 · Parasocial CP Economy',steps:['經紀公司配對並長期經營 CP 組合（如 GMMTV 旗下藝人）','Y 劇播出強化角色情感，確立「戲裡戀愛」印象','社交媒體甜蜜互動（Fanservice）維繫日常黏著度','雙人商業代言與品牌活動','國際巡迴見面會與周邊商品'],desc:'泰國模式常被稱為「擬真陪伴」：業者透過 CP 在劇外的持續互動經營粉絲關係，並延伸至代言、見面會與周邊等消費（Prasannam, 2019）。'}
   },
   tw:{
     flag:'🇹🇼', name:'台灣', en:'TAIWAN · 自由實驗場',
