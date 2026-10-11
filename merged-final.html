@@ -4594,7 +4594,7 @@ const I3 = {"1": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCg
 
 // ══ INIT IMAGES ══
 // 不等整頁圖片與外部資源全部載完（可能要十幾秒），HTML 一解析完就先建立地圖、輪播、卡片
-(function(fn){var done=false;function run(){if(done)return;done=true;fn();}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();window.addEventListener('load',run);})(function(){
+(function(fn){var done=false;function run(){if(done)return;done=true;fn();}if(document.readyState!=='loading')run();else{document.addEventListener('readystatechange',function(){if(document.readyState!=='loading')run();});document.addEventListener('DOMContentLoaded',run);}window.addEventListener('load',run);})(function(){
   const slides = document.querySelectorAll('.h-slide');
   [1,2,3,4,5].forEach((n,i)=>{ if(slides[i]) slides[i].style.backgroundImage = 'url('+I[n]+')'; });
   // Feature A & B images are defined directly in HTML src attributes
