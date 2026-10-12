@@ -5064,7 +5064,7 @@ function buildFlipCards(){
     return '<div class="fcard" onclick="this.classList.toggle(\'flipped\')">'
       +'<div class="fcard-inner">'
       +'<div class="fface">'
-        +'<div class="ff-bg"><img src="'+(d.src||I[d.img])+'" alt=""></div>'
+        +'<div class="ff-bg"><img src="'+(d.src||I[d.img])+'" alt="" loading="lazy" decoding="async"></div>'
         +'<span class="ff-hint">翻面 ↻</span>'
         +'<div class="ff-body"><div class="ff-flag">'+d.flag+'</div><div class="ff-name">'+d.name+'</div><div class="ff-tag">'+d.tag+'</div></div>'
       +'</div>'
@@ -5108,7 +5108,7 @@ function cpBuildSlides(works, imgKeys){
     variants.forEach(function(src,vi){
       var slide=document.createElement('div');
       slide.className='cpl-slide'+(wi===0&&vi===0?' on':'');
-      slide.innerHTML='<img src="'+src+'" alt=""><div class="grain-layer" style="opacity:.4;z-index:5;"></div>';
+      slide.innerHTML='<img src="'+src+'" alt="" loading="lazy" decoding="async"><div class="grain-layer" style="opacity:.4;z-index:5;"></div>';
       main.insertBefore(slide, main.querySelector('.cpl-vig'));
       var dot=document.createElement('div');
       dot.className='cpl-dot'+(wi===0&&vi===0?' on':'');
@@ -5119,7 +5119,7 @@ function cpBuildSlides(works, imgKeys){
     // thumbnail per work
     var th=document.createElement('div');
     th.className='cpl-thumb'+(wi===0?' on':'');
-    th.innerHTML='<img src="'+(w.img||(I3[baseKey]?I3[baseKey][0]:I[1]))+'" alt="">';
+    th.innerHTML='<img src="'+(w.img||(I3[baseKey]?I3[baseKey][0]:I[1]))+'" alt="" loading="lazy" decoding="async">';
     th.onclick=(function(i){return function(){cpShowWork(i);};})(wi);
     th.onmouseenter=(function(i){return function(){cpShowWork(i);};})(wi);
     thumbsEl.appendChild(th);
@@ -5526,11 +5526,14 @@ function moveIC(wrapId, state, dir) {
 
     <!-- ══ IMAGES ══ -->
     <div id="cs-imgs" style="display:none;">
-      <div class="cloc">📷 上傳圖片或貼網址立即套用</div>
-      <div style="font-size:.68rem;color:rgba(245,237,216,.35);margin-bottom:1rem;padding:.65rem;background:rgba(232,134,58,.05);border-radius:6px;border-left:2px solid rgba(232,134,58,.3);">
-        💡 推薦/時間軸的圖片請在「推薦管理」或「時間軸」中各別上傳。此處管理首頁固定圖片。
+      <div class="cloc">📷 全站圖片總管 — 網頁上每一張圖都在這裡，依區塊分組</div>
+      <div class="imgmgr-tip">
+        💡 點開區塊 → 在圖片右邊貼上新網址按「套用網址」，或按「📁 上傳圖片」（在「🚀 發布」設定 ImgBB 金鑰後會自動上傳到 ImgBB）。<br>
+        同一張圖用在好幾個地方時會一起換。換好後到「🚀 發布」按發布，所有人才看得到。
       </div>
-      <div id="img-fixed-list"></div>
+      <input id="imgmgr-q" class="ci" placeholder="🔍 搜尋：作品名、國家、區塊或檔名…" oninput="imgMgrBuild()" style="margin-bottom:.8rem;">
+      <div id="imgmgr-list"></div>
+      <div id="img-fixed-list" style="display:none;"></div>
     </div>
 
     <!-- ══ NAV ══ -->
@@ -6001,6 +6004,28 @@ function moveIC(wrapId, state, dir) {
 .dyn-order-btns{display:flex;gap:.4rem;}
 .dyn-order-btn{background:none;border:1px solid rgba(232,134,58,.18);color:rgba(245,237,216,.4);border-radius:5px;padding:2px 8px;font-size:.7rem;cursor:pointer;}
 .dyn-order-btn:hover{border-color:rgba(232,134,58,.4);color:var(--text);}
+.imgmgr-tip{font-size:.68rem;color:rgba(245,237,216,.45);margin-bottom:.8rem;padding:.65rem;background:rgba(232,134,58,.05);border-radius:6px;border-left:2px solid rgba(232,134,58,.3);line-height:1.75;}
+.imgmgr-grp{background:#162535;border:1px solid rgba(232,134,58,.12);border-radius:9px;margin-bottom:.55rem;}
+.imgmgr-grp>summary{cursor:pointer;padding:.7rem .9rem;font-size:.76rem;color:#F2B07A;display:flex;justify-content:space-between;gap:.6rem;list-style:none;}
+.imgmgr-grp>summary::-webkit-details-marker{display:none;}
+.imgmgr-grp>summary::before{content:"▸";margin-right:.4rem;color:rgba(242,176,122,.6);}
+.imgmgr-grp[open]>summary::before{content:"▾";}
+.imgmgr-cnt{margin-left:auto;font-size:.64rem;color:rgba(245,237,216,.4);white-space:nowrap;}
+.imgmgr-row{display:flex;gap:.7rem;align-items:flex-start;margin:0 .6rem .55rem;padding:.6rem;background:rgba(0,0,0,.2);border-radius:8px;border:1px solid transparent;}
+.imgmgr-row.sw{border-color:rgba(75,168,160,.35);}
+.imgmgr-prev{width:96px;height:64px;object-fit:cover;border-radius:5px;border:1px solid rgba(232,134,58,.15);background:#111e2b;flex-shrink:0;cursor:zoom-in;}
+.imgmgr-main{flex:1;min-width:0;}
+.imgmgr-lbl{font-size:.72rem;color:#F5EDD8;margin-bottom:.15rem;display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;}
+.imgmgr-uses,.imgmgr-tag{font-size:.58rem;padding:1px 6px;border-radius:8px;background:rgba(245,237,216,.07);color:rgba(245,237,216,.5);}
+.imgmgr-tag{background:rgba(75,168,160,.15);color:#4BA8A0;}
+.imgmgr-path{font-size:.6rem;color:rgba(245,237,216,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.4rem;}
+.imgmgr-inp{width:100%;box-sizing:border-box;}
+.imgmgr-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem;align-items:center;}
+.imgmgr-ok{background:rgba(75,168,160,.1);border-color:rgba(75,168,160,.3);color:#4BA8A0;}
+.imgmgr-reset{background:none;border:1px solid rgba(200,60,60,.25);color:rgba(220,120,120,.75);border-radius:5px;padding:3px 9px;font-size:.65rem;cursor:pointer;font-family:"Noto Sans TC",sans-serif;}
+.imgmgr-st{font-size:.62rem;color:#4BA8A0;}
+.imgmgr-empty{font-size:.72rem;color:rgba(245,237,216,.4);padding:1rem;text-align:center;}
+@media(max-width:700px){.imgmgr-row{flex-direction:column;}.imgmgr-prev{width:100%;height:120px;}}
 .img-row-mini{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;background:rgba(0,0,0,.2);border-radius:8px;padding:.6rem;}
 .img-prev-mini{width:70px;height:48px;object-fit:cover;border-radius:5px;border:1px solid rgba(232,134,58,.15);background:#111e2b;flex-shrink:0;}
 .img-url-inp{flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(232,134,58,.14);border-radius:6px;padding:4px 8px;color:#F5EDD8;font-size:.7rem;outline:none;font-family:'Noto Sans TC',sans-serif;}
@@ -6100,7 +6125,7 @@ function renderMainCarousel(){
   if(!track)return;
   track.innerHTML=recsMain.map((it,i)=>`
     <div class="carousel-slide">
-      <img src="${it.img||''}" alt="${it.title}" style="${!it.img?'display:none':''}">
+      <img loading="lazy" decoding="async" src="${it.img||''}" alt="${it.title}" style="${!it.img?'display:none':''}">
       <div class="carousel-caption">
         <span class="badge">${it.badge||''}</span>
         <h3>${it.title||''}</h3>
@@ -6124,7 +6149,7 @@ function renderGenreCarousel(){
     <div class="ic-slide" style="flex:0 0 300px;">
       <div class="drama-card">
         <div class="drama-card-img-wrap">
-          <img src="${d.img||''}" alt="${d.name}" ${!d.img?'style="display:none"':''}>
+          <img loading="lazy" decoding="async" src="${d.img||''}" alt="${d.name}" ${!d.img?'style="display:none"':''}>
           <span class="drama-card-badge">${d.badge||''}</span>
           <span class="drama-card-year">${d.year||''}</span>
         </div>
@@ -6140,7 +6165,7 @@ function renderGenreCarousel(){
             ${d.cast.map(c=>`
             <div class="cast-member">
               <div style="width:50px;height:50px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1px solid var(--sunset-gold);">
-                <img src="${c.img||''}" style="width:100%;height:100%;object-fit:cover;" ${!c.img?'onerror="this.style.display=\'none\'"':''}>
+                <img loading="lazy" decoding="async" src="${c.img||''}" style="width:100%;height:100%;object-fit:cover;" ${!c.img?'onerror="this.style.display=\'none\'"':''}>
               </div>
               <div class="cast-role">主演</div>
               <div class="cast-info">
@@ -6683,7 +6708,7 @@ function cmsTab(s){
   document.querySelectorAll('.ctab').forEach(t=>t.classList.toggle('active',t.dataset.s===s));
   document.querySelectorAll('[id^="cs-"]').forEach(el=>el.style.display='none');
   document.getElementById('cs-'+s).style.display='block';
-  if(s==='imgs')buildFixedImgList();
+  if(s==='imgs'){buildFixedImgList();imgMgrBuild();}
   if(s==='music')mpCmsLoad();
   if(s==='ddl'){ddlCmsBuildList();}
   if(s==='publish')pubLoadSettings();
@@ -6828,11 +6853,14 @@ async function publishToGitHub(){
   if(!token||!repo||!path){alert('請先在「🚀 發布」頁面填寫 GitHub 設定');return;}
   if(!cmsSaveAll()){alert('⚠️ 有資料未能儲存，已取消發布。請先處理儲存問題。');return;}
   const bakedAt=Date.now();
-  const keyMap={txt:K_TXT,recs:K_RECS,tl:K_TL,imgs:K_IMGS,ddl:K_DDL,music:K_MUSIC,map:K_MAP,aud:K_AUD,cult:K_CULT,edit:K_EDIT};
+  const keyMap={txt:K_TXT,recs:K_RECS,tl:K_TL,imgs:K_IMGS,ddl:K_DDL,music:K_MUSIC,map:K_MAP,aud:K_AUD,cult:K_CULT,edit:K_EDIT,imgswap:K_IMGSWAP};
   const allData={bakedAt};
   Object.keys(keyMap).forEach(k=>{allData[k]=JSON.parse(localStorage.getItem(keyMap[k])||'null');});
   const bakedScript='<script id="cms-baked-data">(function(){try{var d='+JSON.stringify(allData).replace(/<\//g,'<\\/')+';var prev=+(localStorage.getItem("globalBL-bakedAt")||0);if(d.bakedAt<=prev)return;var map='+JSON.stringify(keyMap)+';Object.keys(map).forEach(function(k){if(d[k]!=null)localStorage.setItem(map[k],JSON.stringify(d[k]));});localStorage.setItem("globalBL-bakedAt",d.bakedAt);}catch(e){}})();<\/script>';
+  const swapBack={},swapFwd={};Object.keys(imgSwap).forEach(p=>{if(imgSwap[p]){swapBack[imgSwap[p]]=p;swapFwd[p]=imgSwap[p];}});
+  imgReplaceAll(swapBack,true);
   let html=document.documentElement.outerHTML;
+  imgReplaceAll(swapFwd,true);
   if(window.plwStrip)html=plwStrip(html);
   html=html.replace(/<script id="cms-baked-data">[\s\S]*?<\/script>/,'');
   html=html.replace('<head>','<head>\n'+bakedScript);
@@ -7190,7 +7218,7 @@ function wmBuildCarousel(works){
   const track=document.getElementById('wm-carousel-track');
   track.innerHTML=works.map((w,wi)=>{
     const imgs=(w.imgs&&w.imgs.length===3)?w.imgs:[w.img,w.img,w.img];
-    const imgHtml=imgs.map((src,ii)=>`<img class="wm-mini-img${ii===0?' on':''}" src="${src}" alt="${w.title}" onerror="this.style.background='#E8DED0';this.style.opacity='.5'">`).join('');
+    const imgHtml=imgs.map((src,ii)=>`<img loading="lazy" decoding="async" class="wm-mini-img${ii===0?' on':''}" src="${src}" alt="${w.title}" onerror="this.style.background='#E8DED0';this.style.opacity='.5'">`).join('');
     const ytAttr=w.yt?` data-yt="${w.yt}" onclick="if(this.dataset.yt)window.open(this.dataset.yt,'_blank')" style="cursor:pointer;"` :'';
     const ytBtn=w.yt?`<a class="wm-yt-btn" href="${w.yt}" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ 官方預告片</a>`:'';
     return `
@@ -7336,7 +7364,7 @@ function navDdRender(){
   const el=document.getElementById('nav-dd-items');if(!el)return;
   el.innerHTML=ddlData.map(d=>{
     const isLive=d.status==='live';
-    const coverHtml=d.cover?'<img class="nav-dd-cover" src="'+d.cover+'" alt="'+d.title+'">'
+    const coverHtml=d.cover?'<img loading="lazy" decoding="async" class="nav-dd-cover" src="'+d.cover+'" alt="'+d.title+'">'
       :'<div class="nav-dd-cover"></div>';
     const pill='<span class="nav-dd-pill '+(isLive?'dd-pill-live':'dd-pill-soon')+'">'+(isLive?'可閱讀':'即將推出')+'</span>';
     const clickAttr=isLive?'onclick="navDdClose();ddlOpen(\''+d.target+'\')"':'';
@@ -7596,9 +7624,189 @@ function flipBgInit(){
 flipBgInit();
 
 // ═══════════════════════════════
+// 🖼️ 全站圖片總管：網頁上每一張圖都能在後台換（上傳或貼網址）
+// 存法：原始圖片路徑 → 新網址（K_IMGSWAP），發布時跟其他後台資料一起寫進網頁。
+// 同一張圖用在好幾個地方時，會一起換掉。
+// ═══════════════════════════════
+const K_IMGSWAP='globalBL-imgswap';
+let imgSwap={};
+try{imgSwap=JSON.parse(localStorage.getItem(K_IMGSWAP)||'{}')||{};}catch(e){imgSwap={};}
+const IMG_CAT=[];       // [{path,groups,lab,uses,els}]：同一張圖會列在每個用到它的區塊
+const IMG_CAT_IDX={};   // path → 項目
+const imgMgrOpen=new Set();
+const IMG_URL_RE=/url\((['"]?)([^'")]+)\1\)/g;
+function imgIsSrc(s){return typeof s==='string'&&s.length<800&&!/^data:/i.test(s)&&!s.includes('${')&&/\.(jpe?g|png|webp|avif|gif)(\?.*)?$/i.test(s.trim());}
+function imgBase(p){return String(p).split('?')[0].split('/').pop();}
+function imgEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function imgDataSources(){
+  const out=[];
+  // 只處理全球首頁自己的資料；泰劇內容歸泰劇後台（thai-bl-v1377.html）管理
+  [()=>HP_WM_DATA,()=>WM_DATA,()=>I,()=>FLIP,()=>FLIP_BG]
+    .forEach(g=>{try{const o=g();if(o&&typeof o==='object')out.push(o);}catch(e){}});
+  return out;
+}
+function imgCssEach(rules,fn){
+  for(const r of rules){
+    if(r.cssRules&&!r.style){imgCssEach(r.cssRules,fn);continue;}
+    if(!r.style)continue;
+    for(let i=0;i<r.style.length;i++){const p=r.style[i];const v=r.style.getPropertyValue(p);if(v&&v.includes('url('))fn(r,p,v);}
+  }
+}
+function imgSheets(fn){for(const sh of document.styleSheets){let rules;try{rules=sh.cssRules;}catch(e){continue;}if(rules)imgCssEach(rules,fn);}}
+// 把資料、網頁元素、CSS 裡等於 from 的圖片換成 to（map = {from:to}）；domOnly 只動網頁元素
+function imgReplaceAll(map,domOnly){
+  const has=s=>Object.prototype.hasOwnProperty.call(map,s)&&map[s]&&map[s]!==s;
+  if(!Object.keys(map).some(has))return;
+  const swapUrls=str=>{let ch=false;IMG_URL_RE.lastIndex=0;const out=str.replace(IMG_URL_RE,(m,q,u)=>{if(has(u)){ch=true;return 'url('+(q||'"')+map[u]+(q||'"')+')';}return m;});return ch?out:null;};
+  if(!domOnly){
+    const seen=new Set();
+    const walk=o=>{if(!o||typeof o!=='object'||seen.has(o))return;seen.add(o);
+      for(const k of Object.keys(o)){const v=o[k];if(typeof v==='string'){if(has(v))o[k]=map[v];}else if(v&&typeof v==='object')walk(v);}};
+    imgDataSources().forEach(walk);
+    imgSheets((r,p,v)=>{const nv=swapUrls(v);if(nv)r.style.setProperty(p,nv,r.style.getPropertyPriority(p));});
+  }
+  document.querySelectorAll('img[src]').forEach(el=>{if(el.closest('#cms-panel'))return;const s=el.getAttribute('src');if(has(s))el.setAttribute('src',map[s]);});
+  document.querySelectorAll('[style*="url("]').forEach(el=>{if(el.closest('#cms-panel'))return;const nv=swapUrls(el.getAttribute('style'));if(nv)el.setAttribute('style',nv);});
+}
+function imgSecLabel(el){
+  if(el.closest('#oc'))return '🎞️ 開場動畫膠卷';
+  if(el.closest('#hero,#hs'))return '🏠 首頁大橫幅輪播';
+  if(el.closest('#tab-style'))return '🎨 風格經緯（分頁）';
+  if(el.closest('#tab-audience'))return '👥 受眾解構（分頁）';
+  if(el.closest('#tab-culture'))return '🎭 文化錯位（分頁）';
+  const sec=el.closest('section'),eye=sec&&sec.querySelector('.eye');
+  if(eye){const t=eye.textContent.replace(/^\s*\/\/\s*/,'').split('·')[0].trim();if(t)return '🌍 '+t;}
+  return '📁 其他圖片';
+}
+function imgCatAdd(path,group,label,el){
+  if(!path)return;path=String(path).trim();
+  if(!imgIsSrc(path))return;
+  let it=IMG_CAT_IDX[path];
+  if(!it){it={path,groups:[],lab:{},uses:0,els:[]};IMG_CAT_IDX[path]=it;IMG_CAT.push(it);}
+  if(!it.groups.includes(group)){it.groups.push(group);it.lab[group]=label;}
+  it.uses++;if(el&&!it.els.includes(el))it.els.push(el);
+}
+function imgCatBuild(){
+  const skip='#cms-panel,#cms-login,.cms-ui';
+  // 1. 世界地圖：各國作品照片
+  try{Object.keys(HP_WM_DATA).forEach(k=>{const d=HP_WM_DATA[k];(d.works||[]).forEach(w=>{
+    const arr=[...new Set([w.img].concat(w.imgs||[]).filter(Boolean))];
+    arr.forEach((p,i)=>imgCatAdd(p,'🗺️ 世界地圖 · '+d.name,w.title+(arr.length>1?'　圖 '+(i+1):'')));});});}catch(e){}
+  // 2. 網頁上的圖片與背景圖（依所在區塊分組）
+  document.querySelectorAll('img[src]').forEach(el=>{if(el.closest(skip))return;const s=el.getAttribute('src');imgCatAdd(s,imgSecLabel(el),el.getAttribute('alt')||imgBase(s),el);});
+  document.querySelectorAll('[style*="url("]').forEach(el=>{if(el.closest(skip))return;const st=el.getAttribute('style');let m;IMG_URL_RE.lastIndex=0;
+    while((m=IMG_URL_RE.exec(st)))imgCatAdd(m[2],imgSecLabel(el),'背景 · '+imgBase(m[2]),el);});
+  // 3. 七國文化解碼翻轉卡（載入後才產生）
+  try{FLIP.forEach(d=>imgCatAdd(d.src||I[d.img],'🌍 七國文化解碼','翻轉卡 · '+d.name));}catch(e){}
+  // 4. CSS 裡的背景圖
+  imgSheets((r,p,v)=>{const sel=r.selectorText||'';
+    try{if(sel&&!document.querySelector(sel.replace(/::?[a-z-]+(\([^)]*\))?/gi,'')||'*'))return;}catch(e){} // 網頁上沒用到的舊樣式不列出
+    let m;IMG_URL_RE.lastIndex=0;while((m=IMG_URL_RE.exec(v))){const c=(sel.match(/data-c="([^"]+)"/)||[])[1];
+    const g=(/aud/i.test(sel)||/^Audience Analysis\//.test(m[2]))?'👥 受眾解構（分頁）':/^Style Matrix\//.test(m[2])?'🎨 風格經緯（分頁）':/cult/i.test(sel)?'🎭 文化錯位（分頁）':'📁 其他圖片';
+    imgCatAdd(m[2],g,(c?c+' · ':'')+'背景 · '+imgBase(m[2]));}});
+  // 5. 共用備用圖（首頁輪播背景、地圖面板沒有指定圖片時用）
+  try{Object.keys(I).forEach(n=>imgCatAdd(I[n],'📼 共用備用圖','備用圖 '+n));}catch(e){}
+}
+function imgGroupRank(g){
+  if(g.startsWith('🏠'))return 0;
+  if(g==='🌍 互動世界地圖')return 1;
+  if(g.startsWith('🗺️'))return 1.5;
+  if(g.startsWith('🌍')){const eyes=[...document.querySelectorAll('#tab-map section .eye')].map(e=>'🌍 '+e.textContent.replace(/^\s*\/\/\s*/,'').split('·')[0].trim());const i=eyes.indexOf(g);return 2+(i<0?40:i)*.01;}
+  return {'🎨':5,'👥':6,'🎭':7,'🎞️':8,'📼':9}[[...g][0]]??10;
+}
+function imgSwapInit(){
+  imgCatBuild();
+  const m={};Object.keys(imgSwap).forEach(p=>{if(imgSwap[p])m[p]=imgSwap[p];});
+  imgReplaceAll(m);
+}
+// 目前網頁上實際顯示的圖（舊的「固定圖片」或「直接編輯」換過的也算）
+function imgCurrent(it){
+  const el=it.els.find(e=>e.tagName==='IMG'&&e.isConnected);
+  return (el&&el.getAttribute('src'))||imgSwap[it.path]||it.path;
+}
+function imgSetSwap(path,url){
+  const it=IMG_CAT_IDX[path];
+  const old=imgSwap[path]||path, next=url||path, had=imgSwap[path];
+  if(url)imgSwap[path]=url;else delete imgSwap[path];
+  if(!lsSet(K_IMGSWAP,JSON.stringify(imgSwap))){if(had)imgSwap[path]=had;else delete imgSwap[path];return false;}
+  if(it)it.els.forEach(el=>{
+    if(el.tagName!=='IMG')return;
+    // 同一個位置如果之前在「📷 固定圖片」或「✏️ 直接編輯」換過，先移除舊設定，避免重新整理後又被蓋回去
+    if(typeof cmsEditForgetImg==='function')cmsEditForgetImg(el);
+    FIXED_IMGS.forEach(def=>{if(fixedImgs[def.key]&&document.querySelector(def.sel)===el){delete fixedImgs[def.key];saveFixedImgs();}});
+    el.setAttribute('src',next);
+  });
+  imgReplaceAll({[old]:next});
+  return true;
+}
+function imgMgrBuild(){
+  const box=document.getElementById('imgmgr-list');if(!box)return;
+  const q=((document.getElementById('imgmgr-q')||{}).value||'').trim().toLowerCase();
+  const groups={};IMG_CAT.forEach(it=>it.groups.forEach(g=>{(groups[g]=groups[g]||[]).push(it);}));
+  const names=Object.keys(groups).sort((a,b)=>imgGroupRank(a)-imgGroupRank(b));
+  box.innerHTML='';
+  let shown=0;
+  names.forEach(g=>{
+    let items=groups[g];
+    if(q)items=items.filter(it=>(g+' '+it.lab[g]+' '+it.path).toLowerCase().includes(q));
+    if(!items.length)return;
+    shown+=items.length;
+    const changed=items.filter(it=>imgCurrent(it)!==it.path).length;
+    const det=document.createElement('details');det.className='imgmgr-grp';
+    if(q||imgMgrOpen.has(g))det.open=true;
+    det.addEventListener('toggle',()=>{if(!q){det.open?imgMgrOpen.add(g):imgMgrOpen.delete(g);}});
+    det.innerHTML='<summary>'+imgEsc(g)+'<span class="imgmgr-cnt">'+items.length+' 張'+(changed?' · 已換 '+changed:'')+'</span></summary>';
+    items.forEach(it=>det.appendChild(imgMgrRow(it,g)));
+    box.appendChild(det);
+  });
+  if(!shown)box.innerHTML='<div class="imgmgr-empty">找不到符合的圖片</div>';
+}
+function imgMgrRow(it,g){
+  const i=IMG_CAT.indexOf(it),cur=imgCurrent(it),sw=cur!==it.path;
+  const row=document.createElement('div');row.className='imgmgr-row'+(sw?' sw':'');
+  row.innerHTML=
+    '<img class="imgmgr-prev" loading="lazy" decoding="async" src="'+imgEsc(cur)+'" alt="" onclick="window.open(this.src,\'_blank\')" title="點一下看大圖">'
+    +'<div class="imgmgr-main">'
+      +'<div class="imgmgr-lbl">'+imgEsc(it.lab[g])
+        +(it.uses>1?'<span class="imgmgr-uses">用在 '+it.uses+' 處</span>':'')
+        +(sw?'<span class="imgmgr-tag">已更換</span>':'')+'</div>'
+      +'<div class="imgmgr-path" title="'+imgEsc(it.path)+'">原圖：'+imgEsc(it.path)+'</div>'
+      +'<input class="img-url-inp imgmgr-inp" placeholder="貼上新圖片網址（https://…）" value="'+(sw&&!/^data:/i.test(cur)?imgEsc(cur):'')+'" onkeydown="if(event.key===\'Enter\')imgMgrApplyUrl('+i+',this)">'
+      +'<div class="imgmgr-btns">'
+        +'<button class="img-upload-mini imgmgr-ok" onclick="imgMgrApplyUrl('+i+',this)">套用網址</button>'
+        +'<label class="img-upload-mini">📁 上傳圖片<input type="file" accept="image/*" style="display:none" onchange="imgMgrUpload('+i+',this)"></label>'
+        +(sw?'<button class="imgmgr-reset" onclick="imgMgrReset('+i+')">還原原圖</button>':'')
+        +'<span class="imgmgr-st"></span>'
+      +'</div>'
+    +'</div>';
+  return row;
+}
+function imgMgrApplyUrl(i,btn){
+  const it=IMG_CAT[i],row=btn&&btn.closest('.imgmgr-row');if(!it||!row)return;
+  const url=(row.querySelector('.imgmgr-inp').value||'').trim();
+  if(!url){alert('請先貼上圖片網址');return;}
+  if(!/^(https?:\/\/|data:image\/)/i.test(url)&&!imgIsSrc(url)){alert('這看起來不是圖片網址，請貼上 https:// 開頭的網址');return;}
+  const st=row.querySelector('.imgmgr-st');if(st)st.textContent='⏳ 檢查圖片…';
+  const test=new Image();
+  test.onload=()=>{if(imgSetSwap(it.path,url))imgMgrBuild();};
+  test.onerror=()=>{if(st)st.textContent='';if(confirm('這個網址的圖片讀不到（可能網址錯誤，或該網站不允許外連）。\n\n仍然要套用嗎？')){if(imgSetSwap(it.path,url))imgMgrBuild();}};
+  test.src=url;
+}
+function imgMgrUpload(i,input){
+  const it=IMG_CAT[i],file=input.files[0];input.value='';if(!it||!file)return;
+  const st=input.closest('.imgmgr-row').querySelector('.imgmgr-st');if(st)st.textContent='⏳ 上傳中…';
+  cmsUploadImg(file,1600,1600,.82,url=>{if(imgSetSwap(it.path,url))imgMgrBuild();else if(st)st.textContent='';});
+}
+function imgMgrReset(i){
+  const it=IMG_CAT[i];if(!it)return;
+  if(imgSetSwap(it.path,null))imgMgrBuild();
+}
+
+// ═══════════════════════════════
 // AUTO-INIT ON PAGE LOAD
 // ═══════════════════════════════
 (function(){
+  imgSwapInit(); // 先套用「全站圖片總管」換過的圖，再畫輪播、地圖等
   loadData(); loadFixedImgs();
   const raw=localStorage.getItem(K_TXT);if(raw){try{applyTxt(JSON.parse(raw));}catch(e){}}
   renderMainCarousel(); renderGenreCarousel(); renderTimeline(); applyAllFixedImgs();
