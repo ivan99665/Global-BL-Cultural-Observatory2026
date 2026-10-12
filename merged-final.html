@@ -832,7 +832,12 @@ body.cursor-active{cursor:none;}
 .fa-side-th .fa-amb{position:absolute;inset:0;background:radial-gradient(ellipse 90% 55% at 50% 100%,rgba(27,68,54,.2) 0%,transparent 65%);z-index:1;pointer-events:none;}
 .fa-side-jp .fa-amb{position:absolute;inset:0;background:radial-gradient(ellipse 90% 55% at 50% 100%,rgba(184,107,48,.18) 0%,transparent 65%);z-index:1;pointer-events:none;}
 .fa-carousel{position:relative;width:100%;height:100%;min-height:500px;}
-@media(max-width:700px){.fa-carousel{min-height:360px;}}
+@media(max-width:700px){
+  /* 手機：卡片依文字長度自動長高，圖片鋪滿當背景，文字不會被切掉 */
+  .fa-wrap .fa-side{display:flex;flex-direction:column;justify-content:flex-end;min-height:360px;}
+  .fa-wrap .fa-side .fa-carousel{position:absolute;inset:0;min-height:0;height:auto;}
+  .fa-wrap .fa-side .fa-content{position:relative;bottom:auto;padding:4.5rem 1.3rem 1.8rem;}
+}
 .fa-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;}
 .fa-slide.fa-active{opacity:1;}
 .fa-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:none;z-index:1;}
@@ -905,7 +910,12 @@ body.cursor-active{cursor:none;}
 @keyframes ink-rpl{0%{transform:scale(0);opacity:.7}100%{transform:scale(3);opacity:0}}
 /* Carousels */
 .fb-carousel{position:relative;width:100%;height:100%;min-height:500px;}
-@media(max-width:700px){.fb-carousel{min-height:360px;}}
+@media(max-width:700px){
+  /* 手機：卡片依文字長度自動長高，圖片鋪滿當背景，文字不會被切掉 */
+  .fb-wrap .fb-side{display:flex;flex-direction:column;justify-content:flex-end;min-height:360px;}
+  .fb-wrap .fb-side .fb-carousel{position:absolute;inset:0;min-height:0;height:auto;}
+  .fb-wrap .fb-side .fb-content{position:relative;bottom:auto;padding:4.5rem 1.3rem 1.8rem;}
+}
 .fb-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;}
 .fb-slide.fb-active{opacity:1;}
 .fb-slide img{width:100%;height:100%;object-fit:cover;display:block;}
