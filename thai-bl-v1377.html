@@ -11,7 +11,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-13b">
+<meta name="site-build" content="2026-10-13c">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono&display=swap" rel="stylesheet">
@@ -1647,6 +1647,14 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
 #page-feature.feat-themed footer{background:var(--ft-bg2);}
 #feat-ed .fe-upl{margin-left:auto;cursor:pointer;text-transform:none;letter-spacing:0;}
 @media(max-width:640px){#feat-ed .fe-2{grid-template-columns:1fr;}#feat-ed .fe-top{padding:.8rem 16px;}}
+</style>
+<style id="mobile-readability">
+/* 手機閱讀（2026-10-13）：9px 左右的小字放大到 11.5px；資料來源連結與「前往 YouTube」加大可點範圍。電腦版不變。 */
+@media(max-width:700px){
+  .src-note,.src-note a,.tl-video-tag,.scroll-cue span,.section-eyebrow,.footer-note{font-size:11.5px !important;}
+  .src-note a{display:inline-block;padding:9px 0;margin:-9px 0;}
+  a.tl-video-link{display:inline-flex;align-items:center;min-height:40px;}
+}
 </style>
 <script>/* 圖片加速：網址不變，圖片改從 Cloudflare 下載（讀不到會自動改回 GitHub）。只在正式網址啟用。 */
 if('serviceWorker' in navigator&&location.hostname==='ivan99665.github.io'){navigator.serviceWorker.register('sw-img.js').catch(function(){});}</script>
@@ -6438,6 +6446,8 @@ function imgMgrReset(i){
 (function(){
   imgSwapInit(); // 先套用「泰劇圖片總管」換過的圖
   loadData(); loadFixedImgs();
+  // 一次性修正（2026-10-13）：「三格圖片 3（扶桑花語）」誤設成與第 1 格相同的圖，恢復原本的扶桑花圖；之後在後台重新設定不受影響
+  try{if(!localStorage.getItem('tb-fix-gal2-20261013')){if(fixedImgs.gal2==='https://i.ibb.co/qMtCVnB7/j.webp'){delete fixedImgs.gal2;saveFixedImgs();}localStorage.setItem('tb-fix-gal2-20261013','1');}}catch(e){}
   const raw=localStorage.getItem(K_TXT);if(raw){try{applyTxt(JSON.parse(raw));}catch(e){}}
   renderMainCarousel(); renderGenreCarousel(); renderTimeline(); applyAllFixedImgs();
   rxLoad(); rxRender();
