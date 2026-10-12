@@ -1,0 +1,6 @@
+# Cloudflare Pages 設定（GitHub Pages 會忽略這個檔案）
+# 1. 允許原本的 GitHub 網址讀取這裡的圖片（圖片加速小幫手 sw-img.js 需要）
+# 2. 這份 Cloudflare 副本不讓搜尋引擎收錄，正式網址仍是 ivan99665.github.io
+/*
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: noindex
