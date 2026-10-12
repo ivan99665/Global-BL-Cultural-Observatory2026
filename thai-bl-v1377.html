@@ -11,7 +11,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-13a">
+<meta name="site-build" content="2026-10-13b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono&display=swap" rel="stylesheet">
@@ -4307,7 +4307,8 @@ function loadFixedImgs(){try{const r=localStorage.getItem(K_IMGS);if(r)fixedImgs
 function saveFixedImgs(){return lsSet(K_IMGS,JSON.stringify(fixedImgs));}
 function applyFixedImg(def,src){
   if(!src)return;
-  if(def.type==='bg'){const el=document.querySelector(def.sel);if(el)el.style.backgroundImage=`url('${src}')`;}
+  // 背景圖：保留暗色漸層，並置中、填滿畫面（只換 backgroundImage 會變成從左上角以原尺寸顯示，手機上只看得到一角）
+  if(def.type==='bg'){const el=document.querySelector(def.sel);if(el){el.style.backgroundImage=`linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,.65)),url('${src}')`;el.style.backgroundPosition='center';el.style.backgroundSize='cover';el.style.backgroundRepeat='no-repeat';}}
   else{const el=document.querySelector(def.sel);if(el)el.src=src;}
 }
 function applyAllFixedImgs(){FIXED_IMGS.forEach(def=>{if(fixedImgs[def.key])applyFixedImg(def,fixedImgs[def.key]);});}
