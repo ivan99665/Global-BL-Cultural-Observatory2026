@@ -3412,7 +3412,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
   });
   var bar = document.getElementById('bar');
   if (bar){
-    bar.style.transition = 'width 12s linear';
+    bar.style.transition = 'width 4s linear';
     setTimeout(function(){ bar.style.width = '100%'; }, 100);
   }
   // 第一次點擊：顯示標題文字
@@ -3440,7 +3440,7 @@ body[data-tab="culture"] .snp{background:rgba(70,26,8,.92) !important;border-bot
       if (w) w.style.display = 'flex';
     }, 1050);
   };
-  window._oc_t = setTimeout(window.enter, 12000);
+  window._oc_t = setTimeout(window.enter, 4000); // 4 秒後自動進入首頁（原本 12 秒）
 })();
 </script>
 <div id="cur"></div><div id="cur-o"></div>
