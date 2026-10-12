@@ -5015,7 +5015,9 @@ function cpBuildSlides(works, imgKeys){
     variants.forEach(function(src,vi){
       var slide=document.createElement('div');
       slide.className='cpl-slide'+(wi===0&&vi===0?' on':'');
-      slide.innerHTML='<img src="'+src+'" alt="" loading="lazy" decoding="async"><div class="grain-layer" style="opacity:.4;z-index:5;"></div>';
+      // 只先載入第一張；其他張等切換到時才下載（打開國家面板時不再一次下載 9 張大圖）
+      var first=(wi===0&&vi===0);
+      slide.innerHTML='<img '+(first?'src':'data-src')+'="'+src+'" alt="" decoding="async"><div class="grain-layer" style="opacity:.4;z-index:5;"></div>';
       main.insertBefore(slide, main.querySelector('.cpl-vig'));
       var dot=document.createElement('div');
       dot.className='cpl-dot'+(wi===0&&vi===0?' on':'');
@@ -5035,6 +5037,8 @@ function cpBuildSlides(works, imgKeys){
 var _cpSlideTO=null;
 function cpShowSlide(idx){
   var slides=document.querySelectorAll('.cpl-slide'), dots=document.querySelectorAll('.cpl-dot');
+  // 載入這一張，並預先載入下一張
+  [idx,idx+1].forEach(function(i){var im=slides[i]&&slides[i].querySelector('img[data-src]');if(im){im.src=im.getAttribute('data-src');im.removeAttribute('data-src');}});
   if(_cpSlideTO){clearTimeout(_cpSlideTO);}
   slides.forEach(function(s,i){
     if(i===idx){s.style.zIndex=2;s.classList.add('on');}
