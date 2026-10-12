@@ -568,6 +568,26 @@ body.cursor-active{cursor:none;}
 .h-scroll{position:absolute;bottom:2.8rem;right:2rem;z-index:30;display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;}
 .h-scroll span{font-family:var(--mono);font-size:.7rem;letter-spacing:.15em;color:var(--faded);}
 .h-scroll-bar{width:1px;height:44px;background:linear-gradient(to bottom,var(--amber),transparent);animation:sb 2.2s ease-in-out infinite;}
+/* 手機（2026-10-13）：橫式輪播圖完整顯示、左右置中放在畫面上半部，文字移到圖片下方不互相遮住；空白處用同一張圖的模糊版填滿；文字邊距與字距縮小 */
+@media(max-width:700px){
+  .h-slide::before{content:'';position:absolute;inset:-40px;background:var(--hs-bg,none) center/cover no-repeat;filter:blur(24px) brightness(.5) saturate(.9);}
+  .h-slide img{object-fit:contain;object-position:50% 22%;filter:brightness(.92) saturate(.95);}
+  .h-content{justify-content:flex-end;padding:2rem 1.3rem 7.2rem;}
+  .h-eyebrow{font-size:.66rem;letter-spacing:.12em;line-height:1.7;margin-bottom:1.1rem;}
+  .h-sub{font-size:.74rem;letter-spacing:.06em;line-height:2;}
+  .h-btn{font-size:2.2rem;padding:.6rem;}
+  .h-btn.p{left:2px;}
+  .h-btn.n{right:2px;}
+}
+/* 手機閱讀（2026-10-13）：9px 左右的小字放大到 11.5px；小按鈕、資料來源連結、地圖標記加大可點範圍（外觀不變） */
+@media(max-width:700px){
+  .fa-kw,.fb-kw,.ff-tag,.ff-hint,.bud-card-tag,.sm-poster-label,.bud-flip-hint,.bud-flip-label,.aud-buy-en,
+  .src-note,.src-note a,.mflabel,.bud-eyebrow,.aud-stat-label,.bud-card-works,.bud-card-works strong{font-size:11.5px !important;}
+  .src-note a{display:inline-block;padding:9px 0;margin:-9px 0;}
+  .sm-poster-controls .sm-poster-btn{padding:10px 12px !important;margin:-10px -4px !important;}
+  .bud-card-head [style*="font-size:.62rem"],.bud-flip-front [style*="font-size:.64rem"],.bud-flip-back [style*="font-size:.62rem"]{font-size:11.5px !important;}
+  .mpin::after{content:'';position:absolute;inset:-10px;}
+}
 @keyframes sb{0%,100%{opacity:.25;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.25)}}
 
 /* ══ FILMSTRIP ══ */
@@ -4744,6 +4764,8 @@ function buildFS(id, order){
 
 // ══ HERO CAROUSEL ══
 var slides=document.querySelectorAll('.h-slide'), dotsEl=document.getElementById('hd'), frameEl=document.getElementById('hf'), progEl=document.getElementById('hp');
+// 手機：輪播圖上下的模糊背景用同一張圖（換圖時會跟著更新）
+document.querySelectorAll('.h-slide img').forEach(function(img){function setBg(){img.parentElement.style.setProperty('--hs-bg','url("'+(img.currentSrc||img.src)+'")');}if(img.complete&&img.naturalWidth)setBg();img.addEventListener('load',setBg);});
 var hI=0, hT;
 slides.forEach(function(_,i){ var d=document.createElement('div'); d.className='h-dot'+(i===0?' on':''); d.onclick=function(){hGo(i);}; dotsEl.appendChild(d); });
 function hGo(n){ slides[hI].classList.remove('active'); dotsEl.children[hI].classList.remove('on'); hI=((n%slides.length)+slides.length)%slides.length; slides[hI].classList.add('active'); dotsEl.children[hI].classList.add('on'); frameEl.textContent=(''+( hI+1)).padStart(3,'0'); progEl.style.width=((hI+1)/slides.length*100)+'%'; if(window.heroPtclBurst) heroPtclBurst(); }
