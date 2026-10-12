@@ -568,13 +568,14 @@ body.cursor-active{cursor:none;}
 .h-scroll{position:absolute;bottom:2.8rem;right:2rem;z-index:30;display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;}
 .h-scroll span{font-family:var(--mono);font-size:.7rem;letter-spacing:.15em;color:var(--faded);}
 .h-scroll-bar{width:1px;height:44px;background:linear-gradient(to bottom,var(--amber),transparent);animation:sb 2.2s ease-in-out infinite;}
-/* 手機（2026-10-13）：橫式輪播圖完整顯示、左右置中放在畫面上半部，文字移到圖片下方不互相遮住；空白處用同一張圖的模糊版填滿；文字邊距與字距縮小 */
+/* 手機（2026-10-13）：輪播圖放大、左右置中放在畫面上方（底部淡出），文字在圖片下方；其餘空白用同一張圖的模糊版填滿；小字加亮、加陰影 */
 @media(max-width:700px){
   .h-slide::before{content:'';position:absolute;inset:-40px;background:var(--hs-bg,none) center/cover no-repeat;filter:blur(24px) brightness(.5) saturate(.9);}
-  .h-slide img{object-fit:contain;object-position:50% 22%;filter:brightness(.92) saturate(.95);}
-  .h-content{justify-content:flex-end;padding:2rem 1.3rem 7.2rem;}
-  .h-eyebrow{font-size:.66rem;letter-spacing:.12em;line-height:1.7;margin-bottom:1.1rem;}
-  .h-sub{font-size:.74rem;letter-spacing:.06em;line-height:2;}
+  .h-slide img{inset:56px 0 auto 0;height:46vh;object-fit:cover;object-position:50% 50%;filter:brightness(.95) saturate(.95);-webkit-mask-image:linear-gradient(to bottom,#000 78%,transparent);mask-image:linear-gradient(to bottom,#000 78%,transparent);}
+  .h-content{justify-content:flex-end;padding:2rem 1.3rem 6.2rem;}
+  .h-eyebrow{font-size:.76rem;letter-spacing:.1em;line-height:1.6;margin-bottom:.8rem;font-weight:500;color:#F2B07A !important;text-shadow:0 1px 4px rgba(0,0,0,.95),0 0 16px rgba(0,0,0,.8);}
+  .h-sub{font-size:.76rem;letter-spacing:.06em;line-height:1.9;color:rgba(245,234,220,.82) !important;text-shadow:0 1px 6px rgba(0,0,0,.9);}
+  html .h-content .h-div{height:26px!important;margin:.9rem auto;}
   .h-btn{font-size:2.2rem;padding:.6rem;}
   .h-btn.p{left:2px;}
   .h-btn.n{right:2px;}
