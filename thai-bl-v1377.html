@@ -13,7 +13,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-19f">
+<meta name="site-build" content="2026-10-19g">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&amp;family=Noto+Sans+TC:wght@300;400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
@@ -1649,6 +1649,30 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
 #page-feature.feat-themed footer{background:var(--ft-bg2);}
 #feat-root .ic-cap{font-size:.74rem;letter-spacing:.04em;text-transform:none;color:rgb(var(--ft-text-rgb,245 237 216)/.55);line-height:1.6;margin-top:.6rem;}
 #feat-root .ic-slide img{filter:brightness(.92) saturate(1.05);}
+.dd-fb{display:grid;grid-template-columns:1fr 1.1fr;gap:3rem;align-items:start;}
+.dd-fb-text p{font-size:.9rem;line-height:1.9;color:rgba(245,237,216,.68);margin-bottom:1rem;}
+.dd-fb-text ul{list-style:none;padding:0;margin:1.2rem 0 0;}
+.dd-fb-text li{font-size:.84rem;color:rgba(245,237,216,.6);padding:.55rem 0;border-bottom:1px dashed rgba(245,237,216,.12);}
+.dd-fb-text li b{color:var(--sunset-gold);font-weight:600;margin-right:.5rem;}
+.dd-fb-card{border:1px solid rgba(232,134,58,.22);border-radius:14px;padding:1.8rem 1.8rem 2rem;background:rgba(255,255,255,.03);}
+.dd-fb-card .dd-fb-k{font-size:.7rem;letter-spacing:.24em;color:var(--sunset-gold);margin-bottom:.3rem;}
+.dd-fb-card .dd-fb-t{font-size:1.15rem;color:var(--phuket-sand);margin-bottom:1.3rem;}
+.dd-fb-g{margin-bottom:1rem;}
+.dd-fb-g label{display:block;font-size:.72rem;letter-spacing:.08em;color:rgba(245,237,216,.5);margin-bottom:.4rem;}
+.dd-fb-g input,.dd-fb-g textarea,.dd-fb-g select{width:100%;box-sizing:border-box;padding:.75rem .9rem;background:rgba(0,0,0,.25);border:1px solid rgba(245,237,216,.14);border-radius:6px;color:var(--phuket-sand);font-family:inherit;font-size:.88rem;outline:none;}
+.dd-fb-g select option{background:#1a1611;color:#f0ece5;}
+.dd-fb-g input::placeholder,.dd-fb-g textarea::placeholder{color:rgba(245,237,216,.3);}
+.dd-fb-g input:focus,.dd-fb-g textarea:focus,.dd-fb-g select:focus{border-color:rgba(232,134,58,.55);}
+.dd-fb-g textarea{min-height:130px;resize:vertical;}
+.dd-fb-btn{width:100%;padding:.9rem;border:none;border-radius:6px;background:var(--sunset-gold);color:#1a1209;font-weight:700;font-size:.92rem;letter-spacing:.15em;cursor:pointer;font-family:inherit;}
+.dd-fb-btn:disabled{opacity:.6;cursor:default;}
+.dd-fb-ok{display:none;text-align:center;padding:2rem 1rem;}
+.dd-fb-ok div:first-child{font-size:2.4rem;margin-bottom:.8rem;}
+.dd-fb-ok b{display:block;color:var(--sunset-peach);font-size:1rem;margin-bottom:.4rem;}
+.dd-fb-ok span{color:rgba(245,237,216,.6);font-size:.85rem;}
+#page-feature.feat-themed .dd-fb-card{border-color:rgb(var(--ft-acc-rgb)/.25);background:rgb(var(--ft-text-rgb)/.03);}
+#page-feature.feat-themed .dd-fb-text p,#page-feature.feat-themed .dd-fb-text li{color:rgb(var(--ft-text-rgb)/.68);}
+@media(max-width:760px){.dd-fb{grid-template-columns:1fr;gap:1.8rem;}.dd-fb-card{padding:1.4rem 1.2rem 1.6rem;}}
 #feat-root .cmp-photo{width:104px;height:104px;border-radius:50%;object-fit:cover;display:block;margin:0 auto .9rem;border:2px solid rgb(var(--ft-acc-rgb,232 134 58)/.45);}
 #feat-root .s2-badge .cmp-photo{border-color:rgb(var(--ft-acc2-rgb,75 168 160)/.5);}
 #feat-root .cmp-after{max-width:780px;margin-top:2.4rem;}
@@ -2963,6 +2987,7 @@ if('serviceWorker' in navigator&&location.hostname==='ivan99665.github.io'){navi
     </div>
 
 
+  <div id="itsay-fb"></div>
   <!-- ══ 深度專題系列清單 (unified with nav) ══ -->
   <div class="section-wrap" style="padding-bottom:3rem;">
     <p class="section-eyebrow">深度探索 · Deep Dive Series</p>
@@ -7020,6 +7045,40 @@ function featOst(p){
         +(link?'<a class="ost-link" href="'+featEsc(link)+'" target="_blank" rel="noopener">▶ 到 YouTube 收聽</a>':'')+'</div></div>';
     }).join('')+'</div></div>';
 }
+const DD_FB_ENDPOINT='https://formspree.io/f/meebgqek';
+document.addEventListener('DOMContentLoaded',function(){const el=document.getElementById('itsay-fb');if(el)el.innerHTML=featFeedback('以你的心詮釋我的愛');});
+function featFeedback(title){
+  const T=featEsc(title||'深度專題');
+  return '<div class="section-wrap dd-fb-sec"><p class="section-eyebrow">讀者回饋 · Reader Note</p>'
+    +'<h2 class="section-title">讀完這篇專題，有話想說嗎？</h2><div class="divider"></div>'
+    +'<div class="dd-fb"><div class="dd-fb-text">'
+    +'<p>不管是看完的心得、對劇情不一樣的解讀，還是發現文章裡有錯誤的地方，都歡迎留言告訴我。</p>'
+    +'<p>專題裡的台詞和資料我都盡量查證過，但難免有疏漏；如果你發現哪裡寫錯了，請一定要讓我知道，我會盡快修正。</p>'
+    +'<ul><li><b>心得分享</b>看完的感想、喜歡的段落、不同的觀點</li><li><b>內容勘誤</b>台詞、集數、人名或資料有錯</li><li><b>其他</b>想看的專題、排版問題或任何建議</li></ul></div>'
+    +'<div class="dd-fb-card"><div class="dd-fb-k">READER NOTE</div><div class="dd-fb-t">讀者回饋卡 💌</div>'
+    +'<form class="dd-fb-form" onsubmit="return ddFbSubmit(this)">'
+    +'<input type="hidden" name="專題" value="'+T+'"><input type="hidden" name="_subject" value="【深度專題回饋】'+T+'">'
+    +'<div class="dd-fb-g"><label>回饋類型</label><select name="回饋類型"><option>心得分享</option><option>內容勘誤</option><option>其他</option></select></div>'
+    +'<div class="dd-fb-g"><label>你的名字</label><input type="text" name="name" placeholder="請輸入你的名字" required></div>'
+    +'<div class="dd-fb-g"><label>Email</label><input type="email" name="email" placeholder="your@email.com" required></div>'
+    +'<div class="dd-fb-g"><label>回饋內容</label><textarea name="message" placeholder="例如：我對第五集那場告解有不一樣的看法……或是：某段台詞的集數好像寫錯了" required></textarea></div>'
+    +'<button type="submit" class="dd-fb-btn">送出回饋</button></form>'
+    +'<div class="dd-fb-ok"><div>🎬</div><b>回饋已送出！</b><span>謝謝你讀到最後，我會認真看每一則留言 🐰</span></div>'
+    +'</div></div></div>';
+}
+async function ddFbSubmit(form){
+  const btn=form.querySelector('.dd-fb-btn');
+  const sel=form.querySelector('select[name="回饋類型"]'),subj=form.querySelector('input[name="_subject"]');
+  if(sel&&subj&&!subj.dataset.base)subj.dataset.base=subj.value;
+  if(sel&&subj)subj.value=subj.dataset.base.replace('【深度專題回饋】','【深度專題回饋・'+sel.value+'】');
+  btn.textContent='傳送中…';btn.disabled=true;
+  try{
+    const res=await fetch(DD_FB_ENDPOINT,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+    if(res.ok){form.style.display='none';form.parentNode.querySelector('.dd-fb-ok').style.display='block';}
+    else{btn.textContent='送出失敗，請重試';btn.disabled=false;}
+  }catch(e){btn.textContent='送出失敗，請重試';btn.disabled=false;}
+  return false;
+}
 function featTab(t){
   if(t.layout==='compare'){
     const cm=featCmp(t),cols=cm.cols;
@@ -7176,7 +7235,7 @@ function featRender(d){
     h+='<div class="tabs" id="feat-tabs">'+tabs.map(function(t,i){return '<button class="tab'+(i?'':' active')+'" onclick="featTabGo('+i+')">'+featEsc(t.name)+'</button>';}).join('')+'</div>'
       +tabs.map(function(t,i){return '<div class="tab-panel feat-panel'+(i?'':' active')+'">'+featTab(t)+'</div>';}).join('');
   }
-  h+='</div>'+featCast(p)+featOst(p);
+  h+='</div>'+featCast(p)+featOst(p)+featFeedback(p.heroTitle||d.title);
   h+='<div class="section-wrap" style="padding-bottom:3rem;"><p class="section-eyebrow">深度探索 · Deep Dive Series</p><h2 class="section-title">更多深度專題</h2><div class="divider"></div>'
     +'<div id="feat-catalog-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;"></div></div>';
   h+='<footer><div class="footer-title">'+featEsc(p.footTitle||d.title)+'</div>'
