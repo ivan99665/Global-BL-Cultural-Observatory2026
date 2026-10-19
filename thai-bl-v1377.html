@@ -21,7 +21,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-19l">
+<meta name="site-build" content="2026-10-19m">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&amp;family=Noto+Sans+TC:wght@300;400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
@@ -1761,16 +1761,34 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
 .oa-meta{padding:.85rem 1rem 1rem;}
 .oa-meta b{display:block;color:var(--phuket-sand);font-size:.95rem;line-height:1.5;margin-bottom:.3rem;}
 .oa-meta span{font-size:.78rem;color:rgba(245,237,216,.5);}
-.oa-feature{max-width:760px;margin-bottom:3rem;}
-.oa-feature .oa-meta b{font-size:1.2rem;}
-.oa-row{margin-bottom:2.8rem;}
-.oa-row h3{color:var(--sunset-peach);font-size:1.2rem;margin-bottom:.3rem;}
-.oa-row-sub{font-size:.86rem;color:rgba(245,237,216,.55);margin-bottom:1rem;}
-.oa-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,300px);gap:1rem;overflow-x:auto;padding-bottom:.6rem;scroll-snap-type:x mandatory;}
-.oa-scroll .oa-card{scroll-snap-align:start;}
+.oa-shows{display:flex;flex-direction:column;gap:2rem;}
+.oa-show{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);border:1px solid rgba(232,134,58,.2);border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));transition:box-shadow .4s;}
+.oa-show.flash{box-shadow:0 0 0 2px var(--sunset-gold);}
+.oa-player{position:relative;aspect-ratio:16/9;background:#000;cursor:pointer;overflow:hidden;align-self:start;}
+.oa-player img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
+.oa-player:hover img{transform:scale(1.03);}
+.oa-player iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.oa-player .oa-play{width:64px;height:64px;font-size:1.3rem;}
+.oa-pl-cap{position:absolute;left:0;right:0;bottom:0;padding:2.4rem 1.1rem .9rem;background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff;font-size:.92rem;line-height:1.5;}
+.oa-side{padding:1.5rem 1.4rem;display:flex;flex-direction:column;min-width:0;}
+.oa-side h3{font-family:'Noto Serif TC',serif;color:var(--phuket-sand);font-size:1.45rem;line-height:1.35;margin:.35rem 0 .6rem;}
+.oa-show-meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.1rem;}
+.oa-show-meta span{font-size:.74rem;border-radius:20px;padding:.22rem .7rem;background:rgba(232,134,58,.1);color:var(--sunset-peach);}
+.oa-dd-btn{display:flex;justify-content:space-between;align-items:center;width:100%;background:rgba(0,0,0,.25);border:1px solid rgba(232,134,58,.3);color:var(--phuket-sand);border-radius:10px;padding:.7rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;}
+.oa-dd-btn i{font-style:normal;color:var(--sunset-gold);transition:transform .3s;}
+.oa-show.open .oa-dd-btn i{transform:rotate(180deg);}
+.oa-eps{display:none;margin-top:.6rem;max-height:290px;overflow-y:auto;border-radius:10px;border:1px solid rgba(232,134,58,.14);background:rgba(0,0,0,.15);}
+.oa-show.open .oa-eps{display:block;}
+.oa-eps-h{font-size:.72rem;letter-spacing:.12em;color:var(--sunset-gold);padding:.75rem 1rem .3rem;}
+.oa-ep{display:grid;grid-template-columns:3.2rem 1fr;gap:.1rem .6rem;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;color:inherit;padding:.55rem 1rem;cursor:pointer;font-family:inherit;}
+.oa-ep:hover{background:rgba(232,134,58,.07);}
+.oa-ep.on{background:rgba(232,134,58,.14);border-left-color:var(--sunset-gold);}
+.oa-ep b{color:var(--sunset-gold);font-size:.8rem;font-family:'Space Mono',monospace;grid-row:span 2;align-self:center;font-weight:400;}
+.oa-ep span{font-size:.88rem;color:var(--phuket-sand);line-height:1.5;}
+.oa-ep em{font-style:normal;font-size:.72rem;color:rgba(245,237,216,.45);}@media(min-width:701px){.oa-side{contain:size;}.oa-show.open .oa-eps{flex:1 1 0;min-height:0;max-height:none;}}
 .oa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem;}
-.oa-more{color:var(--sunset-gold);font-size:.88rem;text-decoration:none;}
-@media(max-width:700px){.oa-hero{padding:5.5rem 18px 1rem;}.oa-series{grid-template-columns:1fr;}.oa-scroll{grid-auto-columns:80%;}.oa-wrap.section-wrap{padding-left:18px;padding-right:18px;}.oa-intro,.oa-s p{font-size:.98rem;}}
+.oa-more{color:var(--sunset-gold);font-size:.88rem;text-decoration:none;white-space:nowrap;display:inline-block;}
+@media(max-width:700px){.oa-hero{padding:5.5rem 18px 1rem;}.oa-series{grid-template-columns:1fr;}.oa-show{grid-template-columns:1fr;border-radius:14px;}.oa-side{padding:1.2rem 1.1rem 1.3rem;}.oa-side h3{font-size:1.3rem;}.oa-eps{max-height:340px;}#feat-root .oa-grid{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:80%;overflow-x:auto;padding-bottom:.6rem;scroll-snap-type:x mandatory;}#feat-root .oa-grid .oa-card{scroll-snap-align:start;}.oa-wrap.section-wrap{padding-left:18px;padding-right:18px;}.oa-intro,.oa-s p{font-size:.98rem;}}
 #feat-root .cmp-photo{width:104px;height:104px;border-radius:50%;object-fit:cover;display:block;margin:0 auto .9rem;border:2px solid rgb(var(--ft-acc-rgb,232 134 58)/.45);}
 #feat-root .s2-badge .cmp-photo{border-color:rgb(var(--ft-acc2-rgb,75 168 160)/.5);}
 #feat-root .cmp-after{max-width:780px;margin-top:2.4rem;}
@@ -7638,7 +7656,7 @@ async function ddFbSubmit(form){
 }
 const K_ONAIR='tb-onair';
 const OA_TYPES=[['intro','劇集介紹','🎬'],['reaction','Reaction','🎥'],['chat','閒聊','💬']];
-function oaDef(){return {status:'soon',intro:'影音節目正在籌備中！我們會用影片陪你一起追泰國 BL：介紹新劇、一起看 Reaction，也聊聊那些讓人放不下的角色和台詞。',yt:'',ig:'',
+function oaDef(){return {status:'soon',intro:'「凌晨四點」的影音節目！我們用影片陪你一起追泰國 BL：介紹新劇、一起看 Reaction，也聊聊那些讓人放不下的角色和台詞。',yt:'',ig:'',
   names:{intro:'劇集介紹',reaction:'Reaction',chat:'閒聊'},
   series:{intro:'一集帶你認識一部劇：劇情、角色、看點，幫你決定要不要入坑。',reaction:'第一次看的真實反應，陪你一起尖叫、一起心碎。',chat:'看完劇的延伸閒聊：台詞、幕後、角色心理，什麼都聊。'},lists:{intro:'',reaction:'',chat:''},videos:[]};}
 function oaGet(){const d=oaDef();try{const r=JSON.parse(localStorage.getItem(K_ONAIR)||'null');if(r){Object.keys(r).forEach(function(k){if(k==='names'||k==='series'||k==='lists')Object.assign(d[k],r[k]||{});else d[k]=r[k];});}}catch(e){}if(!Array.isArray(d.videos))d.videos=[];return d;}
@@ -7654,10 +7672,11 @@ function oaCard(v,d){
   const u=String(v.url||'').trim(),link=/^https?:\/\//i.test(u)?u:'',img=oaThumb(v);
   return '<a class="oa-card"'+(link?' href="'+featEsc(link)+'" target="_blank" rel="noopener"':'')+'><div class="oa-thumb">'+(img?'<img loading="lazy" decoding="async" src="'+featEsc(img)+'" alt="">':'')
     +'<span class="oa-play">▶</span><span class="oa-badge">'+t[2]+' '+featEsc(d.names[t[0]]||t[1])+'</span></div>'
-    +'<div class="oa-meta"><b>'+featEsc(v.title||'')+'</b><span>'+featEsc([pv.drama,v.date].filter(Boolean).join(' · '))+'</span></div></a>';
+    +'<div class="oa-meta"><b>'+featEsc(String(v.title||'').replace(/^\s*【[^】]*】\s*/,''))+'</b><span>'+featEsc([pv.drama,v.date].filter(Boolean).join(' · '))+'</span></div></a>';
 }
 function oaLinks(d){
   const L=[];if(/^https?:\/\//i.test(d.yt||''))L.push('<a href="'+featEsc(d.yt)+'" target="_blank" rel="noopener">▶ YouTube 頻道</a>');
+  OA_TYPES.forEach(function(t){const pl=String(d.lists&&d.lists[t[0]]||'').trim();if(/^https?:\/\//i.test(pl))L.push('<a href="'+featEsc(pl)+'" target="_blank" rel="noopener">'+t[2]+' '+featEsc(d.names[t[0]]||t[1])+' 播放清單</a>');});
   if(/^https?:\/\//i.test(d.ig||''))L.push('<a href="'+featEsc(d.ig)+'" target="_blank" rel="noopener">📷 Instagram</a>');
   return L.length?'<div class="oa-links">'+L.join('')+'</div>':'';
 }
@@ -7672,32 +7691,79 @@ function oaWishForm(){
     +'<button type="submit" class="dd-fb-btn">送出許願</button></form>'
     +'<div class="dd-fb-ok"><div>📺</div><b>收到你的許願了！</b><span>開播後說不定就會聊到這部 🐰</span></div></div>';
 }
+let oaShowsData=[];
+function oaEp(v){const m=String(v.title||'').match(/EP\.?\s*(\d+)/i);return m?+m[1]:0;}
+function oaShort(v){const t=String(v.title||'').replace(/^\s*【[^】]*】\s*/,''),i=t.indexOf('｜');return i>=0?t.slice(i+1).trim():t;}
+function oaLabel(v,d){const p=oaParse(v),n=oaEp(v);return p.type==='reaction'?(n?'EP.'+n:'▶'):(p.type==='intro'?'介紹':'閒聊');}
+function oaShows(vids){
+  const map={},order=[];
+  vids.forEach(function(v){const k=oaParse(v).drama||'';if(!map[k]){map[k]=[];order.push(k);}map[k].push(v);});
+  const ti=function(v){return OA_TYPES.findIndex(function(t){return t[0]===oaParse(v).type;});};
+  return order.map(function(k){
+    const list=map[k].slice().sort(function(a,b){return ti(a)-ti(b)||oaEp(a)-oaEp(b)||String(a.date||'').localeCompare(String(b.date||''));});
+    let last=0;list.forEach(function(v,j){if(String(v.date||'')>String(list[last].date||''))last=j;});
+    return {name:k,list:list,sel:last,latest:String(list[last].date||'')};
+  }).sort(function(a,b){return (a.name?0:1)-(b.name?0:1)||b.latest.localeCompare(a.latest);});
+}
+function oaPlayerInner(v,d,auto){
+  const id=featYtId(v.url),p=oaParse(v),t=OA_TYPES.find(function(x){return x[0]===p.type;})||OA_TYPES[0];
+  if(auto&&id)return '<iframe src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0" title="'+featEsc(v.title||'')+'" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+  const img=oaThumb(v);
+  return (img?'<img loading="lazy" decoding="async" src="'+featEsc(img)+'" alt="">':'')+'<span class="oa-play">▶</span><span class="oa-badge">'+t[2]+' '+featEsc(d.names[t[0]]||t[1])+'</span>'
+    +'<div class="oa-pl-cap">'+featEsc(oaLabel(v,d)+'｜'+oaShort(v))+'</div>';
+}
+function oaShowHtml(sh,i,d,open){
+  const v=sh.list[sh.sel],cnt={};sh.list.forEach(function(x){const k=oaParse(x).type;cnt[k]=(cnt[k]||0)+1;});
+  let eps='',cur='';
+  sh.list.forEach(function(x,j){const k=oaParse(x).type;if(k!==cur){cur=k;const t=OA_TYPES.find(function(y){return y[0]===k;})||OA_TYPES[0];eps+='<div class="oa-eps-h">'+t[2]+' '+featEsc(d.names[k]||t[1])+'</div>';}
+    eps+='<button class="oa-ep'+(j===sh.sel?' on':'')+'" onclick="oaPlay('+i+','+j+')"><b>'+featEsc(oaLabel(x,d))+'</b><span>'+featEsc(oaShort(x))+'</span><em>'+featEsc(x.date||'')+'</em></button>';});
+  const meta=OA_TYPES.filter(function(t){return cnt[t[0]];}).map(function(t){return '<span>'+t[2]+' '+featEsc(d.names[t[0]]||t[1])+' '+cnt[t[0]]+'</span>';}).join('');
+  return '<div class="oa-show'+(open?' open':'')+'" id="oa-show-'+i+'" data-dr="'+featEsc(sh.name)+'">'
+    +'<div class="oa-player" id="oa-pl-'+i+'" onclick="oaEmbed('+i+')">'+oaPlayerInner(v,d,false)+'</div>'
+    +'<div class="oa-side"><p class="section-eyebrow" style="margin-bottom:0;">'+(sh.name?'劇集 · Series':'其他節目 · More')+'</p><h3>'+featEsc(sh.name||'其他節目')+'</h3>'
+    +'<div class="oa-show-meta">'+meta+'</div>'
+    +'<button class="oa-dd-btn" onclick="oaToggle('+i+')">選擇集數（'+sh.list.length+'）<i>▾</i></button><div class="oa-eps">'+eps+'</div></div></div>';
+}
+function oaToggle(i){const el=document.getElementById('oa-show-'+i);if(!el)return;el.classList.toggle('open');const e=el.querySelector('.oa-eps'),on=e&&e.querySelector('.oa-ep.on');if(on&&el.classList.contains('open'))e.scrollTop=on.offsetTop-e.offsetTop-40;}
+function oaEmbed(i){
+  const sh=oaShowsData[i];if(!sh)return;const v=sh.list[sh.sel],pl=document.getElementById('oa-pl-'+i);
+  if(pl&&pl.querySelector('iframe'))return;
+  if(featYtId(v.url)){pl.innerHTML=oaPlayerInner(v,oaGet(),true);}else if(/^https?:\/\//i.test(v.url||''))window.open(v.url,'_blank','noopener');
+}
+function oaPlay(i,j){
+  const sh=oaShowsData[i];if(!sh||!sh.list[j])return;sh.sel=j;const d=oaGet(),v=sh.list[j],el=document.getElementById('oa-show-'+i);
+  el.querySelectorAll('.oa-ep').forEach(function(b,k){b.classList.toggle('on',k===j);});
+  const pl=document.getElementById('oa-pl-'+i);pl.innerHTML=oaPlayerInner(v,d,!!featYtId(v.url));
+  if(window.matchMedia('(max-width:700px)').matches){el.classList.remove('open');window.scrollTo({top:pl.getBoundingClientRect().top+scrollY-80,behavior:'smooth'});}
+}
+function oaPick(dr){
+  const el=[].slice.call(document.querySelectorAll('#onair-root .oa-show')).find(function(x){return x.dataset.dr===dr;});if(!el)return;
+  window.scrollTo({top:el.getBoundingClientRect().top+scrollY-90,behavior:'smooth'});el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1800);
+}
 function onairRender(){
   const root=document.getElementById('onair-root');if(!root)return;
   const d=oaGet(),vids=d.videos.filter(function(v){return v&&v.url;}),live=d.status==='live'&&vids.length>0;
   const sub=document.getElementById('nav-oa-sub');if(sub)sub.textContent=live?'介紹・Reaction・閒聊':'影音節目・即將開播';
-  let h='<div class="oa-hero"><p class="section-eyebrow">ON AIR · 影音節目</p><h1>On Air'+(live?'':'<em>即將開播</em>')+'</h1><p class="oa-intro">'+featInline(d.intro)+'</p>'+oaLinks(d)+'</div>';
+  let h='<div class="oa-hero"><p class="section-eyebrow">ON AIR · 凌晨四點</p><h1>On Air'+(live?'':'<em>即將開播</em>')+'</h1><p class="oa-intro">'+featInline(d.intro)+'</p>'+oaLinks(d)+'</div>';
   if(live){
-    const s=vids.slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));});
-    h+='<div class="section-wrap oa-wrap"><p class="section-eyebrow">最新一集 · Latest</p><div class="oa-feature">'+oaCard(s[0],d)+'</div>';
-    OA_TYPES.forEach(function(t){const list=s.filter(function(v){return oaParse(v).type===t[0];});if(!list.length)return;const pl=String(d.lists&&d.lists[t[0]]||'').trim();
-      h+='<div class="oa-row"><h3>'+t[2]+' '+featEsc(d.names[t[0]])+'</h3><p class="oa-row-sub">'+featEsc(d.series[t[0]]||'')+(/^https?:\/\//i.test(pl)?'　<a class="oa-more" href="'+featEsc(pl)+'" target="_blank" rel="noopener">看完整播放清單 →</a>':'')+'</p><div class="oa-scroll">'+list.map(function(v){return oaCard(v,d);}).join('')+'</div></div>';});
-    h+='</div>';
+    oaShowsData=oaShows(vids);const open=!window.matchMedia('(max-width:700px)').matches;
+    h+='<div class="section-wrap oa-wrap"><div class="oa-shows">'+oaShowsData.map(function(sh,i){return oaShowHtml(sh,i,d,open);}).join('')+'</div></div>';
   }else{
     h+='<div class="section-wrap oa-wrap"><p class="section-eyebrow">節目預告 · Coming Soon</p><div class="oa-series">'
       +OA_TYPES.map(function(t){return '<div class="oa-s"><div class="oa-s-ic">'+t[2]+'</div><h3>'+featEsc(d.names[t[0]])+'</h3><p>'+featEsc(d.series[t[0]]||'')+'</p></div>';}).join('')+'</div>'
       +'<div class="oa-wish"><div class="oa-wish-h">你最想看我們聊哪部劇？</div><p class="oa-wish-p">開播前先來許願！不管是想看哪部劇的介紹、想陪我們一起 Reaction 的集數，還是想聽我們聊的話題，都可以留言告訴我們。</p>'+oaWishForm()+'</div></div>';
   }
   root.innerHTML=h;
+  root.querySelectorAll('.oa-eps').forEach(function(e){const on=e.querySelector('.oa-ep.on');if(on)e.scrollTop=on.offsetTop-e.offsetTop-40;});
 }
 function featOnair(d){
   const o=oaGet(),p=d.page||{};
   const hay=[d.title,d.sub,p.heroTitle,p.heroSub].filter(Boolean).join(' | ').toLowerCase();
-  const vids=o.videos.filter(function(v){const dr=v&&v.url?oaParse(v).drama:'';return dr&&hay.indexOf(dr.toLowerCase())>=0;}).slice(0,3);
+  const vids=o.videos.filter(function(v){const dr=v&&v.url?oaParse(v).drama:'';return dr&&hay.indexOf(dr.toLowerCase())>=0;}).slice(0,3);const fdr=vids.length?oaParse(vids[0]).drama:'';
   if(!vids.length)return '';
-  return '<div class="section-wrap"><p class="section-eyebrow">ON AIR · 影音節目</p><h2 class="section-title">我們聊過這部劇</h2><div class="divider"></div>'
+  return '<div class="section-wrap"><p class="section-eyebrow">ON AIR · 凌晨四點</p><h2 class="section-title">我們聊過這部劇</h2><div class="divider"></div>'
     +'<div class="oa-grid">'+vids.map(function(v){return oaCard(v,o);}).join('')+'</div>'
-    +'<p style="margin-top:1.3rem;"><a class="oa-more" href="#page-onair" onclick="showPage(\'onair\');return false;">看更多 On Air 節目 →</a></p></div>';
+    +'<p style="margin-top:1.3rem;"><a class="oa-more" href="#page-onair" data-dr="'+featEsc(fdr)+'" onclick="showPage(\'onair\');oaPick(this.dataset.dr);return false;">看《'+featEsc(fdr)+'》所有影片 →</a></p></div>';
 }
 function onairCmsBuild(){
   const el=document.getElementById('oa-cms');if(!el)return;const d=oaGet();
