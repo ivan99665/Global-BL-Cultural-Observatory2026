@@ -14,7 +14,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-19g">
+<meta name="site-build" content="2026-10-19i">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&amp;family=Noto+Sans+TC:wght@300;400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
@@ -1674,6 +1674,39 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
 #page-feature.feat-themed .dd-fb-card{border-color:rgb(var(--ft-acc-rgb)/.25);background:rgb(var(--ft-text-rgb)/.03);}
 #page-feature.feat-themed .dd-fb-text p,#page-feature.feat-themed .dd-fb-text li{color:rgb(var(--ft-text-rgb)/.68);}
 @media(max-width:760px){.dd-fb{grid-template-columns:1fr;gap:1.8rem;}.dd-fb-card{padding:1.4rem 1.2rem 1.6rem;}}
+#feat-root .feat-next{margin-top:2.6rem;text-align:right;}
+#feat-root .feat-next button{background:none;border:1px solid rgb(var(--ft-acc-rgb,232 134 58)/.4);color:var(--sunset-gold);border-radius:22px;padding:.6rem 1.2rem;font-size:.85rem;font-family:inherit;cursor:pointer;}
+#feat-root .feat-next button:hover{background:rgb(var(--ft-acc-rgb,232 134 58)/.12);}
+@media(max-width:600px){
+  #page-feature .section-wrap{padding:3.2rem 18px;}
+  #page-feature .itsay-quote{padding:2rem 6px;font-size:1.08rem;line-height:1.95;}
+  #page-feature .itsay-hero-text{padding-left:18px;padding-right:18px;}
+  #feat-tabs{flex-wrap:wrap;overflow:visible;margin-bottom:2rem;}
+  #feat-tabs .tab{flex:1 0 33.33%;box-sizing:border-box;text-align:center;padding:.75rem .2rem;font-size:.82rem;letter-spacing:.04em;}
+  #feat-root .panel-grid{gap:1.8rem;}
+  #feat-root .panel-text{font-size:1rem;line-height:1.95;}
+  #feat-root .panel-text p{margin-bottom:1.3rem;}
+  #feat-root .panel-hl{padding:1.3rem 1.1rem;}
+  #feat-root .panel-hl h4{font-size:1.05rem;}
+  #feat-root .ep-title{font-size:.98rem;}
+  #feat-root .ep-desc{font-size:.9rem;line-height:1.8;color:rgb(var(--ft-text-rgb,245 237 216)/.72);}
+  #feat-root .detail-value{font-size:.92rem;line-height:1.7;}
+  #feat-root .sym-tag{font-size:.86rem;}
+  #feat-root .feat-card h5{font-size:1.08rem;}
+  #feat-root .feat-card-t{font-size:.95rem;line-height:1.9;}
+  #feat-root .feat-card-b{padding:1.1rem 1.1rem 1.3rem;}
+  #feat-root .feat-cards-h h4{font-size:1.2rem;}
+  #feat-root .feat-cards-h p{font-size:.9rem;}
+  #feat-root .compare-table th,#feat-root .compare-table td{padding:.75rem .55rem;font-size:.86rem;}
+  #feat-root .season-badge h3{font-size:1.3rem;}
+  #feat-root .season-badge p{font-size:.86rem;}
+  #feat-root .actor-section .inner{padding:0 18px;}
+  #feat-root .actor-bio{font-size:.95rem;line-height:1.9;}
+  #feat-root .feat-ost-intro,#feat-root .dd-fb-text p{font-size:.95rem;}
+  #feat-root .ic-cap{font-size:.82rem;}
+  #feat-root .feat-next{text-align:center;}
+  #feat-root .feat-next button{width:100%;padding:.85rem;font-size:.92rem;}
+}
 #feat-root .cmp-photo{width:104px;height:104px;border-radius:50%;object-fit:cover;display:block;margin:0 auto .9rem;border:2px solid rgb(var(--ft-acc-rgb,232 134 58)/.45);}
 #feat-root .s2-badge .cmp-photo{border-color:rgb(var(--ft-acc2-rgb,75 168 160)/.5);}
 #feat-root .cmp-after{max-width:780px;margin-top:2.4rem;}
@@ -6988,6 +7021,7 @@ setInterval(function(){
   if(featHcTotal>1)featHcGo((featHcIdx+1)%featHcTotal);
   Object.keys(featIC).forEach(function(id){if(featIC[id].total>1)featMove(id,1);});
 },4000);
+function featTabsScroll(){const t=document.getElementById('feat-tabs');if(t){const y=t.getBoundingClientRect().top+scrollY-70;window.scrollTo({top:y,behavior:'smooth'});}}
 function featTabGo(i){
   document.querySelectorAll('#feat-tabs .tab').forEach(function(t,j){t.classList.toggle('active',j===i);});
   document.querySelectorAll('#feat-root .feat-panel').forEach(function(p,j){p.classList.toggle('active',j===i);});
@@ -7234,7 +7268,7 @@ function featRender(d){
   h+='<div class="section-wrap">'+(p.quote?'<div class="itsay-quote">'+featInline(p.quote)+'</div>':'');
   if(tabs.length){
     h+='<div class="tabs" id="feat-tabs">'+tabs.map(function(t,i){return '<button class="tab'+(i?'':' active')+'" onclick="featTabGo('+i+')">'+featEsc(t.name)+'</button>';}).join('')+'</div>'
-      +tabs.map(function(t,i){return '<div class="tab-panel feat-panel'+(i?'':' active')+'">'+featTab(t)+'</div>';}).join('');
+      +tabs.map(function(t,i){const nx=tabs[i+1];return '<div class="tab-panel feat-panel'+(i?'':' active')+'">'+featTab(t)+(nx?'<div class="feat-next"><button onclick="featTabGo('+(i+1)+');featTabsScroll()">下一頁：'+featEsc(nx.name)+' →</button></div>':'')+'</div>';}).join('');
   }
   h+='</div>'+featCast(p)+featOst(p)+featFeedback(p.heroTitle||d.title);
   h+='<div class="section-wrap" style="padding-bottom:3rem;"><p class="section-eyebrow">深度探索 · Deep Dive Series</p><h2 class="section-title">更多深度專題</h2><div class="divider"></div>'
