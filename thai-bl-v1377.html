@@ -21,7 +21,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-19m">
+<meta name="site-build" content="2026-10-19n">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&amp;family=Noto+Sans+TC:wght@300;400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
@@ -1780,12 +1780,19 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
 .oa-eps{display:none;margin-top:.6rem;max-height:290px;overflow-y:auto;border-radius:10px;border:1px solid rgba(232,134,58,.14);background:rgba(0,0,0,.15);}
 .oa-show.open .oa-eps{display:block;}
 .oa-eps-h{font-size:.72rem;letter-spacing:.12em;color:var(--sunset-gold);padding:.75rem 1rem .3rem;}
-.oa-ep{display:grid;grid-template-columns:3.2rem 1fr;gap:.1rem .6rem;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;color:inherit;padding:.55rem 1rem;cursor:pointer;font-family:inherit;}
+.oa-ep{display:grid;grid-template-columns:112px 1fr;grid-template-rows:auto 1fr;gap:.15rem .8rem;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;color:inherit;padding:.55rem .9rem;cursor:pointer;font-family:inherit;}
+.oa-ep-th{grid-row:span 2;position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#000;align-self:start;}
+.oa-ep-th img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85;transition:opacity .3s;}
+.oa-ep:hover .oa-ep-th img,.oa-ep.on .oa-ep-th img{opacity:1;}
+.oa-ep-th b{position:absolute;left:4px;bottom:4px;background:rgba(0,0,0,.72);color:var(--sunset-gold);font-size:.68rem;font-family:'Space Mono',monospace;font-weight:400;padding:.05rem .4rem;border-radius:4px;}
+.oa-ep-th i{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-style:normal;color:#fff;font-size:.9rem;background:rgba(0,0,0,.35);}
+.oa-ep.on .oa-ep-th i{display:flex;}
+.oa-ep.on .oa-ep-th{box-shadow:0 0 0 2px var(--sunset-gold);}
 .oa-ep:hover{background:rgba(232,134,58,.07);}
 .oa-ep.on{background:rgba(232,134,58,.14);border-left-color:var(--sunset-gold);}
-.oa-ep b{color:var(--sunset-gold);font-size:.8rem;font-family:'Space Mono',monospace;grid-row:span 2;align-self:center;font-weight:400;}
-.oa-ep span{font-size:.88rem;color:var(--phuket-sand);line-height:1.5;}
-.oa-ep em{font-style:normal;font-size:.72rem;color:rgba(245,237,216,.45);}@media(min-width:701px){.oa-side{contain:size;}.oa-show.open .oa-eps{flex:1 1 0;min-height:0;max-height:none;}}
+
+.oa-ep span{font-size:.86rem;color:var(--phuket-sand);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.oa-ep em{font-style:normal;font-size:.72rem;color:rgba(245,237,216,.45);}@media(min-width:701px){.oa-player{aspect-ratio:auto;align-self:stretch;min-height:340px;}.oa-player img{position:absolute;inset:0;}.oa-eps{max-height:236px;}.oa-side{padding:1.3rem 1.3rem;}.oa-side h3{margin:.25rem 0 .5rem;}.oa-show-meta{margin-bottom:.9rem;}}
 .oa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem;}
 .oa-more{color:var(--sunset-gold);font-size:.88rem;text-decoration:none;white-space:nowrap;display:inline-block;}
 @media(max-width:700px){.oa-hero{padding:5.5rem 18px 1rem;}.oa-series{grid-template-columns:1fr;}.oa-show{grid-template-columns:1fr;border-radius:14px;}.oa-side{padding:1.2rem 1.1rem 1.3rem;}.oa-side h3{font-size:1.3rem;}.oa-eps{max-height:340px;}#feat-root .oa-grid{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:80%;overflow-x:auto;padding-bottom:.6rem;scroll-snap-type:x mandatory;}#feat-root .oa-grid .oa-card{scroll-snap-align:start;}.oa-wrap.section-wrap{padding-left:18px;padding-right:18px;}.oa-intro,.oa-s p{font-size:.98rem;}}
@@ -7716,7 +7723,7 @@ function oaShowHtml(sh,i,d,open){
   const v=sh.list[sh.sel],cnt={};sh.list.forEach(function(x){const k=oaParse(x).type;cnt[k]=(cnt[k]||0)+1;});
   let eps='',cur='';
   sh.list.forEach(function(x,j){const k=oaParse(x).type;if(k!==cur){cur=k;const t=OA_TYPES.find(function(y){return y[0]===k;})||OA_TYPES[0];eps+='<div class="oa-eps-h">'+t[2]+' '+featEsc(d.names[k]||t[1])+'</div>';}
-    eps+='<button class="oa-ep'+(j===sh.sel?' on':'')+'" onclick="oaPlay('+i+','+j+')"><b>'+featEsc(oaLabel(x,d))+'</b><span>'+featEsc(oaShort(x))+'</span><em>'+featEsc(x.date||'')+'</em></button>';});
+    const im=oaThumb(x);eps+='<button class="oa-ep'+(j===sh.sel?' on':'')+'" onclick="oaPlay('+i+','+j+')"><div class="oa-ep-th">'+(im?'<img loading="lazy" decoding="async" src="'+featEsc(im)+'" alt="">':'')+'<b>'+featEsc(oaLabel(x,d))+'</b><i>▶</i></div><span>'+featEsc(oaShort(x))+'</span><em>'+featEsc(x.date||'')+'</em></button>';});
   const meta=OA_TYPES.filter(function(t){return cnt[t[0]];}).map(function(t){return '<span>'+t[2]+' '+featEsc(d.names[t[0]]||t[1])+' '+cnt[t[0]]+'</span>';}).join('');
   return '<div class="oa-show'+(open?' open':'')+'" id="oa-show-'+i+'" data-dr="'+featEsc(sh.name)+'">'
     +'<div class="oa-player" id="oa-pl-'+i+'" onclick="oaEmbed('+i+')">'+oaPlayerInner(v,d,false)+'</div>'
