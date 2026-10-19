@@ -14,7 +14,7 @@
   gtag('config', 'G-2WXJLCFY89');
 </script>
 <meta charset="UTF-8">
-<meta name="site-build" content="2026-10-19i">
+<meta name="site-build" content="2026-10-19j">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>泰國BL劇文化版圖 — 從地下到全球</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;900&amp;family=Noto+Sans+TC:wght@300;400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
@@ -1683,7 +1683,12 @@ body.theme-feat .nav-dd-menu{background:rgb(var(--fn-bg)/.97);border-color:rgb(v
   #page-feature .itsay-hero-text{padding-left:18px;padding-right:18px;}
   #feat-tabs{flex-wrap:wrap;overflow:visible;margin-bottom:2rem;}
   #feat-tabs .tab{flex:1 0 33.33%;box-sizing:border-box;text-align:center;padding:.75rem .2rem;font-size:.82rem;letter-spacing:.04em;}
-  #feat-root .panel-grid{gap:1.8rem;}
+  #feat-root .panel-grid{display:flex;flex-direction:column;gap:0;}
+  #feat-root .panel-grid>div{display:contents;}
+  #feat-root .panel-grid>.panel-text>p{order:1;}
+  #feat-root .panel-grid .ic-wrap{order:2;margin-top:.6rem !important;}
+  #feat-root .panel-grid .ic-cap{order:3;}
+  #feat-root .panel-grid .panel-hl{order:4;margin-top:2rem;}
   #feat-root .panel-text{font-size:1rem;line-height:1.95;}
   #feat-root .panel-text p{margin-bottom:1.3rem;}
   #feat-root .panel-hl{padding:1.3rem 1.1rem;}
